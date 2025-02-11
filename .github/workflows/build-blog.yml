@@ -36,10 +36,23 @@ jobs:
           echo '[' > posts.json
           first=true
           for file in blog-posts/*.md; do
+            echo "Processing: $file"
+            
             filename=$(basename "$file" .md)
             title=$(grep '^#title ' "$file" | sed 's/#title //')
             date=$(grep '^#date ' "$file" | sed 's/#date //')
             excerpt=$(awk 'NR>2 && NR<=7' "$file" | tr '\n' ' ')
+
+            echo "Extracted title: $title"
+            echo "Extracted date: $date"
+            echo "Extracted excerpt: $excerpt"
+
+            # If any field is empty, log the issue
+            if [ -z "$title" ] || [ -z "$date" ]; then
+              echo "Skipping $file (Missing title or date)"
+              continue
+            fi
+
             if [ "$first" = true ]; then
               first=false
             else
@@ -48,7 +61,10 @@ jobs:
             echo "  {\"slug\": \"$filename\", \"title\": \"$title\", \"date\": \"$date\", \"excerpt\": \"$excerpt\"}" >> posts.json
           done
           echo ']' >> posts.json
-      
+
+          echo "Generated posts.json:"
+          cat posts.json
+
       - name: Ensure posts.json is Added
         run: |
           if [ -f "posts.json" ]; then
