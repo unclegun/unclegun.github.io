@@ -31,16 +31,16 @@ jobs:
           else
             echo "<html><body><h1>No Blog Posts Found</h1></body></html>" > posts/index.html
           fi
-
+      
       - name: Generate posts.json
         run: |
           echo '[' > posts.json
           first=true
           for file in blog-posts/*.md; do
             filename=$(basename "$file" .md)
-            title=$(head -n 1 "$file" | sed 's/# //')
-            date=$(git log -1 --format=%ci "$file")
-            excerpt=$(head -n 5 "$file" | tail -n 3 | tr '\n' ' ')
+            title=$(grep '^#title ' "$file" | sed 's/#title //')
+            date=$(grep '^#date ' "$file" | sed 's/#date //')
+            excerpt=$(awk 'NR>2 && NR<=7' "$file" | tr '\n' ' ')
             if [ "$first" = true ]; then
               first=false
             else
