@@ -22,7 +22,11 @@ jobs:
           if compgen -G "blog-posts/*.md" > /dev/null; then
             for file in blog-posts/*.md; do
               filename=$(basename "$file" .md)
+              title=$(grep '^#title ' "$file" | sed 's/#title //')
+              date=$(grep '^#date ' "$file" | sed 's/#date //')
+              excerpt=$(awk 'NR>2 && NR<=7' "$file" | tr '\n' ' ')
               pandoc "$file" -f markdown -t html -o "posts/$filename.html"
+              echo "  {\"slug\": \"$filename\", \"title\": \"$title\", \"date\": \"$date\", \"excerpt\": \"$excerpt\"}" >> posts.json
             done
           else
             echo "<html><body><h1>No Blog Posts Found</h1></body></html>" > posts/index.html
