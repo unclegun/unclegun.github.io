@@ -36,20 +36,21 @@ for filename in os.listdir(BLOG_DIR):
         excerpt_lines = [line.strip() for line in content_lines if line.strip()]
         excerpt = " ".join(excerpt_lines[:5]) if excerpt_lines else ""
 
-        # Extract unordered list items (- item)
+        # Convert lists into HTML format
         list_items = [re.sub(r"^- ", "", line.strip()) for line in content_lines if line.strip().startswith("- ")]
+        formatted_list = "".join(f"<li>{item}</li>" for item in list_items)
+        list_html = f"<ul>{formatted_list}</ul>" if formatted_list else ""
 
-        # Append post data, including lists if available
+        # Convert newlines to <p> tags
+        body_html = "<p>" + "</p><p>".join(excerpt.split("\n")) + "</p>"
+
+        # Append post data
         post_data = {
             "slug": filename.replace(".md", ""),
             "title": title,
             "date": date,
-            "excerpt": excerpt
+            "excerpt": body_html + list_html  # Combine paragraph and list formatting
         }
-
-        # Only include 'list' if there are actual list items
-        if list_items:
-            post_data["list"] = list_items
 
         posts.append(post_data)
 
