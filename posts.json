@@ -3,21 +3,12 @@
     "slug": "First Post",
     "title": "Oh Hello There",
     "date": "2025-02-01",
-    "excerpt": "This is a test of me making a blog post. Hope this works (crosses fingers)."
+    "excerpt": "<p>This is a test of me making a blog post. Hope this works (crosses fingers).</p>"
   },
   {
     "slug": "We have arrived",
     "title": "we have arrived",
     "date": "2025-02-11",
-    "excerpt": "welp it took me two days but I propped up this site. I knew nothing about github pages and all the hoops involved, but hey we're here. Let me recap for those who may decide to set up a static website in the most back asswards way possible: - create a repo in github named username.github.io - this will be your site (just like mine!) - enable github pages in the settings and set it to the main branch (if you toggle between main/docs/none/whatever you'll be able to save changes. fun feature.) - add some pages to the repo root. this will be the funnest part of the process. - commit and push that shiz and if you're lucky it'll be up and running",
-    "list": [
-      "create a repo in github named username.github.io - this will be your site (just like mine!)",
-      "enable github pages in the settings and set it to the main branch (if you toggle between main/docs/none/whatever you'll be able to save changes. fun feature.)",
-      "add some pages to the repo root. this will be the funnest part of the process.",
-      "commit and push that shiz and if you're lucky it'll be up and running",
-      "actions uses a yml file to give a whole bunch instructions to github that can automate things. neat!",
-      "I needed this to generate the json (and eventually the html) behind each blog post because github pages is static so there's no backend out of the box",
-      "sooooo you gotta create a authentication token (the classic one not the new one... for reasons), then add that token into the yml and after several fights with chatGPT (who will now be referred to as Jeeves) we have a json file that is generated with builds the html pages which is committed through the actions. yeah."
-    ]
+    "excerpt": "<p>welp it took me two days but I propped up this site. I knew nothing about github pages and all the hoops involved, but hey we're here. Let me recap for those who may decide to set up a static website in the most back asswards way possible: - create a repo in github named username.github.io - this will be your site (just like mine!) - enable github pages in the settings and set it to the main branch (if you toggle between main/docs/none/whatever you'll be able to save changes. fun feature.) - add some pages to the repo root. this will be the funnest part of the process. - commit and push that shiz and if you're lucky it'll be up and running</p><ul><li>create a repo in github named username.github.io - this will be your site (just like mine!)</li><li>enable github pages in the settings and set it to the main branch (if you toggle between main/docs/none/whatever you'll be able to save changes. fun feature.)</li><li>add some pages to the repo root. this will be the funnest part of the process.</li><li>commit and push that shiz and if you're lucky it'll be up and running</li><li>actions uses a yml file to give a whole bunch instructions to github that can automate things. neat!</li><li>I needed this to generate the json (and eventually the html) behind each blog post because github pages is static so there's no backend out of the box</li><li>sooooo you gotta create a authentication token (the classic one not the new one... for reasons), then add that token into the yml and after several fights with chatGPT (who will now be referred to as Jeeves) we have a json file that is generated with builds the html pages which is committed through the actions. yeah.</li></ul>"
   }
 ]
