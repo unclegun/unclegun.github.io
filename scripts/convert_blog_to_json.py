@@ -2,9 +2,12 @@ import os
 import json
 import re
 
-# Set the blog directory and output file path
-BLOG_DIR = r"E:\Development\unclegun.github.io\blog-posts"
-OUTPUT_FILE = r"E:\Development\unclegun.github.io\posts.json"
+# Get the repo root dynamically (assumes script is inside scripts/)
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+# Define relative paths
+BLOG_DIR = os.path.join(REPO_ROOT, "blog-posts")
+OUTPUT_FILE = os.path.join(REPO_ROOT, "posts.json")
 
 # List to store post data
 posts = []
