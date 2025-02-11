@@ -16,13 +16,18 @@ jobs:
       - name: Install Pandoc
         run: sudo apt-get install -y pandoc
       
-      - name: Convert Markdown to HTML
+            - name: Convert Markdown to HTML
         run: |
           mkdir -p posts
-          for file in blog-posts/*.md; do
-            filename=$(basename "$file" .md)
-            pandoc "$file" -f markdown -t html -o "posts/$filename.html"
-          done
+          if compgen -G "blog-posts/*.md" > /dev/null; then
+            for file in blog-posts/*.md; do
+              filename=$(basename "$file" .md)
+              pandoc "$file" -f markdown -t html -o "posts/$filename.html"
+            done
+          else
+            echo "<html><body><h1>No Blog Posts Found</h1></body></html>" > posts/index.html
+          fi
+
       
       - name: Generate posts.json
         run: |
@@ -49,12 +54,14 @@ jobs:
           fetch-depth: 0
 
       - name: Commit and Push Changes
-        env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/unclgun/unclgun.github.io.git
-          git add posts posts.json
-          git commit -m "Auto-generate blog posts" || echo "No changes to commit"
-          git push origin main
+          if [ -d "posts" ] && [ "$(ls -A posts)" ]; then
+            git add posts posts.json
+            git commit -m "Auto-generate blog posts" || echo "No changes to commit"
+            git push origin main
+          else
+            echo "No new blog posts to commit."
+          fi
+
