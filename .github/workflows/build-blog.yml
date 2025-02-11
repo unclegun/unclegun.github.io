@@ -68,7 +68,20 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add posts posts.json
-          git status
-          git commit -m "Auto-generate blog posts" || echo "No changes to commit"
-          git push origin main
+
+          # Ensure the posts/ directory exists
+          if [ ! -d "posts" ]; then
+            echo "Creating posts/ directory..."
+            mkdir -p posts
+          fi
+
+          # Check if posts/ contains files
+          if [ "$(ls -A posts 2>/dev/null)" ]; then
+            echo "Adding posts and posts.json to git..."
+            git add posts posts.json
+            git status  # Debugging: Show staged files
+            git commit -m "Auto-generate blog posts" || echo "No changes to commit"
+            git push origin main
+          else
+            echo "No new blog posts to commit."
+          fi
