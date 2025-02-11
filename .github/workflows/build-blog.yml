@@ -19,7 +19,7 @@ jobs:
       - name: Install Pandoc
         run: sudo apt-get install -y pandoc
       
-      - name: Convert Markdown to HTML
+            - name: Convert Markdown to HTML
         run: |
           mkdir -p posts
           if compgen -G "blog-posts/*.md" > /dev/null; then
@@ -28,15 +28,20 @@ jobs:
               title=$(grep '^#title ' "$file" | sed 's/#title //')
               date=$(grep '^#date ' "$file" | sed 's/#date //')
 
-              pandoc "$file" -f markdown -t html \
+              # Remove metadata lines (first two lines)
+              sed '1,2d' "$file" > "temp.md"
+
+              # Convert Markdown to HTML with custom template
+              pandoc "temp.md" -f markdown -t html \
                 --template=blog-template.html \
                 -V title="$title" -V date="$date" \
                 -o "posts/$filename.html"
+
+              rm temp.md
             done
           else
             echo "<html><body><h1>No Blog Posts Found</h1></body></html>" > posts/index.html
           fi
-
       
       - name: Generate posts.json
         run: |
