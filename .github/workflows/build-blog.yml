@@ -21,6 +21,22 @@ jobs:
           sudo apt-get install -y pandoc
           sudo apt-get install -y python3 python3-pip
 
+      # 🔹 Run Python script to generate JSON **BEFORE** converting Markdown to HTML
+      - name: Run Python Script to Generate posts.json
+        run: |
+          python3 scripts/convert_blog_to_json.py
+
+      - name: Ensure posts.json is Present
+        run: |
+          ls -lah
+          if [ -f "posts.json" ]; then
+            echo "posts.json is still here before commit."
+          else
+            echo "ERROR: posts.json disappeared before commit!"
+            exit 1
+          fi
+
+      # 🔹 Convert Markdown to HTML AFTER JSON is generated
       - name: Convert Markdown to HTML
         run: |
           mkdir -p posts
@@ -43,38 +59,4 @@ jobs:
             done
           else
             echo "<html><body><h1>No Blog Posts Found</h1></body></html>" > posts/index.html
-          fi
-
-      - name: Run Python Script to Generate posts.json
-        run: |
-          python3 scripts/convert_blog_to_json.py
-
-      - name: Ensure posts.json is Present
-        run: |
-          ls -lah
-          if [ -f "posts.json" ]; then
-            echo "posts.json is still here before commit."
-          else
-            echo "ERROR: posts.json disappeared before commit!"
-            exit 1
-          fi
-
-      - name: Commit and Push Changes
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-
-          if [ ! -s "posts.json" ]; then
-            echo "ERROR: posts.json is missing before commit!"
-            exit 1
-          fi
-
-          git add posts.json posts || echo "Nothing to add"
-          git status
-          
-          if git diff --cached --quiet; then
-            echo "No changes detected, skipping commit."
-          else
-            git commit -m "Auto-generate blog posts"
-            git push origin main
           fi
