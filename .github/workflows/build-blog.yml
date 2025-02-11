@@ -34,18 +34,14 @@ jobs:
       
       - name: Generate posts.json
         run: |
-          echo "Checking blog posts directory..."
-          ls -l blog-posts/
           echo '[' > posts.json
           first=true
           for file in blog-posts/*.md; do
-            echo "Processing: $file"
             filename=$(basename "$file" .md)
             title=$(grep '^#title ' "$file" | sed 's/#title //')
             date=$(grep '^#date ' "$file" | sed 's/#date //')
             excerpt=$(awk 'NR>2 && NR<=7' "$file" | tr '\n' ' ')
-
-            # Handle empty values
+            
             if [ -z "$title" ] || [ -z "$date" ]; then
               echo "Skipping $file (Missing title or date)"
               continue
@@ -56,6 +52,7 @@ jobs:
             else
               echo ',' >> posts.json
             fi
+
             echo "  {\"slug\": \"$filename\", \"title\": \"$title\", \"date\": \"$date\", \"excerpt\": \"$excerpt\"}" >> posts.json
           done
           echo ']' >> posts.json
@@ -69,23 +66,23 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           fetch-depth: 0
 
-      - name: Commit and Push Changes
+       - name: Commit and Push Changes
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-          if [ -f "posts.json" ]; then
-            echo "posts.json exists. Adding it to git..."
-          else
+          # Ensure posts.json exists
+          if [ ! -f "posts.json" ]; then
             echo "ERROR: posts.json was not found!"
             exit 1
           fi
 
-          if [ -d "posts" ] && [ "$(ls -A posts)" ]; then
-            git add posts posts.json
-            git status  # Debugging step to confirm files are staged
-            git commit -m "Auto-generate blog posts" || echo "No changes to commit"
-            git push origin main
+          git add posts.json posts/
+          git status  # Debugging: Ensure files are staged
+          
+          if git diff --cached --quiet; then
+            echo "No changes detected, skipping commit."
           else
-            echo "No new blog posts to commit."
+            git commit -m "Auto-generate blog posts"
+            git push origin main
           fi
