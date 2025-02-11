@@ -1,3 +1,5 @@
 [
   {"slug": "First Post", "title": "Oh Hello There", "date": "2025-02-01", "excerpt": " This is a test of me making a blog post. Hope this works (crosses fingers). "}
+,
+  {"slug": "We have arrived", "title": "we have arrived", "date": "2025-02-11", "excerpt": " welp it took me two days but I propped up this site. I knew nothing about github pages and all the hoops involved, but hey we're here. Let me recap for those who may decide to set up a static website in the most back asswards way possible: - create a repo in github named username.github.io - this will be your site (just like mine!) - enable github pages in the settings and set it to the main branch (if you toggle between main/docs/none/whatever you'll be able to save changes. fun feature.) - add some pages to the repo root. this will be the funnest part of the process. "}
 ]
