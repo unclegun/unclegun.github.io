@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(posts => {
             const blogContainer = document.getElementById("blog-posts");
+            if (!blogContainer) return;
             posts.forEach(post => {
                 const postElement = document.createElement("article");
                 postElement.innerHTML = `
@@ -12,5 +13,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 `;
                 blogContainer.appendChild(postElement);
             });
-        });
+        })
+        .catch(error => console.error("Error loading blog posts:", error));
 });
