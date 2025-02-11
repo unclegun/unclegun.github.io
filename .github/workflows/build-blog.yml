@@ -26,7 +26,6 @@ jobs:
               date=$(grep '^#date ' "$file" | sed 's/#date //')
               excerpt=$(awk 'NR>2 && NR<=7' "$file" | tr '\n' ' ')
               pandoc "$file" -f markdown -t html -o "posts/$filename.html"
-              echo "  {\"slug\": \"$filename\", \"title\": \"$title\", \"date\": \"$date\", \"excerpt\": \"$excerpt\"}" >> posts.json
             done
           else
             echo "<html><body><h1>No Blog Posts Found</h1></body></html>" > posts/index.html
@@ -41,48 +40,35 @@ jobs:
             title=$(grep '^#title ' "$file" | sed 's/#title //')
             date=$(grep '^#date ' "$file" | sed 's/#date //')
             excerpt=$(awk 'NR>2 && NR<=7' "$file" | tr '\n' ' ')
-            
-            if [ -z "$title" ] || [ -z "$date" ]; then
-              echo "Skipping $file (Missing title or date)"
-              continue
-            fi
-
             if [ "$first" = true ]; then
               first=false
             else
               echo ',' >> posts.json
             fi
-
             echo "  {\"slug\": \"$filename\", \"title\": \"$title\", \"date\": \"$date\", \"excerpt\": \"$excerpt\"}" >> posts.json
           done
           echo ']' >> posts.json
-
-          echo "Generated posts.json:"
-          cat posts.json
-
-      - name: Checkout repository
+      
+      - name: Ensure posts.json is Added
+        run: |
+          if [ -f "posts.json" ]; then
+            echo "posts.json exists. Adding it to git..."
+          else
+            echo "ERROR: posts.json was not found!"
+            exit 1
+          fi
+      
+      - name: Checkout repository with Token
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_PAT }}
           fetch-depth: 0
 
-       - name: Commit and Push Changes
+      - name: Commit and Push Changes
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-
-          # Ensure posts.json exists
-          if [ ! -f "posts.json" ]; then
-            echo "ERROR: posts.json was not found!"
-            exit 1
-          fi
-
-          git add posts.json posts/
-          git status  # Debugging: Ensure files are staged
-          
-          if git diff --cached --quiet; then
-            echo "No changes detected, skipping commit."
-          else
-            git commit -m "Auto-generate blog posts"
-            git push origin main
-          fi
+          git add posts posts.json
+          git status
+          git commit -m "Auto-generate blog posts" || echo "No changes to commit"
+          git push origin main
