@@ -14,22 +14,24 @@
             <ul>
                 <li><a href="../index.html">Home</a></li>
                 <li><a href="../projects.html">Projects</a></li>
-                <li><a href="blog.html">Blog</a></li>
+                <li><a href="../blog.html">Blog</a></li>
             </ul>
         </nav>
     </header>
     
-    <main class="blog-content">
-        <article class="blog-article">
-            <h2 class="blog-title">$title$</h2>
-            <p class="blog-date"><em>Published on $date$</em></p>
-            <div class="blog-body">
-                $body$
-            </div>
-        </article>
+    <main>
+        <section>
+            <article>
+                <h2>$title$</h2>
+                <p><em>Published on $date$</em></p>
+                <div>
+                    {{content}}
+                </div>
+            </article>
+        </section>
     </main>
     
-    <footer class="blog-footer">
+    <footer>
         <p>&copy; 2025 My Portfolio</p>
     </footer>
 </body>
