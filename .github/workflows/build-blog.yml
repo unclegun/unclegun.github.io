@@ -62,7 +62,7 @@ jobs:
 
           echo "Generated posts.json:"
           cat posts.json
-          
+
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
@@ -73,8 +73,17 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
+
+          if [ -f "posts.json" ]; then
+            echo "posts.json exists. Adding it to git..."
+          else
+            echo "ERROR: posts.json was not found!"
+            exit 1
+          fi
+
           if [ -d "posts" ] && [ "$(ls -A posts)" ]; then
             git add posts posts.json
+            git status  # Debugging step to confirm files are staged
             git commit -m "Auto-generate blog posts" || echo "No changes to commit"
             git push origin main
           else
