@@ -43,6 +43,15 @@
       opacity: 0.8;
     }
   }
+  .img-home{
+    max-width: 300px;
+    display: block;
+    margin: 10px auto;
+  }
+  .p-img{
+    text-align: center;
+    font-size: 1em;
+  }
 
   /* Blog Page Styling */
     .blog-post {
