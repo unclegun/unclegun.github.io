@@ -32,15 +32,25 @@ jobs:
             echo "<html><body><h1>No Blog Posts Found</h1></body></html>" > posts/index.html
           fi
       
-      - name: Generate posts.json
+            - name: Generate posts.json
         run: |
+          echo "Checking blog posts directory..."
+          ls -l blog-posts/
           echo '[' > posts.json
           first=true
           for file in blog-posts/*.md; do
+            echo "Processing: $file"
             filename=$(basename "$file" .md)
             title=$(grep '^#title ' "$file" | sed 's/#title //')
             date=$(grep '^#date ' "$file" | sed 's/#date //')
             excerpt=$(awk 'NR>2 && NR<=7' "$file" | tr '\n' ' ')
+
+            # Handle empty values
+            if [ -z "$title" ] || [ -z "$date" ]; then
+              echo "Skipping $file (Missing title or date)"
+              continue
+            fi
+
             if [ "$first" = true ]; then
               first=false
             else
@@ -49,6 +59,10 @@ jobs:
             echo "  {\"slug\": \"$filename\", \"title\": \"$title\", \"date\": \"$date\", \"excerpt\": \"$excerpt\"}" >> posts.json
           done
           echo ']' >> posts.json
+
+          echo "Generated posts.json:"
+          cat posts.json
+
 
       - name: Checkout repository
         uses: actions/checkout@v3
