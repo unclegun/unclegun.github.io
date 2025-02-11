@@ -16,7 +16,7 @@ jobs:
       - name: Install Pandoc
         run: sudo apt-get install -y pandoc
       
-            - name: Convert Markdown to HTML
+      - name: Convert Markdown to HTML
         run: |
           mkdir -p posts
           if compgen -G "blog-posts/*.md" > /dev/null; then
@@ -28,7 +28,6 @@ jobs:
             echo "<html><body><h1>No Blog Posts Found</h1></body></html>" > posts/index.html
           fi
 
-      
       - name: Generate posts.json
         run: |
           echo '[' > posts.json
@@ -64,4 +63,3 @@ jobs:
           else
             echo "No new blog posts to commit."
           fi
-
