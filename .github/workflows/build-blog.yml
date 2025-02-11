@@ -32,7 +32,7 @@ jobs:
             echo "<html><body><h1>No Blog Posts Found</h1></body></html>" > posts/index.html
           fi
       
-            - name: Generate posts.json
+      - name: Generate posts.json
         run: |
           echo "Checking blog posts directory..."
           ls -l blog-posts/
@@ -62,8 +62,7 @@ jobs:
 
           echo "Generated posts.json:"
           cat posts.json
-
-
+          
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
