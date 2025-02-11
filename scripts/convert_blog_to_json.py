@@ -33,26 +33,33 @@ for filename in os.listdir(BLOG_DIR):
         content_lines = lines[2:]
 
         # Extract unordered list items (- item)
-        list_items = [line.strip() for line in content_lines if line.strip().startswith("- ")]
-        formatted_list = "".join(f"<li>{re.sub(r'^- ', '', item)}</li>" for item in list_items)
-        list_html = f"<ul>{formatted_list}</ul>" if formatted_list else ""
+        list_items = []
+        formatted_text = []
+        
+        for line in content_lines:
+            stripped_line = line.strip()
+            if stripped_line.startswith("- "):
+                list_items.append(re.sub(r"^- ", "", stripped_line))
+            else:
+                # If there's a list collected, flush it into formatted_text
+                if list_items:
+                    formatted_text.append("<ul>" + "".join(f"<li>{item}</li>" for item in list_items) + "</ul>")
+                    list_items = []  # Reset list
+                formatted_text.append(f"<p>{stripped_line}</p>")  # Treat normal lines as paragraphs
 
-        # Remove list items from content_lines to avoid duplication
-        content_without_lists = [line for line in content_lines if line.strip() not in list_items]
+        # Flush any remaining list at the end of the document
+        if list_items:
+            formatted_text.append("<ul>" + "".join(f"<li>{item}</li>" for item in list_items) + "</ul>")
 
-        # Extract excerpt (first 5 non-empty lines)
-        excerpt_lines = [line.strip() for line in content_without_lists if line.strip()]
-        excerpt = " ".join(excerpt_lines[:5]) if excerpt_lines else ""
-
-        # Convert newlines to <p> tags
-        body_html = "<p>" + "</p><p>".join(excerpt.split("\n")) + "</p>"
+        # Join the formatted text
+        formatted_body = "".join(formatted_text)
 
         # Append post data
         post_data = {
             "slug": filename.replace(".md", ""),
             "title": title,
             "date": date,
-            "excerpt": body_html + list_html  # Combine paragraph and list formatting
+            "excerpt": formatted_body
         }
 
         posts.append(post_data)
