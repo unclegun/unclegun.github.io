@@ -64,16 +64,22 @@ jobs:
           done
           echo ']' >> posts.json
 
-          # Debugging: Print posts.json to confirm it exists
-          echo "Final posts.json contents:"
-          cat posts.json
-
-      - name: Ensure posts.json is Added
-        run: |
-          if [ -f "posts.json" ]; then
-            echo "posts.json exists. Adding it to git..."
+          # Ensure posts.json is really there before moving to the next step
+          if [ -s "posts.json" ]; then
+            echo "posts.json successfully generated!"
+            cat posts.json
           else
-            echo "ERROR: posts.json was not found!"
+            echo "ERROR: posts.json is empty or missing after generation!"
+            exit 1
+          fi
+      
+      - name: Ensure posts.json is Present
+        run: |
+          ls -lah
+          if [ -f "posts.json" ]; then
+            echo "posts.json is still here before commit."
+          else
+            echo "ERROR: posts.json disappeared before commit!"
             exit 1
           fi
       
@@ -88,18 +94,20 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-          # Ensure posts.json exists and is not empty
-          if [ -s "posts.json" ]; then
-            echo "posts.json exists and is not empty. Adding it to git..."
-          else
-            echo "ERROR: posts.json is empty or missing!"
+          # Ensure posts.json exists before adding
+          if [ ! -s "posts.json" ]; then
+            echo "ERROR: posts.json is missing before commit!"
             exit 1
           fi
 
-          # Debugging: Show file status before commit
-          git status
-          
           # Ensure Git recognizes changes
           git add posts.json posts || echo "Nothing to add"
-          git commit -m "Auto-generate blog posts" || echo "No changes to commit"
-          git push origin main || echo "No changes to push"
+          git status
+          
+          # Check if any changes were staged
+          if git diff --cached --quiet; then
+            echo "No changes detected, skipping commit."
+          else
+            git commit -m "Auto-generate blog posts"
+            git push origin main
+          fi
