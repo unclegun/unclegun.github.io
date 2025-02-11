@@ -85,19 +85,22 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-          # Ensure the posts/ directory exists
-          if [ ! -d "posts" ]; then
-            echo "Creating posts/ directory..."
-            mkdir -p posts
+          # Check if posts.json exists and is not empty
+          if [ -s "posts.json" ]; then
+            echo "posts.json exists and is not empty. Adding it to git..."
+          else
+            echo "ERROR: posts.json is empty or missing!"
+            exit 1
           fi
 
-          # Check if posts/ contains files
-          if [ "$(ls -A posts 2>/dev/null)" ]; then
-            echo "Adding posts and posts.json to git..."
-            git add posts posts.json
-            git status  # Debugging: Show staged files
-            git commit -m "Auto-generate blog posts" || echo "No changes to commit"
-            git push origin main
+          # Ensure Git recognizes changes
+          git add posts.json posts || echo "Nothing to add"
+          git status
+
+          # Commit only if there are changes
+          if git diff --cached --quiet; then
+            echo "No changes detected, skipping commit."
           else
-            echo "No new blog posts to commit."
+            git commit -m "Auto-generate blog posts"
+            git push origin main
           fi
