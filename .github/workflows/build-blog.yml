@@ -47,7 +47,7 @@ jobs:
 
       - name: Run Python Script to Generate posts.json
         run: |
-          python3 convert_blog_to_json.py
+          python3 scripts/convert_blog_to_json.py
 
       - name: Ensure posts.json is Present
         run: |
