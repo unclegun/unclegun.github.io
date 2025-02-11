@@ -16,9 +16,11 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           fetch-depth: 0
 
-      - name: Install Pandoc
-        run: sudo apt-get install -y pandoc
-      
+      - name: Install Dependencies
+        run: |
+          sudo apt-get install -y pandoc
+          sudo apt-get install -y python3 python3-pip
+
       - name: Convert Markdown to HTML
         run: |
           mkdir -p posts
@@ -42,52 +44,10 @@ jobs:
           else
             echo "<html><body><h1>No Blog Posts Found</h1></body></html>" > posts/index.html
           fi
-      
-      - name: Generate posts.json
+
+      - name: Run Python Script to Generate posts.json
         run: |
-          echo "Generating posts.json..."
-          echo '[' > posts.json
-          first=true
-          for file in blog-posts/*.md; do
-            echo "Processing: $file"
-            
-            filename=$(basename "$file" .md)
-            title=$(grep '^#title ' "$file" | sed 's/#title //')
-            date=$(grep '^#date ' "$file" | sed 's/#date //')
-
-            # Extract the excerpt (first 5 non-metadata lines)
-            excerpt=$(awk 'NR>2 && NR<=7' "$file" | tr '\n' ' ')
-
-            # Extract list items (lines starting with "- ") and format them as JSON array
-            list_items=$(grep '^- ' "$file" | sed 's/^- //' | jq -R . | jq -s .)
-
-            echo "Extracted title: $title"
-            echo "Extracted date: $date"
-            echo "Extracted excerpt: $excerpt"
-            echo "Extracted list items: $list_items"
-
-            if [ -z "$title" ] || [ -z "$date" ]; then
-              echo "Skipping $file (Missing title or date)"
-              continue
-            fi
-
-            if [ "$first" = true ]; then
-              first=false
-            else
-              echo ',' >> posts.json
-            fi
-            echo "  {\"slug\": \"$filename\", \"title\": \"$title\", \"date\": \"$date\", \"excerpt\": \"$excerpt\", \"list\": $list_items}" >> posts.json
-          done
-          echo ']' >> posts.json
-
-          if [ -s "posts.json" ]; then
-            echo "posts.json successfully generated!"
-            cat posts.json
-          else
-            echo "ERROR: posts.json is empty or missing after generation!"
-            exit 1
-          fi
-
+          python3 convert_blog_to_json.py
 
       - name: Ensure posts.json is Present
         run: |
