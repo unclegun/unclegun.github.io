@@ -54,11 +54,17 @@ jobs:
             filename=$(basename "$file" .md)
             title=$(grep '^#title ' "$file" | sed 's/#title //')
             date=$(grep '^#date ' "$file" | sed 's/#date //')
+
+            # Extract the excerpt (first 5 non-metadata lines)
             excerpt=$(awk 'NR>2 && NR<=7' "$file" | tr '\n' ' ')
+
+            # Extract list items (lines starting with "- ") and format them as JSON array
+            list_items=$(grep '^- ' "$file" | sed 's/^- //' | jq -R . | jq -s .)
 
             echo "Extracted title: $title"
             echo "Extracted date: $date"
             echo "Extracted excerpt: $excerpt"
+            echo "Extracted list items: $list_items"
 
             if [ -z "$title" ] || [ -z "$date" ]; then
               echo "Skipping $file (Missing title or date)"
@@ -70,7 +76,7 @@ jobs:
             else
               echo ',' >> posts.json
             fi
-            echo "  {\"slug\": \"$filename\", \"title\": \"$title\", \"date\": \"$date\", \"excerpt\": \"$excerpt\"}" >> posts.json
+            echo "  {\"slug\": \"$filename\", \"title\": \"$title\", \"date\": \"$date\", \"excerpt\": \"$excerpt\", \"list\": $list_items}" >> posts.json
           done
           echo ']' >> posts.json
 
@@ -81,6 +87,7 @@ jobs:
             echo "ERROR: posts.json is empty or missing after generation!"
             exit 1
           fi
+
 
       - name: Ensure posts.json is Present
         run: |
