@@ -32,14 +32,17 @@ for filename in os.listdir(BLOG_DIR):
         # Remove metadata lines
         content_lines = lines[2:]
 
-        # Extract excerpt (first 5 non-empty lines)
-        excerpt_lines = [line.strip() for line in content_lines if line.strip()]
-        excerpt = " ".join(excerpt_lines[:5]) if excerpt_lines else ""
-
-        # Convert lists into HTML format
-        list_items = [re.sub(r"^- ", "", line.strip()) for line in content_lines if line.strip().startswith("- ")]
-        formatted_list = "".join(f"<li>{item}</li>" for item in list_items)
+        # Extract unordered list items (- item)
+        list_items = [line.strip() for line in content_lines if line.strip().startswith("- ")]
+        formatted_list = "".join(f"<li>{re.sub(r'^- ', '', item)}</li>" for item in list_items)
         list_html = f"<ul>{formatted_list}</ul>" if formatted_list else ""
+
+        # Remove list items from content_lines to avoid duplication
+        content_without_lists = [line for line in content_lines if line.strip() not in list_items]
+
+        # Extract excerpt (first 5 non-empty lines)
+        excerpt_lines = [line.strip() for line in content_without_lists if line.strip()]
+        excerpt = " ".join(excerpt_lines[:5]) if excerpt_lines else ""
 
         # Convert newlines to <p> tags
         body_html = "<p>" + "</p><p>".join(excerpt.split("\n")) + "</p>"
