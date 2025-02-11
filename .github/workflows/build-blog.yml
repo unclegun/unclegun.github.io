@@ -41,6 +41,11 @@ jobs:
             echo "  {\"slug\": \"$filename\", \"title\": \"$title\", \"date\": \"$date\", \"excerpt\": \"$excerpt\"}" >> posts.json
           done
           echo ']' >> posts.json
+
+      - name: Debug GitHub Token
+        run: |
+          echo "GitHub Token Length: ${#GH_TOKEN}"
+
       
       - name: Commit and Push Changes
         env:
