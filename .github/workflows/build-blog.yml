@@ -43,9 +43,12 @@ jobs:
           echo ']' >> posts.json
       
       - name: Commit and Push Changes
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
+          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/YOUR_USERNAME/YOUR_REPO.git
           git add posts posts.json
-          git commit -m "Auto-generate blog posts"
-          git push
+          git commit -m "Auto-generate blog posts" || echo "No changes to commit"
+          git push origin main
