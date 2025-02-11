@@ -48,7 +48,7 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/YOUR_USERNAME/YOUR_REPO.git
+          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/unclgun/unclgun.github.io.git
           git add posts posts.json
           git commit -m "Auto-generate blog posts" || echo "No changes to commit"
           git push origin main
