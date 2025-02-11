@@ -33,6 +33,7 @@ jobs:
       
       - name: Generate posts.json
         run: |
+          echo "Generating posts.json..."
           echo '[' > posts.json
           first=true
           for file in blog-posts/*.md; do
@@ -43,11 +44,12 @@ jobs:
             date=$(grep '^#date ' "$file" | sed 's/#date //')
             excerpt=$(awk 'NR>2 && NR<=7' "$file" | tr '\n' ' ')
 
+            # Debugging: Print extracted values
             echo "Extracted title: $title"
             echo "Extracted date: $date"
             echo "Extracted excerpt: $excerpt"
 
-            # If any field is empty, log the issue
+            # Skip if title or date is missing
             if [ -z "$title" ] || [ -z "$date" ]; then
               echo "Skipping $file (Missing title or date)"
               continue
@@ -62,7 +64,8 @@ jobs:
           done
           echo ']' >> posts.json
 
-          echo "Generated posts.json:"
+          # Debugging: Print posts.json to confirm it exists
+          echo "Final posts.json contents:"
           cat posts.json
 
       - name: Ensure posts.json is Added
@@ -85,7 +88,7 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-          # Check if posts.json exists and is not empty
+          # Ensure posts.json exists and is not empty
           if [ -s "posts.json" ]; then
             echo "posts.json exists and is not empty. Adding it to git..."
           else
@@ -93,14 +96,10 @@ jobs:
             exit 1
           fi
 
+          # Debugging: Show file status before commit
+          git status
+          
           # Ensure Git recognizes changes
           git add posts.json posts || echo "Nothing to add"
-          git status
-
-          # Commit only if there are changes
-          if git diff --cached --quiet; then
-            echo "No changes detected, skipping commit."
-          else
-            git commit -m "Auto-generate blog posts"
-            git push origin main
-          fi
+          git commit -m "Auto-generate blog posts" || echo "No changes to commit"
+          git push origin main || echo "No changes to push"
