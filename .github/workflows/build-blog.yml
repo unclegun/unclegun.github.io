@@ -27,12 +27,16 @@ jobs:
               filename=$(basename "$file" .md)
               title=$(grep '^#title ' "$file" | sed 's/#title //')
               date=$(grep '^#date ' "$file" | sed 's/#date //')
-              excerpt=$(awk 'NR>2 && NR<=7' "$file" | tr '\n' ' ')
-              pandoc "$file" -f markdown -t html -o "posts/$filename.html"
+
+              pandoc "$file" -f markdown -t html \
+                --template=blog-template.html \
+                -V title="$title" -V date="$date" \
+                -o "posts/$filename.html"
             done
           else
             echo "<html><body><h1>No Blog Posts Found</h1></body></html>" > posts/index.html
           fi
+
       
       - name: Generate posts.json
         run: |
