@@ -43,6 +43,8 @@ jobs:
           echo ']' >> posts.json
 
       - name: Debug GitHub Token
+        env:
+            GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           echo "GitHub Token Length: ${#GH_TOKEN}"
 
