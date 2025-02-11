@@ -10,9 +10,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout repository with Token
         uses: actions/checkout@v3
-      
+        with:
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
+
       - name: Install Pandoc
         run: sudo apt-get install -y pandoc
       
@@ -44,12 +47,10 @@ jobs:
             date=$(grep '^#date ' "$file" | sed 's/#date //')
             excerpt=$(awk 'NR>2 && NR<=7' "$file" | tr '\n' ' ')
 
-            # Debugging: Print extracted values
             echo "Extracted title: $title"
             echo "Extracted date: $date"
             echo "Extracted excerpt: $excerpt"
 
-            # Skip if title or date is missing
             if [ -z "$title" ] || [ -z "$date" ]; then
               echo "Skipping $file (Missing title or date)"
               continue
@@ -64,7 +65,6 @@ jobs:
           done
           echo ']' >> posts.json
 
-          # Ensure posts.json is really there before moving to the next step
           if [ -s "posts.json" ]; then
             echo "posts.json successfully generated!"
             cat posts.json
@@ -72,7 +72,7 @@ jobs:
             echo "ERROR: posts.json is empty or missing after generation!"
             exit 1
           fi
-      
+
       - name: Ensure posts.json is Present
         run: |
           ls -lah
@@ -82,29 +82,20 @@ jobs:
             echo "ERROR: posts.json disappeared before commit!"
             exit 1
           fi
-      
-      - name: Checkout repository with Token
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GH_PAT }}
-          fetch-depth: 0
 
       - name: Commit and Push Changes
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-          # Ensure posts.json exists before adding
           if [ ! -s "posts.json" ]; then
             echo "ERROR: posts.json is missing before commit!"
             exit 1
           fi
 
-          # Ensure Git recognizes changes
           git add posts.json posts || echo "Nothing to add"
           git status
           
-          # Check if any changes were staged
           if git diff --cached --quiet; then
             echo "No changes detected, skipping commit."
           else
