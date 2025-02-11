@@ -48,10 +48,12 @@
     display: block;
     margin: 10px auto;
   }
-  .p-img{
+  .p-img, .p-intro{
     text-align: center;
     font-size: 1em;
   }
+
+
 
   /* Blog Page Styling */
     .blog-post {
