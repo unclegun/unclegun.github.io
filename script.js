@@ -7,13 +7,30 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (!blogContainer) return;
             blogContainer.innerHTML = ""; // Clear existing content
 
-            posts.forEach(post => {
+            // Sort posts by date (newest first)
+            posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            posts.forEach((post, index) => {
                 const postElement = document.createElement("article");
+                const isFirstPost = index === 0;
                 postElement.innerHTML = `
                     <h3><a href="posts/${post.slug}.html">${post.title}</a></h3>
                     <p>${post.date}</p>
-                    <p>${post.excerpt}</p>
+                    <div class="post-content" style="display: ${isFirstPost ? "block" : "none"};">
+                        <p>${post.excerpt}</p>
+                    </div>
+                    ${isFirstPost ? "" : `<button class="toggle-post">Read More</button>`}
                 `;
+
+                if (!isFirstPost) {
+                    postElement.querySelector(".toggle-post").addEventListener("click", function () {
+                        const content = postElement.querySelector(".post-content");
+                        const isCollapsed = content.style.display === "none";
+                        content.style.display = isCollapsed ? "block" : "none";
+                        this.textContent = isCollapsed ? "Collapse" : "Read More";
+                    });
+                }
+
                 blogContainer.appendChild(postElement);
             });
         })

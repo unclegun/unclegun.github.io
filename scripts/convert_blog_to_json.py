@@ -9,8 +9,21 @@ REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 BLOG_DIR = os.path.join(REPO_ROOT, "blog-posts")
 OUTPUT_FILE = os.path.join(REPO_ROOT, "posts.json")
 
-# List to store post data
-posts = []
+# Try loading existing posts.json
+if os.path.exists(OUTPUT_FILE):
+    with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
+        try:
+            existing_posts = json.load(f)
+        except json.JSONDecodeError:
+            existing_posts = []
+else:
+    existing_posts = []
+
+# Convert existing posts into a dictionary (for easy lookup)
+existing_posts_dict = {post["slug"]: post for post in existing_posts}
+
+# List to store updated post data
+updated_posts = []
 
 # Loop through each Markdown file in the directory
 for filename in os.listdir(BLOG_DIR):
@@ -26,7 +39,7 @@ for filename in os.listdir(BLOG_DIR):
 
         # Skip files without a valid title and date
         if not title or not date:
-            print(f"❌ Skipping {filename} (Missing title or date)")
+            print(f"Skipping {filename} (Missing title or date)")
             continue
 
         # Remove metadata lines
@@ -54,18 +67,30 @@ for filename in os.listdir(BLOG_DIR):
         # Join the formatted text
         formatted_body = "".join(formatted_text)
 
-        # Append post data
+        # Create post data
         post_data = {
             "slug": filename.replace(".md", ""),
             "title": title,
-            "date": date,
+            "date": date.strip(),  # Ensure no whitespace issues
             "excerpt": formatted_body
         }
 
-        posts.append(post_data)
+        # Only update if the post has changed
+        if filename.replace(".md", "") in existing_posts_dict:
+            old_post = existing_posts_dict[filename.replace(".md", "")]
+            if old_post != post_data:
+                print(f"Updating {filename} (Content changed)")
+                updated_posts.append(post_data)
+            else:
+                updated_posts.append(old_post)  # Keep the existing post unchanged
+        else:
+            print(f"Adding new post: {filename}")
+            updated_posts.append(post_data)
 
-# Write JSON to file
-with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-    json.dump(posts, f, indent=2)
-
-print(f"✅ JSON successfully created: {OUTPUT_FILE}")
+# Write JSON only if changes were detected
+if updated_posts != existing_posts:
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        json.dump(updated_posts, f, indent=2)
+    print(f"JSON successfully updated: {OUTPUT_FILE}")
+else:
+    print("No changes detected, JSON file remains the same.")
