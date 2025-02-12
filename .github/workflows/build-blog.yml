@@ -36,6 +36,15 @@ jobs:
             exit 1
           fi
 
+      # 🔹 NEW: Commit and Push Updated posts.json
+      - name: Commit and Push Updated posts.json
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add posts.json
+          git commit -m "Auto-update posts.json [skip ci]" || echo "No changes to commit"
+          git push origin main
+
       # 🔹 Convert Markdown to HTML AFTER JSON is generated
       - name: Convert Markdown to HTML
         run: |
