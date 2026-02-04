@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart.js Demo - Modern Data Visualization</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --info-color: #0dcaf0;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 0;
+            margin-bottom: 40px;
+        }
+        
+        .hero-section h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .hero-section p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: var(--warning-color);
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .chart-canvas {
+            max-height: 400px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .feature-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 15px 0;
+        }
+        
+        .code-block .keyword {
+            color: #f687b3;
+        }
+        
+        .code-block .string {
+            color: #68d391;
+        }
+        
+        .code-block .comment {
+            color: #a0aec0;
+            font-style: italic;
+        }
+        
+        .nav-tabs .nav-link {
+            color: #495057;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            background: transparent;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-step {
+            display: none;
+        }
+        
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            background: #e9ecef;
+            margin: 0 5px;
+            transition: all 0.3s;
+        }
+        
+        .progress-step.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .progress-step.completed {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .best-practice-box {
+            background: #fff3cd;
+            border-left: 5px solid var(--warning-color);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .best-practice-box h5 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .dotnet-example {
+            background: #e7f3ff;
+            border-left: 5px solid var(--info-color);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .dotnet-example h5 {
+            color: #004085;
+            margin-bottom: 10px;
+        }
+        
+        .badge-custom {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px 0;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">unclegun.github.io</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="projects.html">Projects</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="blog.html">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="chartjs-demo.html">Chart.js Demo</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-section text-center">
+        <div class="container">
+            <h1>Chart.js Complete Guide</h1>
+            <p class="lead">Master Data Visualization with Chart.js, Bootstrap, and .NET Core</p>
+            <div class="mt-4">
+                <span class="badge-custom bg-light text-dark">Interactive Charts</span>
+                <span class="badge-custom bg-light text-dark">Responsive Design</span>
+                <span class="badge-custom bg-light text-dark">.NET Core Integration</span>
+                <span class="badge-custom bg-light text-dark">SPA Best Practices</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Introduction Section -->
+        <section class="mb-5">
+            <h2 class="section-title">What is Chart.js?</h2>
+            <div class="row">
+                <div class="col-lg-8">
+                    <p class="lead">Chart.js is a powerful, flexible, and open-source JavaScript library for creating beautiful, responsive charts. It's built on HTML5 Canvas and provides a simple yet flexible API for developers.</p>
+                    
+                    <div class="feature-card">
+                        <h4>🎨 Key Features</h4>
+                        <ul>
+                            <li><strong>8 Chart Types:</strong> Line, Bar, Radar, Doughnut, Pie, Polar Area, Bubble, and Scatter</li>
+                            <li><strong>Responsive:</strong> Charts automatically resize based on container size</li>
+                            <li><strong>Animation:</strong> Smooth, customizable animations out of the box</li>
+                            <li><strong>Interactivity:</strong> Tooltips, legends, and click events</li>
+                            <li><strong>Accessibility:</strong> ARIA labels and keyboard navigation</li>
+                            <li><strong>Customizable:</strong> Extensive configuration options</li>
+                            <li><strong>Lightweight:</strong> Small bundle size (~200KB)</li>
+                            <li><strong>Framework Agnostic:</strong> Works with React, Vue, Angular, and vanilla JS</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feature-card">
+                        <h4>📚 Quick Links</h4>
+                        <ul class="list-unstyled">
+                            <li><a href="https://www.chartjs.org/" target="_blank">Official Documentation</a></li>
+                            <li><a href="https://github.com/chartjs/Chart.js" target="_blank">GitHub Repository</a></li>
+                            <li><a href="https://www.npmjs.com/package/chart.js" target="_blank">NPM Package</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chart Examples Section -->
+        <section class="mb-5">
+            <h2 class="section-title">Chart Examples</h2>
+            
+            <!-- Line Chart -->
+            <div class="chart-container">
+                <h3 class="mb-4">📈 Line Chart - Sales Over Time</h3>
+                <p>Perfect for showing trends and changes over time. Use for revenue tracking, user growth, or performance metrics.</p>
+                <canvas id="lineChart" class="chart-canvas"></canvas>
+            </div>
+
+            <!-- Bar Chart -->
+            <div class="chart-container">
+                <h3 class="mb-4">📊 Bar Chart - Monthly Revenue Comparison</h3>
+                <p>Ideal for comparing values across categories. Great for sales comparisons, survey results, or competitive analysis.</p>
+                <canvas id="barChart" class="chart-canvas"></canvas>
+            </div>
+
+            <!-- Pie & Doughnut Charts -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h3 class="mb-4">🥧 Pie Chart - Market Share</h3>
+                        <p>Shows proportions and percentages of a whole.</p>
+                        <canvas id="pieChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h3 class="mb-4">🍩 Doughnut Chart - Budget Allocation</h3>
+                        <p>Similar to pie chart but with a center cutout for additional info.</p>
+                        <canvas id="doughnutChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Radar Chart -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h3 class="mb-4">🎯 Radar Chart - Skills Assessment</h3>
+                        <p>Multi-dimensional data visualization, perfect for comparing multiple variables.</p>
+                        <canvas id="radarChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h3 class="mb-4">📊 Mixed Chart - Sales & Profit Analysis</h3>
+                        <p>Combine different chart types for comprehensive insights.</p>
+                        <canvas id="mixedChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- .NET Core Integration Section -->
+        <section class="mb-5">
+            <h2 class="section-title">Chart.js in .NET Core Web Applications</h2>
+            
+            <div class="dotnet-example">
+                <h5>💡 Integration Approach</h5>
+                <p>Chart.js integrates seamlessly with .NET Core through the View layer. Your .NET backend provides data via API endpoints, and Chart.js renders it on the frontend.</p>
+            </div>
+
+            <div class="feature-card">
+                <h4>Step 1: Create a Web API Controller</h4>
+                <div class="code-block">
+<span class="comment">// Controllers/ChartDataController.cs</span>
+<span class="keyword">using</span> Microsoft.AspNetCore.Mvc;
+
+[Route(<span class="string">"api/[controller]"</span>)]
+[ApiController]
+<span class="keyword">public class</span> ChartDataController : ControllerBase
+{
+    [HttpGet(<span class="string">"sales"</span>)]
+    <span class="keyword">public</span> IActionResult GetSalesData()
+    {
+        <span class="keyword">var</span> data = <span class="keyword">new</span>
+        {
+            labels = <span class="keyword">new</span>[] { <span class="string">"Jan"</span>, <span class="string">"Feb"</span>, <span class="string">"Mar"</span>, <span class="string">"Apr"</span>, <span class="string">"May"</span>, <span class="string">"Jun"</span> },
+            datasets = <span class="keyword">new</span>[]
+            {
+                <span class="keyword">new</span>
+                {
+                    label = <span class="string">"Sales 2024"</span>,
+                    data = <span class="keyword">new</span>[] { 65, 59, 80, 81, 56, 55 },
+                    backgroundColor = <span class="string">"rgba(54, 162, 235, 0.2)"</span>,
+                    borderColor = <span class="string">"rgba(54, 162, 235, 1)"</span>,
+                    borderWidth = 2
+                }
+            }
+        };
+        <span class="keyword">return</span> Ok(data);
+    }
+
+    [HttpGet(<span class="string">"dashboard"</span>)]
+    <span class="keyword">public async</span> Task&lt;IActionResult&gt; GetDashboardData()
+    {
+        <span class="comment">// Fetch from database using Entity Framework</span>
+        <span class="keyword">var</span> salesData = <span class="keyword">await</span> _context.Sales
+            .Where(s => s.Date >= DateTime.Now.AddMonths(-6))
+            .GroupBy(s => s.Date.Month)
+            .Select(g => <span class="keyword">new</span> { Month = g.Key, Total = g.Sum(s => s.Amount) })
+            .ToListAsync();
+
+        <span class="keyword">return</span> Ok(salesData);
+    }
+}
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <h4>Step 2: Create Razor View with Chart.js</h4>
+                <div class="code-block">
+<span class="comment">@* Views/Dashboard/Index.cshtml *@</span>
+&lt;div class=<span class="string">"container"</span>&gt;
+    &lt;h2&gt;Sales Dashboard&lt;/h2&gt;
+    &lt;canvas id=<span class="string">"salesChart"</span>&gt;&lt;/canvas&gt;
+&lt;/div&gt;
+
+@section Scripts {
+    &lt;script src=<span class="string">"https://cdn.jsdelivr.net/npm/chart.js"</span>&gt;&lt;/script&gt;
+    &lt;script&gt;
+        <span class="comment">// Fetch data from API</span>
+        fetch(<span class="string">'/api/chartdata/sales'</span>)
+            .then(response => response.json())
+            .then(data => {
+                <span class="keyword">const</span> ctx = document.getElementById(<span class="string">'salesChart'</span>).getContext(<span class="string">'2d'</span>);
+                <span class="keyword">new</span> Chart(ctx, {
+                    type: <span class="string">'line'</span>,
+                    data: data,
+                    options: {
+                        responsive: <span class="keyword">true</span>,
+                        plugins: {
+                            title: {
+                                display: <span class="keyword">true</span>,
+                                text: <span class="string">'Monthly Sales Data'</span>
+                            }
+                        }
+                    }
+                });
+            });
+    &lt;/script&gt;
+}
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <h4>Step 3: Using with Razor Pages (Alternative)</h4>
+                <div class="code-block">
+<span class="comment">// Pages/Dashboard.cshtml.cs</span>
+<span class="keyword">public class</span> DashboardModel : PageModel
+{
+    <span class="keyword">private readonly</span> IChartService _chartService;
+
+    <span class="keyword">public</span> DashboardModel(IChartService chartService)
+    {
+        _chartService = chartService;
+    }
+
+    <span class="keyword">public</span> string ChartDataJson { get; <span class="keyword">set</span>; }
+
+    <span class="keyword">public async</span> Task OnGetAsync()
+    {
+        <span class="keyword">var</span> chartData = <span class="keyword">await</span> _chartService.GetSalesDataAsync();
+        ChartDataJson = JsonSerializer.Serialize(chartData);
+    }
+}
+
+<span class="comment">// In the Razor Page:</span>
+&lt;script&gt;
+    <span class="keyword">const</span> chartData = @Html.Raw(Model.ChartDataJson);
+    <span class="keyword">const</span> ctx = document.getElementById(<span class="string">'myChart'</span>).getContext(<span class="string">'2d'</span>);
+    <span class="keyword">new</span> Chart(ctx, {
+        type: <span class="string">'bar'</span>,
+        data: chartData
+    });
+&lt;/script&gt;
+                </div>
+            </div>
+
+            <div class="best-practice-box">
+                <h5>🎯 .NET Core Best Practices</h5>
+                <ul>
+                    <li><strong>Separate API Layer:</strong> Create dedicated API controllers for chart data</li>
+                    <li><strong>Use DTOs:</strong> Map database entities to Data Transfer Objects</li>
+                    <li><strong>Implement Caching:</strong> Cache frequently accessed chart data using IMemoryCache</li>
+                    <li><strong>Async Operations:</strong> Use async/await for database queries</li>
+                    <li><strong>Error Handling:</strong> Implement proper exception handling and return appropriate status codes</li>
+                    <li><strong>Authorization:</strong> Secure API endpoints with [Authorize] attributes</li>
+                    <li><strong>Validation:</strong> Validate query parameters using model validation</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Best Design Practices Section -->
+        <section class="mb-5">
+            <h2 class="section-title">Best Design Practices</h2>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <h4>🎨 Visual Design</h4>
+                        <ul>
+                            <li><strong>Color Consistency:</strong> Use your brand colors for charts</li>
+                            <li><strong>Accessibility:</strong> Ensure sufficient color contrast (WCAG 2.1)</li>
+                            <li><strong>Simplicity:</strong> Don't overcrowd charts with too much data</li>
+                            <li><strong>Responsive:</strong> Charts should adapt to all screen sizes</li>
+                            <li><strong>Animations:</strong> Use subtle animations for better UX</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <h4>⚡ Performance</h4>
+                        <ul>
+                            <li><strong>Lazy Loading:</strong> Load charts only when visible</li>
+                            <li><strong>Data Decimation:</strong> Sample large datasets</li>
+                            <li><strong>Destroy Charts:</strong> Clean up chart instances when not needed</li>
+                            <li><strong>Debounce Updates:</strong> Limit real-time update frequency</li>
+                            <li><strong>Canvas vs SVG:</strong> Use Canvas for better performance</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <h4>📱 Bootstrap Integration</h4>
+                        <ul>
+                            <li><strong>Grid System:</strong> Use Bootstrap's responsive grid for chart layout</li>
+                            <li><strong>Cards:</strong> Wrap charts in Bootstrap cards for consistent styling</li>
+                            <li><strong>Spacing:</strong> Utilize Bootstrap's spacing utilities (mt, mb, p-*)</li>
+                            <li><strong>Themes:</strong> Leverage Bootstrap's color scheme</li>
+                            <li><strong>Responsive Breakpoints:</strong> Adjust chart sizes at different breakpoints</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <h4>♿ Accessibility</h4>
+                        <ul>
+                            <li><strong>Alt Text:</strong> Provide text descriptions for screen readers</li>
+                            <li><strong>Keyboard Navigation:</strong> Ensure charts are keyboard accessible</li>
+                            <li><strong>ARIA Labels:</strong> Use appropriate ARIA attributes</li>
+                            <li><strong>Color Blind Friendly:</strong> Don't rely solely on color</li>
+                            <li><strong>Data Tables:</strong> Provide tabular data as alternative</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Single Page Application Demo -->
+        <section class="mb-5">
+            <h2 class="section-title">Single Page Application - Complex Form Example</h2>
+            
+            <div class="best-practice-box">
+                <h5>🚀 SPA Form Best Practices</h5>
+                <ul>
+                    <li><strong>Progressive Disclosure:</strong> Show form sections step-by-step to reduce cognitive load</li>
+                    <li><strong>Client-Side Validation:</strong> Validate inputs immediately for better UX</li>
+                    <li><strong>State Management:</strong> Persist form data in case of page refresh</li>
+                    <li><strong>Visual Progress:</strong> Show users where they are in the process</li>
+                    <li><strong>Save & Continue:</strong> Allow users to save progress and return later</li>
+                    <li><strong>Responsive Design:</strong> Ensure forms work on all devices</li>
+                </ul>
+            </div>
+
+            <div class="form-section">
+                <h3 class="mb-4">Data Analytics Survey Form</h3>
+                
+                <!-- Progress Indicator -->
+                <div class="d-flex mb-4" id="progressIndicator">
+                    <div class="progress-step active" data-step="1">
+                        <strong>1.</strong> Personal Info
+                    </div>
+                    <div class="progress-step" data-step="2">
+                        <strong>2.</strong> Analytics Preferences
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <strong>3.</strong> Chart Preferences
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <strong>4.</strong> Review & Submit
+                    </div>
+                </div>
+
+                <form id="multiStepForm">
+                    <!-- Step 1: Personal Information -->
+                    <div class="form-step active" data-step="1">
+                        <h4 class="mb-4">Personal Information</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">First Name *</label>
+                                <input type="text" class="form-control" id="firstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" id="lastName" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="company" class="form-label">Company</label>
+                            <input type="text" class="form-control" id="company">
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role *</label>
+                            <select class="form-select" id="role" required>
+                                <option value="">Select your role...</option>
+                                <option value="developer">Developer</option>
+                                <option value="designer">Designer</option>
+                                <option value="analyst">Data Analyst</option>
+                                <option value="manager">Manager</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Analytics Preferences -->
+                    <div class="form-step" data-step="2">
+                        <h4 class="mb-4">Analytics Preferences</h4>
+                        <div class="mb-4">
+                            <label class="form-label">How often do you work with data visualization? *</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="frequency" id="daily" value="daily" required>
+                                <label class="form-check-label" for="daily">Daily</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="frequency" id="weekly" value="weekly">
+                                <label class="form-check-label" for="weekly">Weekly</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="frequency" id="monthly" value="monthly">
+                                <label class="form-check-label" for="monthly">Monthly</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="frequency" id="rarely" value="rarely">
+                                <label class="form-check-label" for="rarely">Rarely</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Primary use cases (select all that apply):</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="usecase1" value="business-intelligence">
+                                <label class="form-check-label" for="usecase1">Business Intelligence Dashboards</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="usecase2" value="reporting">
+                                <label class="form-check-label" for="usecase2">Reporting & Analytics</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="usecase3" value="real-time">
+                                <label class="form-check-label" for="usecase3">Real-time Monitoring</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="usecase4" value="presentations">
+                                <label class="form-check-label" for="usecase4">Presentations</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dataSize" class="form-label">Typical Dataset Size</label>
+                            <input type="range" class="form-range" id="dataSize" min="1" max="5" step="1" value="3">
+                            <div class="d-flex justify-content-between">
+                                <small>&lt;100 rows</small>
+                                <small>100-1K</small>
+                                <small>1K-10K</small>
+                                <small>10K-100K</small>
+                                <small>&gt;100K</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Chart Preferences -->
+                    <div class="form-step" data-step="3">
+                        <h4 class="mb-4">Chart Preferences</h4>
+                        <div class="mb-3">
+                            <label for="favoriteChart" class="form-label">Favorite Chart Type *</label>
+                            <select class="form-select" id="favoriteChart" required>
+                                <option value="">Select chart type...</option>
+                                <option value="line">Line Chart</option>
+                                <option value="bar">Bar Chart</option>
+                                <option value="pie">Pie Chart</option>
+                                <option value="doughnut">Doughnut Chart</option>
+                                <option value="radar">Radar Chart</option>
+                                <option value="scatter">Scatter Chart</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Important Chart Features (select top 3):</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="feature1" value="interactivity">
+                                <label class="form-check-label" for="feature1">Interactivity & Tooltips</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="feature2" value="animations">
+                                <label class="form-check-label" for="feature2">Smooth Animations</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="feature3" value="responsive">
+                                <label class="form-check-label" for="feature3">Responsive Design</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="feature4" value="customization">
+                                <label class="form-check-label" for="feature4">Customization Options</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="feature5" value="performance">
+                                <label class="form-check-label" for="feature5">Performance</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="feedback" class="form-label">Additional Feedback</label>
+                            <textarea class="form-control" id="feedback" rows="4" placeholder="Share your thoughts about Chart.js..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Review -->
+                    <div class="form-step" data-step="4">
+                        <h4 class="mb-4">Review Your Information</h4>
+                        <div class="alert alert-info">
+                            <strong>Please review your information before submitting.</strong>
+                        </div>
+                        <div id="reviewContent" class="mb-4">
+                            <!-- Review content will be populated by JavaScript -->
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                I agree to the terms and conditions *
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                            ← Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" id="nextBtn">
+                            Next →
+                        </button>
+                        <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                            Submit Form
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Implementation Details -->
+            <div class="feature-card mt-4">
+                <h4>🔧 SPA Form Implementation Details</h4>
+                <p>This multi-step form demonstrates key SPA concepts:</p>
+                <ul>
+                    <li><strong>State Management:</strong> Form data is stored in JavaScript objects and can be persisted to localStorage</li>
+                    <li><strong>Progressive Disclosure:</strong> Complex form is broken into digestible sections</li>
+                    <li><strong>Client-Side Validation:</strong> Immediate feedback on user input</li>
+                    <li><strong>Visual Feedback:</strong> Progress indicator shows completion status</li>
+                    <li><strong>Smooth Transitions:</strong> CSS animations enhance user experience</li>
+                    <li><strong>Responsive Design:</strong> Bootstrap ensures mobile compatibility</li>
+                </ul>
+                <div class="code-block">
+<span class="comment">// Example: Saving form state to localStorage</span>
+<span class="keyword">function</span> saveFormState() {
+    <span class="keyword">const</span> formData = {
+        firstName: document.getElementById(<span class="string">'firstName'</span>).value,
+        lastName: document.getElementById(<span class="string">'lastName'</span>).value,
+        email: document.getElementById(<span class="string">'email'</span>).value,
+        <span class="comment">// ... other fields</span>
+    };
+    localStorage.setItem(<span class="string">'surveyFormData'</span>, JSON.stringify(formData));
+}
+
+<span class="comment">// Restore form state on page load</span>
+<span class="keyword">function</span> restoreFormState() {
+    <span class="keyword">const</span> savedData = localStorage.getItem(<span class="string">'surveyFormData'</span>);
+    <span class="keyword">if</span> (savedData) {
+        <span class="keyword">const</span> formData = JSON.parse(savedData);
+        document.getElementById(<span class="string">'firstName'</span>).value = formData.firstName || <span class="string">''</span>;
+        <span class="comment">// ... restore other fields</span>
+    }
+}
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Examples Section -->
+        <section class="mb-5">
+            <h2 class="section-title">Quick Start Code Examples</h2>
+            
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#basicSetup">Basic Setup</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#advancedConfig">Advanced Config</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#dynamicUpdate">Dynamic Updates</a>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-3">
+                <div class="tab-pane fade show active" id="basicSetup">
+                    <div class="code-block">
+<span class="comment">// Basic Chart.js Setup</span>
+<span class="keyword">const</span> ctx = document.getElementById(<span class="string">'myChart'</span>).getContext(<span class="string">'2d'</span>);
+<span class="keyword">const</span> myChart = <span class="keyword">new</span> Chart(ctx, {
+    type: <span class="string">'bar'</span>,
+    data: {
+        labels: [<span class="string">'Red'</span>, <span class="string">'Blue'</span>, <span class="string">'Yellow'</span>, <span class="string">'Green'</span>, <span class="string">'Purple'</span>, <span class="string">'Orange'</span>],
+        datasets: [{
+            label: <span class="string">'# of Votes'</span>,
+            data: [12, 19, 3, 5, 2, 3],
+            backgroundColor: [
+                <span class="string">'rgba(255, 99, 132, 0.2)'</span>,
+                <span class="string">'rgba(54, 162, 235, 0.2)'</span>,
+                <span class="string">'rgba(255, 206, 86, 0.2)'</span>,
+                <span class="string">'rgba(75, 192, 192, 0.2)'</span>,
+                <span class="string">'rgba(153, 102, 255, 0.2)'</span>,
+                <span class="string">'rgba(255, 159, 64, 0.2)'</span>
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: <span class="keyword">true</span>
+            }
+        }
+    }
+});
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="advancedConfig">
+                    <div class="code-block">
+<span class="comment">// Advanced Configuration with Plugins</span>
+<span class="keyword">const</span> config = {
+    type: <span class="string">'line'</span>,
+    data: data,
+    options: {
+        responsive: <span class="keyword">true</span>,
+        maintainAspectRatio: <span class="keyword">false</span>,
+        plugins: {
+            title: {
+                display: <span class="keyword">true</span>,
+                text: <span class="string">'Custom Chart Title'</span>,
+                font: { size: 18 }
+            },
+            legend: {
+                position: <span class="string">'bottom'</span>,
+                labels: {
+                    usePointStyle: <span class="keyword">true</span>,
+                    padding: 15
+                }
+            },
+            tooltip: {
+                backgroundColor: <span class="string">'rgba(0,0,0,0.8)'</span>,
+                callbacks: {
+                    label: <span class="keyword">function</span>(context) {
+                        <span class="keyword">return</span> context.dataset.label + <span class="string">': $'</span> + context.parsed.y;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: <span class="keyword">false</span> }
+            },
+            y: {
+                beginAtZero: <span class="keyword">true</span>,
+                ticks: {
+                    callback: <span class="keyword">function</span>(value) {
+                        <span class="keyword">return</span> <span class="string">'$'</span> + value;
+                    }
+                }
+            }
+        },
+        animation: {
+            duration: 2000,
+            easing: <span class="string">'easeInOutQuart'</span>
+        }
+    }
+};
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="dynamicUpdate">
+                    <div class="code-block">
+<span class="comment">// Dynamically Update Chart Data</span>
+<span class="keyword">function</span> addData(chart, label, data) {
+    chart.data.labels.push(label);
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(data);
+    });
+    chart.update();
+}
+
+<span class="keyword">function</span> removeData(chart) {
+    chart.data.labels.pop();
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.pop();
+    });
+    chart.update();
+}
+
+<span class="comment">// Real-time data update example</span>
+setInterval(() => {
+    <span class="keyword">const</span> newValue = Math.random() * 100;
+    addData(myChart, <span class="string">'New'</span>, newValue);
+    
+    <span class="comment">// Keep only last 10 data points</span>
+    <span class="keyword">if</span> (myChart.data.labels.length > 10) {
+        removeData(myChart);
+    }
+}, 5000);
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resources Section -->
+        <section class="mb-5">
+            <h2 class="section-title">Additional Resources</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <h4>📖 Learning Resources</h4>
+                        <ul class="list-unstyled">
+                            <li><a href="https://www.chartjs.org/docs/latest/" target="_blank">Official Documentation</a></li>
+                            <li><a href="https://www.chartjs.org/docs/latest/samples/" target="_blank">Sample Gallery</a></li>
+                            <li><a href="https://github.com/chartjs/awesome" target="_blank">Awesome Chart.js</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <h4>🛠️ Tools & Plugins</h4>
+                        <ul class="list-unstyled">
+                            <li><a href="https://www.chartjs.org/docs/latest/developers/plugins.html" target="_blank">Plugin Development</a></li>
+                            <li><a href="https://github.com/chartjs/chartjs-plugin-datalabels" target="_blank">Data Labels Plugin</a></li>
+                            <li><a href="https://github.com/chartjs/chartjs-plugin-zoom" target="_blank">Zoom Plugin</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <h4>💼 .NET Resources</h4>
+                        <ul class="list-unstyled">
+                            <li><a href="https://docs.microsoft.com/en-us/aspnet/core/" target="_blank">ASP.NET Core Docs</a></li>
+                            <li><a href="https://getbootstrap.com/docs/5.3/" target="_blank">Bootstrap Documentation</a></li>
+                            <li><a href="https://docs.microsoft.com/en-us/ef/core/" target="_blank">Entity Framework Core</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 unclegun.github.io | Built with Chart.js & Bootstrap</p>
+            <p class="mb-0 mt-2">
+                <a href="https://www.chartjs.org/" target="_blank" class="text-white">Chart.js</a> | 
+                <a href="https://getbootstrap.com/" target="_blank" class="text-white">Bootstrap</a> | 
+                <a href="index.html" class="text-white">Home</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Chart.js Initialization -->
+    <script>
+        // Line Chart
+        const lineCtx = document.getElementById('lineChart').getContext('2d');
+        const lineChart = new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                datasets: [{
+                    label: 'Sales 2024',
+                    data: [65, 59, 80, 81, 56, 55, 70],
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.4
+                }, {
+                    label: 'Sales 2023',
+                    data: [45, 49, 60, 71, 46, 45, 60],
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Year-over-Year Sales Comparison'
+                    },
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value + 'K';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Bar Chart
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        const barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [120, 150, 180, 200],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Quarterly Revenue Performance'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value + 'M';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Pie Chart
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        const pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Product A', 'Product B', 'Product C', 'Product D'],
+                datasets: [{
+                    data: [30, 25, 25, 20],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Doughnut Chart
+        const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+        const doughnutChart = new Chart(doughnutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Development', 'Marketing', 'Sales', 'Operations', 'Support'],
+                datasets: [{
+                    data: [35, 20, 15, 20, 10],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Radar Chart
+        const radarCtx = document.getElementById('radarChart').getContext('2d');
+        const radarChart = new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: ['JavaScript', 'Python', 'C#', 'Java', 'Go', 'SQL'],
+                datasets: [{
+                    label: 'Developer A',
+                    data: [90, 75, 85, 70, 60, 80],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2
+                }, {
+                    label: 'Developer B',
+                    data: [70, 90, 60, 85, 80, 75],
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Mixed Chart
+        const mixedCtx = document.getElementById('mixedChart').getContext('2d');
+        const mixedChart = new Chart(mixedCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    type: 'line',
+                    label: 'Profit Margin %',
+                    data: [15, 18, 22, 20, 25, 28],
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    yAxisID: 'y1',
+                    tension: 0.4
+                }, {
+                    type: 'bar',
+                    label: 'Revenue',
+                    data: [50, 60, 70, 80, 90, 100],
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                    yAxisID: 'y'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Revenue vs Profit Margin'
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value + 'K';
+                            }
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        beginAtZero: true,
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Multi-step Form Logic
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        function showStep(step) {
+            document.querySelectorAll('.form-step').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+
+            // Update progress indicator
+            document.querySelectorAll('.progress-step').forEach((el, index) => {
+                el.classList.remove('active', 'completed');
+                if (index + 1 < step) {
+                    el.classList.add('completed');
+                } else if (index + 1 === step) {
+                    el.classList.add('active');
+                }
+            });
+
+            // Update buttons
+            document.getElementById('prevBtn').style.display = step === 1 ? 'none' : 'inline-block';
+            document.getElementById('nextBtn').style.display = step === totalSteps ? 'none' : 'inline-block';
+            document.getElementById('submitBtn').style.display = step === totalSteps ? 'inline-block' : 'none';
+
+            // If on review step, populate review content
+            if (step === 4) {
+                populateReview();
+            }
+
+            currentStep = step;
+        }
+
+        function populateReview() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const company = document.getElementById('company').value;
+            const role = document.getElementById('role').value;
+            const frequency = document.querySelector('input[name="frequency"]:checked')?.value || 'Not specified';
+            const favoriteChart = document.getElementById('favoriteChart').value;
+
+            const reviewHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Personal Information</h5>
+                        <p><strong>Name:</strong> ${firstName} ${lastName}</p>
+                        <p><strong>Email:</strong> ${email}</p>
+                        <p><strong>Company:</strong> ${company || 'Not provided'}</p>
+                        <p><strong>Role:</strong> ${role}</p>
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Analytics Preferences</h5>
+                        <p><strong>Frequency:</strong> ${frequency}</p>
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Chart Preferences</h5>
+                        <p><strong>Favorite Chart:</strong> ${favoriteChart}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('reviewContent').innerHTML = reviewHTML;
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                // Basic validation
+                const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+                const requiredFields = currentStepEl.querySelectorAll('[required]');
+                let valid = true;
+
+                requiredFields.forEach(field => {
+                    if (!field.value && field.type !== 'radio' && field.type !== 'checkbox') {
+                        valid = false;
+                        field.classList.add('is-invalid');
+                    } else if (field.type === 'radio') {
+                        const radioGroup = currentStepEl.querySelectorAll(`input[name="${field.name}"]`);
+                        const checked = Array.from(radioGroup).some(radio => radio.checked);
+                        if (!checked) valid = false;
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+
+                if (valid) {
+                    showStep(currentStep + 1);
+                } else {
+                    alert('Please fill in all required fields.');
+                }
+            }
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+            }
+        });
+
+        document.getElementById('multiStepForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (document.getElementById('agreeTerms').checked) {
+                alert('Form submitted successfully! This is a demo, so no data is actually sent.');
+                // Here you would typically send the data to your server
+                // Example: fetch('/api/submit-survey', { method: 'POST', body: JSON.stringify(formData) })
+            } else {
+                alert('Please agree to the terms and conditions.');
+            }
+        });
+
+        // Initialize form
+        showStep(1);
+
+        // Save form state on input change
+        document.querySelectorAll('input, select, textarea').forEach(field => {
+            field.addEventListener('change', () => {
+                // In a real application, you would save to localStorage here
+                // localStorage.setItem('formData', JSON.stringify(getFormData()));
+            });
+        });
+    </script>
+</body>
+</html>
