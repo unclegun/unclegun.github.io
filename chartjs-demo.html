@@ -236,6 +236,81 @@
                 position: static;
             }
         }
+
+        @media (max-width: 768px) {
+            .navbar .btn {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.6rem;
+            }
+
+            .playbook-nav {
+                padding: 12px;
+            }
+
+            .standard-card {
+                padding: 16px;
+            }
+
+            .standard-card h3 {
+                font-size: 1.15rem;
+            }
+
+            .workspace-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .workspace-shell {
+                padding: 14px;
+            }
+
+            .workspace-shell .list-group {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+            }
+
+            .workspace-shell .list-group-item {
+                margin-bottom: 0;
+                text-align: center;
+                font-size: 0.85rem;
+            }
+
+            .workspace-card {
+                padding: 12px;
+            }
+
+            .workspace-card .btn {
+                width: 100%;
+            }
+
+            .workspace-card .d-flex.gap-2 {
+                flex-direction: column;
+            }
+
+            .under-hood {
+                margin-top: 16px;
+            }
+
+            .nav-tabs .nav-link {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .workspace-shell .list-group {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar .text-white-50 {
+                display: none;
+            }
+
+            .visual-box canvas {
+                height: 180px !important;
+            }
+        }
     </style>
 </head>
 <body data-bs-spy="scroll" data-bs-target="#playbookSidebar" data-bs-offset="120" tabindex="0">
