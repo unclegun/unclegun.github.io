@@ -3,1368 +3,1507 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chart.js Demo - Modern Data Visualization</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Chart.js -->
+    <title>Razor Playbook - .NET Core Standards</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    
-    <!-- Custom Styles -->
+
     <style>
         :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #6c757d;
-            --success-color: #198754;
-            --info-color: #0dcaf0;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
+            --ink: #0f172a;
+            --muted: #64748b;
+            --surface: #ffffff;
+            --shell: #f8fafc;
+            --accent: #2563eb;
+            --accent-soft: #e0f2fe;
+            --accent-2: #14b8a6;
+            --accent-3: #f97316;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
         }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
+            background: radial-gradient(circle at top, #e0f2fe 0%, var(--shell) 45%, #f1f5f9 100%);
+            color: var(--ink);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         }
-        
-        .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 80px 0;
-            margin-bottom: 40px;
+
+        .navbar {
+            background: linear-gradient(120deg, #0f172a 0%, #1d4ed8 60%, #0f172a 100%) !important;
         }
-        
-        .hero-section h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 20px;
+
+        .app-shell {
+            display: grid;
+            grid-template-columns: 240px 1fr 320px;
+            gap: 24px;
+            align-items: start;
         }
-        
-        .hero-section p {
-            font-size: 1.3rem;
-            opacity: 0.9;
+
+        .playbook-nav {
+            position: sticky;
+            top: 90px;
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 4px solid var(--accent);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
         }
-        
-        .section-title {
-            color: #2c3e50;
-            font-weight: 700;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid var(--primary-color);
-            position: relative;
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 0;
-            width: 100px;
-            height: 3px;
-            background: var(--warning-color);
-        }
-        
-        .chart-container {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .chart-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .chart-canvas {
-            max-height: 400px;
-        }
-        
-        .feature-card {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .feature-card h4 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-        
-        .code-block {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 20px;
+
+        .playbook-nav .nav-link {
+            color: var(--muted);
+            font-weight: 600;
             border-radius: 8px;
-            overflow-x: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            margin: 15px 0;
+            padding: 8px 10px;
         }
-        
-        .code-block .keyword {
-            color: #f687b3;
+
+        .playbook-nav .nav-link.active {
+            color: var(--ink);
+            background: var(--accent-soft);
         }
-        
-        .code-block .string {
-            color: #68d391;
+
+        .standard-card {
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid var(--accent);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
         }
-        
-        .code-block .comment {
-            color: #a0aec0;
-            font-style: italic;
+
+        .standard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
         }
-        
-        .nav-tabs .nav-link {
-            color: #495057;
-            border: none;
-            border-bottom: 3px solid transparent;
-            font-weight: 500;
+
+        .standard-card h3 {
+            font-size: 1.35rem;
+            margin-bottom: 12px;
+            color: var(--accent);
         }
-        
-        .nav-tabs .nav-link.active {
-            color: var(--primary-color);
-            background: transparent;
-            border-bottom: 3px solid var(--primary-color);
+
+        .standard-card h4 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin-bottom: 8px;
         }
-        
-        .form-section {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
+
+        .standard-card .visual-box {
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px dashed #cbd5f5;
         }
-        
-        .form-step {
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .status-draft {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-complete {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-needs {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-notstarted {
+            background: #e2e8f0;
+            color: #1f2937;
+        }
+
+        .workspace-card {
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #cbd5f5;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: #ffffff;
+        }
+
+        .workspace-shell {
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            background: #ffffff;
+            padding: 18px;
+            box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.7);
+        }
+
+        .workspace-shell .list-group-item {
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 8px;
+        }
+
+        .workspace-shell .list-group-item.active {
+            background: var(--accent-soft);
+            color: var(--ink);
+            border-color: #93c5fd;
+        }
+
+        .workspace-card.is-editing .workspace-view {
             display: none;
         }
-        
-        .form-step.active {
+
+        .workspace-card.is-editing .workspace-edit {
             display: block;
-            animation: fadeIn 0.5s;
         }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+
+        .workspace-edit {
+            display: none;
         }
-        
-        .progress-step {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            border-radius: 5px;
-            background: #e9ecef;
-            margin: 0 5px;
-            transition: all 0.3s;
+
+        .workspace-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
         }
-        
-        .progress-step.active {
-            background: var(--primary-color);
-            color: white;
+
+        .workspace-header h5 {
+            margin: 0;
+        }
+
+        .workspace-meta {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .under-hood {
+            position: sticky;
+            top: 90px;
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            border-top: 4px solid var(--accent-2);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .under-hood .nav-link {
             font-weight: 600;
+            color: var(--muted);
         }
-        
-        .progress-step.completed {
-            background: var(--success-color);
-            color: white;
+
+        .under-hood .nav-link.active {
+            color: var(--accent);
         }
-        
-        .best-practice-box {
-            background: #fff3cd;
-            border-left: 5px solid var(--warning-color);
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 5px;
+
+        pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            max-height: 280px;
+            overflow: auto;
         }
-        
-        .best-practice-box h5 {
-            color: #856404;
-            margin-bottom: 10px;
+
+        .prompt-toast {
+            position: fixed;
+            top: 80px;
+            right: 24px;
+            z-index: 1080;
         }
-        
-        .dotnet-example {
-            background: #e7f3ff;
-            border-left: 5px solid var(--info-color);
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-        
-        .dotnet-example h5 {
-            color: #004085;
-            margin-bottom: 10px;
-        }
-        
-        .badge-custom {
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: 500;
-            margin-right: 10px;
-            margin-bottom: 10px;
-            display: inline-block;
-        }
-        
-        footer {
-            background: #2c3e50;
-            color: white;
-            padding: 30px 0;
-            margin-top: 60px;
+
+        @media (max-width: 1200px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .playbook-nav,
+            .under-hood {
+                position: static;
+            }
         }
     </style>
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">unclegun.github.io</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="projects.html">Projects</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="blog.html">Blog</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="chartjs-demo.html">Chart.js Demo</a>
-                    </li>
-                </ul>
+<body data-bs-spy="scroll" data-bs-target="#playbookSidebar" data-bs-offset="120" tabindex="0">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <span class="navbar-brand fw-semibold">Razor Playbook</span>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <span class="text-white-50 small">v1.0 | 2026-02-06</span>
+                <button class="btn btn-outline-light btn-sm" id="copyPrompt">Copy prompt</button>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <div class="hero-section text-center">
-        <div class="container">
-            <h1>Chart.js Complete Guide</h1>
-            <p class="lead">Master Data Visualization with Chart.js, Bootstrap, and .NET Core</p>
-            <div class="mt-4">
-                <span class="badge-custom bg-light text-dark">Interactive Charts</span>
-                <span class="badge-custom bg-light text-dark">Responsive Design</span>
-                <span class="badge-custom bg-light text-dark">.NET Core Integration</span>
-                <span class="badge-custom bg-light text-dark">SPA Best Practices</span>
+    <div class="container-fluid my-4">
+        <div class="app-shell">
+            <aside class="playbook-nav" id="playbookSidebar">
+                <h6 class="text-uppercase text-muted">Playbook</h6>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="#app-shell" data-snippet-id="app-shell" data-hood>1. Standard App Shell</a>
+                    <a class="nav-link" href="#page-types" data-snippet-id="page-types" data-hood>2. Page Types</a>
+                    <a class="nav-link" href="#composition" data-snippet-id="composition" data-hood>3. Composition Rules</a>
+                    <a class="nav-link" href="#workspace" data-snippet-id="workspace" data-hood>4. Form Workspace Pattern</a>
+                    <a class="nav-link" href="#spa-ux" data-snippet-id="spa-ux" data-hood>5. Practical SPA UX</a>
+                    <a class="nav-link" href="#chartjs" data-snippet-id="chartjs" data-hood>6. Chart.js Integration</a>
+                    <a class="nav-link" href="#bootstrap" data-snippet-id="bootstrap" data-hood>7. Bootstrap Modularity</a>
+                    <a class="nav-link" href="#proposal-demo" data-snippet-id="proposal-demo" data-hood>8. Gov Proposal Example</a>
+                    <a class="nav-link" href="#devops" data-snippet-id="devops" data-hood>9. Azure DevOps CI/CD</a>
+                    <a class="nav-link" href="#structure" data-snippet-id="structure" data-hood>10. Folder Template</a>
+                    <a class="nav-link" href="#checklist" data-snippet-id="checklist" data-hood>11. Definition of Done</a>
+                </nav>
+            </aside>
+
+            <main>
+                <div class="alert alert-info d-flex align-items-center" role="alert">
+                    <span class="badge text-bg-primary me-2">Tip</span>
+                    Click any sidebar item, section card, or button with a preview to load snippets in the Under the Hood panel.
+                </div>
+                <section class="standard-card" id="app-shell" data-snippet-id="app-shell">
+                    <div class="workspace-header mb-3">
+                        <div>
+                            <h3>Standard App Shell</h3>
+                            <div class="workspace-meta">Layout, nav, sidebar, notifications, and consistent status language.</div>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm" data-snippet-id="layout" data-hood>View layout snippet</button>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <h4>What</h4>
+                            <p>Every Razor app uses a shared shell that defines navigation, page chrome, and a predictable surface for modules.</p>
+                            <h4>Why</h4>
+                            <p>NIH and governance requirements demand auditability, accessibility, and consistency across records.</p>
+                            <h4>How</h4>
+                            <ul>
+                                <li>_Layout.cshtml owns header, sidebar, and notification stack.</li>
+                                <li>AppSidebar partial controls nav and the current location.</li>
+                                <li>RecordHeader view component renders record identity + status.</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4>Visual</h4>
+                            <div class="visual-box">
+                                <div class="workspace-header mb-2">
+                                    <strong>Record A-1042</strong>
+                                    <span class="status-chip status-draft">Draft</span>
+                                </div>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <span class="badge bg-primary">Nav</span>
+                                    <span class="badge bg-secondary">Sidebar</span>
+                                    <span class="badge bg-success">Toast stack</span>
+                                    <span class="badge bg-warning text-dark">Status chips</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="standard-card" id="page-types" data-snippet-id="page-types">
+                    <h3>Page Types</h3>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <h4>What</h4>
+                            <p>Index, Details, Edit, Review, and the long-lived Workspace page. Each page has explicit handlers.</p>
+                            <h4>Why</h4>
+                            <p>Clear page boundaries protect audit trails and reduce regression in regulated workflows.</p>
+                            <h4>How</h4>
+                            <ul>
+                                <li>Index: search + table list.</li>
+                                <li>Details: read-only summary.</li>
+                                <li>Edit: section-level updates.</li>
+                                <li>Review: final validation + submission.</li>
+                                <li>Workspace: section cards + independent saves.</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4>Visual</h4>
+                            <div class="visual-box">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="badge bg-dark">Index</span>
+                                    <span class="badge bg-dark">Details</span>
+                                    <span class="badge bg-dark">Edit</span>
+                                    <span class="badge bg-dark">Review</span>
+                                    <span class="badge bg-dark">Workspace</span>
+                                </div>
+                                <div class="small text-muted">Workspace is the SPA-like shell for long-lived records.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="standard-card" id="composition" data-snippet-id="composition">
+                    <h3>Composition Rules</h3>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <h4>What</h4>
+                            <p>Clear rules on when to use Razor Pages, partials, view components, or tag helpers.</p>
+                            <h4>Why</h4>
+                            <p>Consistency and maintainability across teams with different modules.</p>
+                            <h4>How</h4>
+                            <ul>
+                                <li>Pages orchestrate and call the DAL.</li>
+                                <li>Partials render section markup only.</li>
+                                <li>View components encapsulate reusable logic.</li>
+                                <li>Tag helpers cover tiny repetitive patterns.</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4>Visual</h4>
+                            <div class="visual-box">
+                                <div class="mb-2"><strong>Page</strong> → orchestrates</div>
+                                <div class="mb-2"><strong>Partial</strong> → section markup</div>
+                                <div class="mb-2"><strong>ViewComponent</strong> → shared widgets</div>
+                                <div><strong>TagHelper</strong> → badges, chips, small UI</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="standard-card" id="workspace" data-snippet-id="workspace">
+                    <h3>Form Workspace Pattern</h3>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <h4>What</h4>
+                            <p>One record workspace where sections save independently and remain Draft until Submit.</p>
+                            <h4>Why</h4>
+                            <p>Information appears over time; draft saves preserve auditability without blocking progress.</p>
+                            <h4>How</h4>
+                            <ul>
+                                <li>Each section has its own handler: OnPostSaveContact.</li>
+                                <li>Draft validation is lenient; submit validation is strict.</li>
+                                <li>Deep links allow direct navigation to /records/123#contact.</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4>Visual</h4>
+                            <div class="visual-box workspace-demo" data-snippet-id="workspace-module" data-hood>
+                                <div class="workspace-header mb-3">
+                                    <div>
+                                        <h5>Record A-1042</h5>
+                                        <div class="workspace-meta">Last saved: <span data-last-saved>08:12 AM</span></div>
+                                    </div>
+                                    <span class="status-chip status-draft" data-record-status>Draft</span>
+                                </div>
+                                <div class="workspace-card" data-section="contact" data-snippet-id="section-contact" data-hood>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <strong>Contact Information</strong>
+                                        <span class="status-chip status-notstarted" data-status>Not started</span>
+                                    </div>
+                                    <div class="workspace-view">
+                                        <div class="text-muted">
+                                            <div><strong>Name:</strong> <span data-display="contactName">Not provided</span></div>
+                                            <div><strong>Email:</strong> <span data-display="contactEmail">Not provided</span></div>
+                                            <div><strong>Phone:</strong> <span data-display="contactPhone">Not provided</span></div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary mt-2" data-action="edit">Edit</button>
+                                    </div>
+                                    <div class="workspace-edit">
+                                        <input class="form-control mb-2" placeholder="Primary contact name" data-field="contactName">
+                                        <input class="form-control mb-2" placeholder="Email" data-field="contactEmail">
+                                        <input class="form-control mb-2" placeholder="Phone" data-field="contactPhone">
+                                        <button class="btn btn-sm btn-success" data-action="save">Save</button>
+                                        <button class="btn btn-sm btn-outline-secondary" data-action="cancel">Cancel</button>
+                                    </div>
+                                </div>
+                                <div class="workspace-card" data-section="compliance" data-snippet-id="section-compliance" data-hood>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <strong>Compliance Review</strong>
+                                        <span class="status-chip status-needs" data-status>Needs review</span>
+                                    </div>
+                                    <div class="workspace-view">
+                                        <div class="text-muted">
+                                            <div><strong>Insurance:</strong> <span data-display="insuranceStatus">Missing</span></div>
+                                            <div><strong>OFAC:</strong> <span data-display="ofacStatus">Pending</span></div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary mt-2" data-action="edit">Edit</button>
+                                    </div>
+                                    <div class="workspace-edit">
+                                        <select class="form-select mb-2" data-field="insuranceStatus">
+                                            <option>Missing</option>
+                                            <option>Received</option>
+                                        </select>
+                                        <select class="form-select mb-2" data-field="ofacStatus">
+                                            <option>Pending</option>
+                                            <option>Passed</option>
+                                            <option>Failed</option>
+                                        </select>
+                                        <button class="btn btn-sm btn-success" data-action="save">Save</button>
+                                        <button class="btn btn-sm btn-outline-secondary" data-action="cancel">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="standard-card" id="spa-ux" data-snippet-id="spa-ux">
+                    <h3>Practical SPA UX in Razor</h3>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <h4>What</h4>
+                            <p>SPA ergonomics without React: Razor Pages + partial updates + targeted handlers.</p>
+                            <h4>Why</h4>
+                            <p>Faster UX while keeping audit logging, RBAC, and server rendering intact.</p>
+                            <h4>How</h4>
+                            <ul>
+                                <li>Use HTMX or fetch for section-level GET/POST updates.</li>
+                                <li>Render partials on the server for each section.</li>
+                                <li>Maintain scroll position and show toast feedback.</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4>Visual</h4>
+                            <div class="visual-box">
+                                <div class="mb-2">Edit → Save → Section swaps back to view state.</div>
+                                <div class="small text-muted">Handlers: OnGetSection, OnPostSaveSection</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="standard-card" id="chartjs" data-snippet-id="chartjs">
+                    <h3>Chart.js Integration (No Controllers)</h3>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <h4>What</h4>
+                            <p>Razor emits JSON safely; JS reads it and renders Chart.js. DAL loads data directly.</p>
+                            <h4>Why</h4>
+                            <p>No extra API surface, works in air-gapped environments, and stays testable.</p>
+                            <h4>How</h4>
+                            <ul>
+                                <li>DAL returns POCO list.</li>
+                                <li>PageModel maps to chart VM.</li>
+                                <li>Razor serializes to JSON blob.</li>
+                                <li>Chart.js reads JSON and renders.</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4>Visual</h4>
+                            <div class="visual-box" data-snippet-id="chart-module" data-hood>
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <strong>Chart module</strong>
+                                    <select class="form-select form-select-sm w-auto" id="chartSelect" aria-label="Select chart">
+                                        <option value="runCounts">Run counts</option>
+                                        <option value="reviewTimes">Review times</option>
+                                        <option value="budgetMix">Budget mix</option>
+                                    </select>
+                                </div>
+                                <canvas id="runCountsChart" height="180"></canvas>
+                                <script type="application/json" id="chart-data">
+                                    {"charts":{"runCounts":{"type":"bar","data":{"labels":["Pending","In Review","Approved","Rejected"],"datasets":[{"label":"Run counts","data":[12,9,18,4],"backgroundColor":["#3b82f6","#f59e0b","#10b981","#ef4444"]}]}},"reviewTimes":{"type":"line","data":{"labels":["Week 1","Week 2","Week 3","Week 4"],"datasets":[{"label":"Days to review","data":[6,4,8,5],"borderColor":"#2563eb","backgroundColor":"rgba(37,99,235,0.2)","tension":0.4}]}},"budgetMix":{"type":"doughnut","data":{"labels":["Personnel","Equipment","Travel","Other"],"datasets":[{"label":"Budget mix","data":[52,18,12,18],"backgroundColor":["#14b8a6","#6366f1","#f59e0b","#94a3b8"]}]}}}}
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="standard-card" id="bootstrap" data-snippet-id="bootstrap">
+                    <h3>Bootstrap Building Blocks</h3>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <h4>Approved patterns</h4>
+                            <ul>
+                                <li>Card + header actions</li>
+                                <li>Accordion for many sections</li>
+                                <li>Offcanvas help panel</li>
+                                <li>Toast feedback</li>
+                                <li>Stepper / progress</li>
+                                <li>Table with sticky header</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4>Visual</h4>
+                            <div class="visual-box">
+                                <div class="accordion" id="demoAccordion">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingOne">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">Accordion section</button>
+                                        </h2>
+                                        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#demoAccordion">
+                                            <div class="accordion-body">Use when many sections are present.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="toast show mt-3" role="alert" aria-live="assertive" aria-atomic="true">
+                                    <div class="toast-header">
+                                        <strong class="me-auto">Saved</strong>
+                                        <small>Just now</small>
+                                    </div>
+                                    <div class="toast-body">Draft saved successfully.</div>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="offcanvas" data-bs-target="#bootstrapLab">Open Bootstrap Lab</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-2">
+                        <div class="col-lg-6">
+                            <h4>When to use</h4>
+                            <ul>
+                                <li>Dashboards that need dense info display.</li>
+                                <li>Record workspaces with many modules.</li>
+                                <li>Administrative grids with filtering.</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4>Bootstrap Lab</h4>
+                            <div class="visual-box">
+                                <div class="d-flex gap-2 flex-wrap mb-2">
+                                    <span class="badge bg-primary">Badges</span>
+                                    <span class="badge bg-success">Pills</span>
+                                    <span class="badge bg-warning text-dark">Alerts</span>
+                                    <span class="badge bg-info text-dark">Tooltips</span>
+                                </div>
+                                <div class="progress mb-2" role="progressbar" aria-label="Completion" aria-valuenow="64" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="progress-bar progress-bar-striped" style="width: 64%">64%</div>
+                                </div>
+                                <div class="list-group">
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        Pending approvals
+                                        <span class="badge bg-secondary rounded-pill">6</span>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        Open questions
+                                        <span class="badge bg-secondary rounded-pill">3</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="standard-card" id="proposal-demo" data-snippet-id="proposal-demo">
+                    <h3>Government Research Proposal Workspace (SPA Example)</h3>
+                    <div class="mb-3">
+                        <h4>What</h4>
+                        <p>A real-world example of a long-lived proposal with multiple sections that can be completed over time.</p>
+                        <h4>Why</h4>
+                        <p>Government submissions require auditability, incremental saves, and structured review cycles.</p>
+                        <h4>How</h4>
+                        <ul>
+                            <li>Each section is a module with its own save handler.</li>
+                            <li>Draft saves allowed, submit validation is strict.</li>
+                            <li>Users can deep-link to a section in review.</li>
+                        </ul>
+                        <h4>Uses</h4>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge bg-primary">App shell</span>
+                            <span class="badge bg-success">Workspace modules</span>
+                            <span class="badge bg-info text-dark">Chart module</span>
+                            <span class="badge bg-warning text-dark">Offcanvas help</span>
+                            <span class="badge bg-secondary">Toasts</span>
+                        </div>
+                    </div>
+                    <h4>Workspace Example</h4>
+                    <div class="workspace-shell workspace-demo" data-snippet-id="proposal-module" data-hood>
+                        <div class="workspace-header mb-3">
+                            <div>
+                                <h5>NIH Proposal: Neurogenomics 2026</h5>
+                                <div class="workspace-meta">Last saved: <span data-last-saved>09:40 AM</span></div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="status-chip status-notstarted" data-record-status>Not started</span>
+                                <button class="btn btn-sm btn-outline-secondary" type="button">Route</button>
+                                <button class="btn btn-sm btn-primary" type="button" disabled>Submit</button>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-lg-3">
+                                <div class="list-group">
+                                    <div class="list-group-item active">Project Summary</div>
+                                    <div class="list-group-item">Specific Aims</div>
+                                    <div class="list-group-item">Project Logistics</div>
+                                    <div class="list-group-item">Budget & Resources</div>
+                                    <div class="list-group-item">Compliance & IRB</div>
+                                    <div class="list-group-item">Data Management Plan</div>
+                                    <div class="list-group-item">Attachments</div>
+                                </div>
+                            </div>
+                            <div class="col-lg-9">
+                                <div class="workspace-card" data-section="summary" data-snippet-id="proposal-summary" data-hood>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <strong>Project Summary</strong>
+                                        <span class="status-chip status-draft" data-status>Draft</span>
+                                    </div>
+                                    <div class="workspace-view">
+                                        <div class="text-muted">
+                                            <div><strong>Lead:</strong> <span data-display="summaryLead">Dr. Nguyen</span></div>
+                                            <div><strong>Summary:</strong> <span data-display="summaryText">Draft narrative uploaded</span></div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary mt-2" data-action="edit">Edit</button>
+                                    </div>
+                                    <div class="workspace-edit">
+                                        <input class="form-control mb-2" placeholder="Lead investigator" data-field="summaryLead">
+                                        <textarea class="form-control mb-2" rows="2" placeholder="Summary narrative" data-field="summaryText"></textarea>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-success" data-action="save">Save</button>
+                                            <button class="btn btn-sm btn-outline-secondary" data-action="cancel">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="workspace-card" data-section="aims" data-snippet-id="proposal-aims" data-hood>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <strong>Specific Aims</strong>
+                                        <span class="status-chip status-notstarted" data-status>Not started</span>
+                                    </div>
+                                    <div class="workspace-view">
+                                        <div class="text-muted">
+                                            <div><strong>Aim 1:</strong> <span data-display="aim1">Not provided</span></div>
+                                            <div><strong>Aim 2:</strong> <span data-display="aim2">Not provided</span></div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary mt-2" data-action="edit">Edit</button>
+                                    </div>
+                                    <div class="workspace-edit">
+                                        <input class="form-control mb-2" placeholder="Aim 1 summary" data-field="aim1">
+                                        <input class="form-control mb-2" placeholder="Aim 2 summary" data-field="aim2">
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-success" data-action="save">Save</button>
+                                            <button class="btn btn-sm btn-outline-secondary" data-action="cancel">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="workspace-card" data-section="logistics" data-snippet-id="proposal-logistics" data-hood>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <strong>Project Logistics (Standard Fields)</strong>
+                                        <span class="status-chip status-draft" data-status>Draft</span>
+                                    </div>
+                                    <div class="workspace-view">
+                                        <div class="text-muted">
+                                            <div><strong>Title:</strong> <span data-display="projectTitle">Neurogenomics Atlas</span></div>
+                                            <div><strong>Dates:</strong> <span data-display="startDate">2026-03-01</span> to <span data-display="endDate">2027-02-28</span></div>
+                                            <div><strong>Mechanism:</strong> <span data-display="fundingMechanism">R01</span></div>
+                                            <div><strong>Sponsor:</strong> <span data-display="sponsorName">NIH</span></div>
+                                            <div><strong>Route:</strong> <span data-display="submissionRoute">NIH eRA Commons</span></div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary mt-2" data-action="edit">Edit</button>
+                                    </div>
+                                    <div class="workspace-edit">
+                                        <div class="row g-2">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Project title</label>
+                                                <input class="form-control" placeholder="Proposal title" data-field="projectTitle">
+                                                <div class="form-text">Required. Used in headers and exports.</div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label">Start date</label>
+                                                <input class="form-control" type="date" data-field="startDate">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label">End date</label>
+                                                <input class="form-control" type="date" data-field="endDate">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Funding mechanism</label>
+                                                <select class="form-select" data-field="fundingMechanism">
+                                                    <option>R01</option>
+                                                    <option>R21</option>
+                                                    <option>U01</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Sponsor</label>
+                                                <input class="form-control" placeholder="Agency or sponsor" data-field="sponsorName">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Submission route</label>
+                                                <select class="form-select" data-field="submissionRoute">
+                                                    <option>NIH eRA Commons</option>
+                                                    <option>Grants.gov</option>
+                                                    <option>Internal review</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex gap-2 mt-3">
+                                            <button class="btn btn-sm btn-success" data-action="save">Save</button>
+                                            <button class="btn btn-sm btn-outline-secondary" data-action="cancel">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="workspace-card" data-section="budget" data-snippet-id="proposal-budget" data-hood>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <strong>Budget & Resources</strong>
+                                        <span class="status-chip status-needs" data-status>Needs review</span>
+                                    </div>
+                                    <div class="workspace-view">
+                                        <div class="text-muted">
+                                            <div><strong>Total:</strong> <span data-display="budgetTotal">Vendor quotes pending</span></div>
+                                            <div><strong>Period:</strong> <span data-display="budgetPeriod">Not provided</span></div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary mt-2" data-action="edit">Edit</button>
+                                    </div>
+                                    <div class="workspace-edit">
+                                        <input class="form-control mb-2" placeholder="Total requested" data-field="budgetTotal">
+                                        <select class="form-select mb-2" data-field="budgetPeriod">
+                                            <option>1 year</option>
+                                            <option>2 years</option>
+                                            <option>3 years</option>
+                                        </select>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-success" data-action="save">Save</button>
+                                            <button class="btn btn-sm btn-outline-secondary" data-action="cancel">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="workspace-card" data-section="compliance" data-snippet-id="proposal-compliance" data-hood>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <strong>Compliance & IRB</strong>
+                                        <span class="status-chip status-complete" data-status>Complete</span>
+                                    </div>
+                                    <div class="workspace-view">
+                                        <div class="text-muted">
+                                            <div><strong>IRB:</strong> <span data-display="irbStatus">Approved</span></div>
+                                            <div><strong>Documentation:</strong> <span data-display="irbDocs">Attached</span></div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary mt-2" data-action="edit">Edit</button>
+                                    </div>
+                                    <div class="workspace-edit">
+                                        <select class="form-select mb-2" data-field="irbStatus">
+                                            <option>Approved</option>
+                                            <option>Pending</option>
+                                        </select>
+                                        <input class="form-control mb-2" placeholder="Documentation status" data-field="irbDocs">
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-success" data-action="save">Save</button>
+                                            <button class="btn btn-sm btn-outline-secondary" data-action="cancel">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="workspace-card" data-section="data-plan" data-snippet-id="proposal-data" data-hood>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <strong>Data Management Plan</strong>
+                                        <span class="status-chip status-notstarted" data-status>Not started</span>
+                                    </div>
+                                    <div class="workspace-view">
+                                        <div class="text-muted">
+                                            <div><strong>Storage:</strong> <span data-display="dataStorage">Not provided</span></div>
+                                            <div><strong>Sharing:</strong> <span data-display="dataSharing">Not provided</span></div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary mt-2" data-action="edit">Edit</button>
+                                    </div>
+                                    <div class="workspace-edit">
+                                        <input class="form-control mb-2" placeholder="Storage location" data-field="dataStorage">
+                                        <textarea class="form-control mb-2" rows="2" placeholder="Sharing and retention" data-field="dataSharing"></textarea>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-success" data-action="save">Save</button>
+                                            <button class="btn btn-sm btn-outline-secondary" data-action="cancel">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="workspace-card" data-section="attachments" data-snippet-id="proposal-attachments" data-hood>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <strong>Attachments</strong>
+                                        <span class="status-chip status-draft" data-status>Draft</span>
+                                    </div>
+                                    <div class="workspace-view">
+                                        <div class="text-muted">
+                                            <div><strong>Files:</strong> <span data-display="attachmentCount">3 files uploaded</span></div>
+                                            <div><strong>Last upload:</strong> <span data-display="attachmentLast">Today</span></div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary mt-2" data-action="edit">Edit</button>
+                                    </div>
+                                    <div class="workspace-edit">
+                                        <input class="form-control mb-2" type="file" multiple data-field="attachmentCount">
+                                        <input class="form-control mb-2" placeholder="Last upload note" data-field="attachmentLast">
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-success" data-action="save">Save</button>
+                                            <button class="btn btn-sm btn-outline-secondary" data-action="cancel">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="standard-card" id="devops" data-snippet-id="devops">
+                    <h3>Azure DevOps CI/CD (On-Prem)</h3>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <h4>What</h4>
+                            <p>Use Azure DevOps Server (TFS) with self-hosted agents to run builds, tests, and deployments entirely on-prem.</p>
+                            <h4>Why</h4>
+                            <p>Improves department efficiency by standardizing builds, enforcing quality gates, and reducing manual handoffs.</p>
+                            <h4>How</h4>
+                            <ul>
+                                <li>CI pipeline runs on every PR: restore, build, unit tests, and coverage.</li>
+                                <li>DAL and core components get unit-tested with database mocks or local SQL test containers.</li>
+                                <li>CD pipeline deploys to internal dev/test servers with approvals.</li>
+                                <li>Policy gates enforce security scanning and artifact retention.</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4>Visual</h4>
+                            <div class="visual-box" data-snippet-id="devops-pipeline" data-hood>
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <span class="badge bg-primary">CI</span>
+                                    <span class="badge bg-info text-dark">Unit Tests</span>
+                                    <span class="badge bg-warning text-dark">Security</span>
+                                    <span class="badge bg-success">Package</span>
+                                    <span class="badge bg-secondary">CD (On-Prem)</span>
+                                </div>
+                                <div class="small text-muted">Self-hosted agents only. No external cloud services or SaaS dependencies.</div>
+                            </div>
+                            <div class="mt-3">
+                                <h4>Efficiency impact</h4>
+                                <ul>
+                                    <li>Fast feedback on DAL regressions before merge.</li>
+                                    <li>Repeatable deployments reduce release risk.</li>
+                                    <li>Audit-ready logs for change tracking.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="standard-card" id="structure" data-snippet-id="structure">
+                    <h3>Recommended Repo Structure</h3>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <h4>What</h4>
+                            <p>Standardized folders and naming conventions for Razor Pages, partials, components, and tag helpers.</p>
+                            <h4>How</h4>
+                            <ul>
+                                <li>Pages orchestrate; components render.</li>
+                                <li>DAL calls only in PageModel or ViewComponent (choose one).</li>
+                                <li>Each section has VM + partial + handlers.</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4>Visual</h4>
+                            <div class="visual-box">
+                                <pre>/Pages
+  /Shared
+    _Layout.cshtml
+    /Partials
+      _AppSidebar.cshtml
+      _ValidationSummary.cshtml
+    /Sections
+      _SectionCardShell.cshtml
+      _FileUploadCard.cshtml
+  /Records
+    /{id}
+      Index.cshtml
+      Index.cshtml.cs
+      Review.cshtml
+      Review.cshtml.cs
+/ViewComponents
+  RecordHeaderViewComponent.cs
+  StatusSummaryViewComponent.cs
+/TagHelpers
+  StatusBadgeTagHelper.cs
+/wwwroot
+  /js
+    charts/runCounts.js
+  /css
+    site.css</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="standard-card" id="checklist" data-snippet-id="checklist">
+                    <h3>Definition of Done Checklist</h3>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <h4>What</h4>
+                            <p>A repeatable checklist for performance, accessibility, and security.</p>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4>Why</h4>
+                            <p>Standardized quality gates across the department.</p>
+                        </div>
+                    </div>
+                    <div class="row g-2 mt-2">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">WCAG contrast verified</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Audit logging enabled</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Rowversion concurrency checks</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Toast + inline validation</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Performance budget checked</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Security headers applied</label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <aside class="under-hood">
+                <div class="border-bottom p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong>Under the Hood</strong>
+                        <button class="btn btn-sm btn-outline-secondary" id="copySnippet">Copy snippet</button>
+                    </div>
+                    <div class="text-muted small" id="snippetTitle">Select a module or card to inspect its implementation.</div>
+                </div>
+                <ul class="nav nav-tabs px-3 pt-3" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#hood-file">File tree</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#hood-page">Razor page</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#hood-model">PageModel</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#hood-partial">Partial</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#hood-component">ViewComponent</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#hood-js">JS</button>
+                    </li>
+                </ul>
+                <div class="tab-content p-3">
+                    <div class="tab-pane fade show active" id="hood-file"><pre id="snippetFile"></pre></div>
+                    <div class="tab-pane fade" id="hood-page"><pre id="snippetPage"></pre></div>
+                    <div class="tab-pane fade" id="hood-model"><pre id="snippetModel"></pre></div>
+                    <div class="tab-pane fade" id="hood-partial"><pre id="snippetPartial"></pre></div>
+                    <div class="tab-pane fade" id="hood-component"><pre id="snippetComponent"></pre></div>
+                    <div class="tab-pane fade" id="hood-js"><pre id="snippetJs"></pre></div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="prompt-toast toast align-items-center text-bg-dark" role="alert" aria-live="assertive" aria-atomic="true" id="promptToast">
+        <div class="d-flex">
+            <div class="toast-body">Prompt copied to clipboard.</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="saveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Section saved</strong>
+                <small>Just now</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">Draft saved. Continue to the next section.</div>
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="bootstrapLab" aria-labelledby="bootstrapLabLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="bootstrapLabLabel">Bootstrap Lab</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <p class="text-muted">Explore rapid UI patterns approved for internal apps.</p>
+            <div class="mb-3">
+                <label class="form-label">Quick filters</label>
+                <div class="btn-group" role="group" aria-label="Filters">
+                    <button class="btn btn-outline-primary btn-sm" type="button">Active</button>
+                    <button class="btn btn-outline-primary btn-sm" type="button">Pending</button>
+                    <button class="btn btn-outline-primary btn-sm" type="button">Archived</button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Inline progress</label>
+                <div class="progress" role="progressbar" aria-label="Review progress" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar bg-success" style="width: 42%">42%</div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Status list</label>
+                <div class="list-group">
+                    <div class="list-group-item d-flex justify-content-between">
+                        Reviews complete
+                        <span class="badge bg-success rounded-pill">14</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        Awaiting signatures
+                        <span class="badge bg-warning text-dark rounded-pill">5</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="container">
-        <!-- Introduction Section -->
-        <section class="mb-5">
-            <h2 class="section-title">What is Chart.js?</h2>
-            <div class="row">
-                <div class="col-lg-8">
-                    <p class="lead">Chart.js is a powerful, flexible, and open-source JavaScript library for creating beautiful, responsive charts. It's built on HTML5 Canvas and provides a simple yet flexible API for developers.</p>
-                    
-                    <div class="feature-card">
-                        <h4>🎨 Key Features</h4>
-                        <ul>
-                            <li><strong>8 Chart Types:</strong> Line, Bar, Radar, Doughnut, Pie, Polar Area, Bubble, and Scatter</li>
-                            <li><strong>Responsive:</strong> Charts automatically resize based on container size</li>
-                            <li><strong>Animation:</strong> Smooth, customizable animations out of the box</li>
-                            <li><strong>Interactivity:</strong> Tooltips, legends, and click events</li>
-                            <li><strong>Accessibility:</strong> ARIA labels and keyboard navigation</li>
-                            <li><strong>Customizable:</strong> Extensive configuration options</li>
-                            <li><strong>Lightweight:</strong> Small bundle size (~200KB)</li>
-                            <li><strong>Framework Agnostic:</strong> Works with React, Vue, Angular, and vanilla JS</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="feature-card">
-                        <h4>📚 Quick Links</h4>
-                        <ul class="list-unstyled">
-                            <li><a href="https://www.chartjs.org/" target="_blank">Official Documentation</a></li>
-                            <li><a href="https://github.com/chartjs/Chart.js" target="_blank">GitHub Repository</a></li>
-                            <li><a href="https://www.npmjs.com/package/chart.js" target="_blank">NPM Package</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Chart Examples Section -->
-        <section class="mb-5">
-            <h2 class="section-title">Chart Examples</h2>
-            
-            <!-- Line Chart -->
-            <div class="chart-container">
-                <h3 class="mb-4">📈 Line Chart - Sales Over Time</h3>
-                <p>Perfect for showing trends and changes over time. Use for revenue tracking, user growth, or performance metrics.</p>
-                <canvas id="lineChart" class="chart-canvas"></canvas>
-            </div>
-
-            <!-- Bar Chart -->
-            <div class="chart-container">
-                <h3 class="mb-4">📊 Bar Chart - Monthly Revenue Comparison</h3>
-                <p>Ideal for comparing values across categories. Great for sales comparisons, survey results, or competitive analysis.</p>
-                <canvas id="barChart" class="chart-canvas"></canvas>
-            </div>
-
-            <!-- Pie & Doughnut Charts -->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="chart-container">
-                        <h3 class="mb-4">🥧 Pie Chart - Market Share</h3>
-                        <p>Shows proportions and percentages of a whole.</p>
-                        <canvas id="pieChart" class="chart-canvas"></canvas>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="chart-container">
-                        <h3 class="mb-4">🍩 Doughnut Chart - Budget Allocation</h3>
-                        <p>Similar to pie chart but with a center cutout for additional info.</p>
-                        <canvas id="doughnutChart" class="chart-canvas"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Radar Chart -->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="chart-container">
-                        <h3 class="mb-4">🎯 Radar Chart - Skills Assessment</h3>
-                        <p>Multi-dimensional data visualization, perfect for comparing multiple variables.</p>
-                        <canvas id="radarChart" class="chart-canvas"></canvas>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="chart-container">
-                        <h3 class="mb-4">📊 Mixed Chart - Sales & Profit Analysis</h3>
-                        <p>Combine different chart types for comprehensive insights.</p>
-                        <canvas id="mixedChart" class="chart-canvas"></canvas>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- .NET Core Integration Section -->
-        <section class="mb-5">
-            <h2 class="section-title">Chart.js in .NET Core Web Applications</h2>
-            
-            <div class="dotnet-example">
-                <h5>💡 Integration Approach</h5>
-                <p>Chart.js integrates seamlessly with .NET Core through the View layer. Your .NET backend provides data via API endpoints, and Chart.js renders it on the frontend.</p>
-            </div>
-
-            <div class="feature-card">
-                <h4>Step 1: Create a Web API Controller</h4>
-                <div class="code-block">
-<span class="comment">// Controllers/ChartDataController.cs</span>
-<span class="keyword">using</span> Microsoft.AspNetCore.Mvc;
-
-[Route(<span class="string">"api/[controller]"</span>)]
-[ApiController]
-<span class="keyword">public class</span> ChartDataController : ControllerBase
-{
-    [HttpGet(<span class="string">"sales"</span>)]
-    <span class="keyword">public</span> IActionResult GetSalesData()
-    {
-        <span class="keyword">var</span> data = <span class="keyword">new</span>
-        {
-            labels = <span class="keyword">new</span>[] { <span class="string">"Jan"</span>, <span class="string">"Feb"</span>, <span class="string">"Mar"</span>, <span class="string">"Apr"</span>, <span class="string">"May"</span>, <span class="string">"Jun"</span> },
-            datasets = <span class="keyword">new</span>[]
-            {
-                <span class="keyword">new</span>
-                {
-                    label = <span class="string">"Sales 2024"</span>,
-                    data = <span class="keyword">new</span>[] { 65, 59, 80, 81, 56, 55 },
-                    backgroundColor = <span class="string">"rgba(54, 162, 235, 0.2)"</span>,
-                    borderColor = <span class="string">"rgba(54, 162, 235, 1)"</span>,
-                    borderWidth = 2
-                }
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const snippets = {
+            "app-shell": {
+                title: "Standard App Shell",
+                fileTree: "/Pages/Shared/_Layout.cshtml\n/Pages/Shared/Partials/_AppSidebar.cshtml\n/ViewComponents/RecordHeaderViewComponent.cs",
+                page: "@* _Layout.cshtml *@\n<body>\n  <header>...navigation...</header>\n  <main class=\"container-fluid\">@RenderBody()</main>\n</body>",
+                model: "// Not applicable for layout",
+                partial: "@* _AppSidebar.cshtml *@\n<nav>\n  <a asp-page=\"/Records/Index\">Records</a>\n</nav>",
+                component: "public class RecordHeaderViewComponent : ViewComponent\n{\n  public IViewComponentResult Invoke(RecordSummary summary)\n  {\n    return View(summary);\n  }\n}",
+                js: "// Toast stack initializes in _Layout"
+            },
+            "layout": {
+                title: "_Layout.cshtml",
+                fileTree: "/Pages/Shared/_Layout.cshtml",
+                page: "@* _Layout.cshtml *@\n<div class=\"app-shell\">\n  <partial name=\"Partials/_AppSidebar\" />\n  <main>@RenderBody()</main>\n  <vc:record-header model=\"Model.Summary\" />\n</div>",
+                model: "// Layout uses ViewComponents or ViewData",
+                partial: "@* _AppSidebar.cshtml *@\n<ul class=\"nav flex-column\">\n  <li class=\"nav-item\">Records</li>\n</ul>",
+                component: "public class RecordHeaderViewComponent : ViewComponent\n{\n  public IViewComponentResult Invoke(RecordSummary summary) => View(summary);\n}",
+                js: "// No JS required for layout"
+            },
+            "page-types": {
+                title: "Page Types",
+                fileTree: "/Pages/Records/{id}/Index.cshtml\n/Pages/Records/{id}/Review.cshtml",
+                page: "@page \"/records/{id}\"\n@model RecordIndexModel\n<h1>@Model.Summary.Title</h1>",
+                model: "public class RecordIndexModel : PageModel\n{\n  public Task OnGetAsync(int id) { /* load data */ }\n}",
+                partial: "@* _SectionCardShell.cshtml *@\n<div class=\"card\">@RenderBody()</div>",
+                component: "// Optional ViewComponent for status summary",
+                js: "// Minimal JS for toast notifications"
+            },
+            "composition": {
+                title: "Composition Rules",
+                fileTree: "/Pages/Shared/Sections/_ContactCard.cshtml\n/ViewComponents/RecordHeaderViewComponent.cs\n/TagHelpers/StatusBadgeTagHelper.cs",
+                page: "@page\n<partial name=\"Sections/_ContactCard\" model=\"Model.Contact\" />",
+                model: "public class RecordDetailsModel : PageModel\n{\n  public ContactVm Contact { get; set; }\n}",
+                partial: "@model ContactVm\n<div class=\"card\">\n  <h5>Contact</h5>\n</div>",
+                component: "public class RecordHeaderViewComponent : ViewComponent\n{\n  public IViewComponentResult Invoke(RecordSummary summary) => View(summary);\n}",
+                js: "// TagHelpers use server-side rendering"
+            },
+            "workspace": {
+                title: "Workspace Pattern",
+                fileTree: "/Pages/Records/{id}/Index.cshtml\n/Pages/Records/{id}/Index.cshtml.cs\n/Pages/Shared/Sections/_ContactCard.cshtml",
+                page: "@page \"/records/{id}\"\n<partial name=\"Sections/_ContactCard\" model=\"Model.Contact\" />",
+                model: "public class RecordIndexModel : PageModel\n{\n  public async Task<IActionResult> OnPostSaveContactAsync(int id)\n  {\n    // Save draft section\n    return Partial(\"Sections/_ContactCard\", Contact);\n  }\n}",
+                partial: "@model ContactVm\n<div class=\"section-card\">\n  <button asp-page-handler=\"SaveContact\">Save</button>\n</div>",
+                component: "// StatusSummaryViewComponent renders overall state",
+                js: "// HTMX or fetch swaps the section HTML"
+            },
+            "spa-ux": {
+                title: "Practical SPA UX",
+                fileTree: "/Pages/Records/{id}/Sections/Contact.cshtml\n/wwwroot/js/sections.js",
+                page: "<div hx-get=\"/records/123/sections/contact\" hx-trigger=\"load\"></div>",
+                model: "public async Task<IActionResult> OnPostSaveContactAsync()\n{\n  // Return updated partial\n}",
+                partial: "@* Sections/_ContactCard.cshtml *@\n<form hx-post=\"/records/123/sections/contact\">...</form>",
+                component: "// RecordHeaderViewComponent persists across swaps",
+                js: "// JS only handles toasts and scroll"
+            },
+            "chartjs": {
+                title: "Chart.js Module",
+                fileTree: "/Pages/Records/{id}/Index.cshtml.cs\n/Pages/Shared/Sections/_RunCountsChart.cshtml\n/wwwroot/js/charts/runCounts.js",
+                page: "@* _RunCountsChart.cshtml *@\n<script type=\"application/json\" id=\"run-counts-data\">@Model.ChartJson<\\/script>\n<canvas id=\"runCountsChart\"></canvas>",
+                model: "public class RecordIndexModel : PageModel\n{\n  public string ChartJson { get; set; }\n  public async Task OnGetAsync(int id)\n  {\n    var data = await _dal.GetRunCountsAsync(id);\n    ChartJson = JsonSerializer.Serialize(data);\n  }\n}",
+                partial: "@model ChartVm\n<canvas id=\"runCountsChart\"></canvas>",
+                component: "// Optional view component for chart wrappers",
+                js: "const payload = JSON.parse(document.getElementById('run-counts-data').textContent);\nnew Chart(ctx, { type: 'bar', data: payload });"
+            },
+            "bootstrap": {
+                title: "Bootstrap Building Blocks",
+                fileTree: "/Pages/Shared/Sections/_SectionCardShell.cshtml\n/Pages/Shared/Partials/_ToastStack.cshtml",
+                page: "<div class=\"card\">...section...</div>",
+                model: "// No PageModel needed for static layout",
+                partial: "@* _SectionCardShell.cshtml *@\n<div class=\"card\">@RenderBody()</div>",
+                component: "// ToastStackViewComponent can be shared",
+                js: "// Bootstrap bundle handles accordion/offcanvas"
+            },
+            "devops": {
+                title: "Azure DevOps CI/CD (On-Prem)",
+                fileTree: "/azure-pipelines.yml\n/build/\n/tests/\n/scripts/",
+                page: "// Pipeline configuration lives in the repo root",
+                model: "// No PageModel for CI/CD",
+                partial: "// Internal scripts for packaging and deployment",
+                component: "// Quality gates applied via branch policies",
+                js: "// CI runs on self-hosted agents only"
+            },
+            "devops-pipeline": {
+                title: "Azure DevOps Pipeline",
+                fileTree: "/azure-pipelines.yml",
+                page: "trigger:\n- main\n\npool:\n  name: OnPrem-Agent-Pool\n\nsteps:\n- task: DotNetCoreCLI@2\n  inputs:\n    command: 'restore'\n- task: DotNetCoreCLI@2\n  inputs:\n    command: 'build'\n    arguments: '--configuration Release'\n- task: DotNetCoreCLI@2\n  inputs:\n    command: 'test'\n    arguments: '--collect \"XPlat Code Coverage\"'\n- task: PublishTestResults@2\n  inputs:\n    testResultsFiles: '**/*.trx'\n- task: PublishBuildArtifacts@1\n  inputs:\n    pathToPublish: '$(Build.ArtifactStagingDirectory)'\n    artifactName: 'drop'",
+                model: "// Self-hosted agent executes inside your network",
+                partial: "// DAL unit tests run here",
+                component: "// Deployment gated by approvals",
+                js: "// No JS required"
+            },
+            "structure": {
+                title: "Repo Structure",
+                fileTree: "/Pages\n/Pages/Shared\n/ViewComponents\n/TagHelpers\n/wwwroot",
+                page: "// See folder template",
+                model: "// Conventions enforced via review",
+                partial: "// Section partials live in /Pages/Shared/Sections",
+                component: "// ViewComponents live in /ViewComponents",
+                js: "// JS modules live in /wwwroot/js"
+            },
+            "checklist": {
+                title: "Definition of Done",
+                fileTree: "/docs/standards/checklist.md",
+                page: "// Checklist referenced in PRs",
+                model: "// Required checks for each release",
+                partial: "// Validation summary partial",
+                component: "// StatusSummaryViewComponent",
+                js: "// Minimal JS for client-only validation"
+            },
+            "workspace-module": {
+                title: "Workspace Section Module",
+                fileTree: "/Pages/Records/{id}/Sections/Contact.cshtml\n/Pages/Records/{id}/Sections/Contact.cshtml.cs",
+                page: "@page\n<partial name=\"Sections/_ContactCard\" model=\"Model.Contact\" />",
+                model: "public async Task<IActionResult> OnPostSaveContactAsync(int id) { /* save */ }",
+                partial: "@model ContactVm\n<div class=\"section-card\">...inputs...</div>",
+                component: "// RecordHeaderViewComponent",
+                js: "// JS toggles edit state in the static demo"
+            },
+            "section-contact": {
+                title: "Contact Section",
+                fileTree: "/Pages/Shared/Sections/_ContactCard.cshtml",
+                page: "@* Contact card *@\n<partial name=\"Sections/_ContactCard\" model=\"Model.Contact\" />",
+                model: "public async Task<IActionResult> OnPostSaveContactAsync() { /* save */ }",
+                partial: "@model ContactVm\n<div class=\"card\">\n  <label>Primary Contact</label>\n</div>",
+                component: "// StatusBadgeTagHelper used inside partial",
+                js: "// Toast shown after save"
+            },
+            "section-compliance": {
+                title: "Compliance Section",
+                fileTree: "/Pages/Shared/Sections/_ComplianceCard.cshtml",
+                page: "@* Compliance card *@\n<partial name=\"Sections/_ComplianceCard\" model=\"Model.Compliance\" />",
+                model: "public async Task<IActionResult> OnPostSaveComplianceAsync() { /* save */ }",
+                partial: "@model ComplianceVm\n<div class=\"card\">\n  <select>...</select>\n</div>",
+                component: "// ViewComponent for status summary",
+                js: "// Toast shown after save"
+            },
+            "chart-module": {
+                title: "Run Counts Chart",
+                fileTree: "/Pages/Shared/Sections/_RunCountsChart.cshtml\n/wwwroot/js/charts/runCounts.js",
+                page: "<script type=\"application/json\" id=\"run-counts-data\">@Model.ChartJson<\\/script>",
+                model: "public string ChartJson { get; set; }",
+                partial: "@model ChartVm\n<canvas id=\"runCountsChart\"></canvas>",
+                component: "// Optional wrapper component",
+                js: "const data = JSON.parse(document.getElementById('run-counts-data').textContent);"
+            },
+            "proposal-demo": {
+                title: "Proposal Workspace Example",
+                fileTree: "/Pages/Proposals/{id}/Index.cshtml\n/Pages/Proposals/{id}/Index.cshtml.cs",
+                page: "@page \"/proposals/{id}\"\n<partial name=\"Sections/_ProjectSummary\" model=\"Model.Summary\" />",
+                model: "public class ProposalIndexModel : PageModel\n{\n  public Task<IActionResult> OnPostSaveSummaryAsync(int id) { /* save */ }\n  public Task<IActionResult> OnPostSaveAimsAsync(int id) { /* save */ }\n}",
+                partial: "@model ProposalSummaryVm\n<div class=\"section-card\">Project Summary</div>",
+                component: "// ViewComponent for proposal header",
+                js: "// Section swaps emulate HTMX behavior"
+            },
+            "proposal-module": {
+                title: "Proposal Module",
+                fileTree: "/Pages/Shared/Sections/_ProjectSummary.cshtml\n/Pages/Shared/Sections/_SpecificAims.cshtml",
+                page: "@* Proposal workspace *@\n<partial name=\"Sections/_ProjectSummary\" model=\"Model.Summary\" />",
+                model: "public class ProposalIndexModel : PageModel { /* handlers */ }",
+                partial: "@model ProposalSummaryVm\n<div class=\"card\">Project Summary</div>",
+                component: "// ProposalHeaderViewComponent",
+                js: "// Toast triggered after save"
+            },
+            "proposal-summary": {
+                title: "Project Summary Section",
+                fileTree: "/Pages/Shared/Sections/_ProjectSummary.cshtml",
+                page: "@* Project Summary *@\n<partial name=\"Sections/_ProjectSummary\" model=\"Model.Summary\" />",
+                model: "public Task<IActionResult> OnPostSaveSummaryAsync(int id)",
+                partial: "@model ProposalSummaryVm\n<textarea class=\"form-control\"></textarea>",
+                component: "// StatusBadgeTagHelper",
+                js: "// Draft save updates status chip"
+            },
+            "proposal-aims": {
+                title: "Specific Aims Section",
+                fileTree: "/Pages/Shared/Sections/_SpecificAims.cshtml",
+                page: "@* Specific Aims *@\n<partial name=\"Sections/_SpecificAims\" model=\"Model.Aims\" />",
+                model: "public Task<IActionResult> OnPostSaveAimsAsync(int id)",
+                partial: "@model SpecificAimsVm\n<input class=\"form-control\" />",
+                component: "// ProposalHeaderViewComponent",
+                js: "// Save handler returns updated partial"
+            },
+            "proposal-logistics": {
+                title: "Project Logistics (Standard Fields)",
+                fileTree: "/Pages/Shared/Sections/_ProjectLogistics.cshtml",
+                page: "@* Project Logistics *@\n<partial name=\"Sections/_ProjectLogistics\" model=\"Model.Logistics\" />",
+                model: "public Task<IActionResult> OnPostSaveLogisticsAsync(int id)",
+                partial: "@model LogisticsVm\n<input class=\"form-control\" />\n<select class=\"form-select\"></select>",
+                component: "// TagHelpers handle required markers",
+                js: "// Save handler returns updated partial"
+            },
+            "proposal-budget": {
+                title: "Budget Section",
+                fileTree: "/Pages/Shared/Sections/_BudgetCard.cshtml",
+                page: "@* Budget *@\n<partial name=\"Sections/_BudgetCard\" model=\"Model.Budget\" />",
+                model: "public Task<IActionResult> OnPostSaveBudgetAsync(int id)",
+                partial: "@model BudgetVm\n<input class=\"form-control\" />",
+                component: "// BudgetSummaryViewComponent",
+                js: "// Validation summary rendered on save"
+            },
+            "proposal-compliance": {
+                title: "Compliance Section",
+                fileTree: "/Pages/Shared/Sections/_ComplianceCard.cshtml",
+                page: "@* Compliance *@\n<partial name=\"Sections/_ComplianceCard\" model=\"Model.Compliance\" />",
+                model: "public Task<IActionResult> OnPostSaveComplianceAsync(int id)",
+                partial: "@model ComplianceVm\n<select class=\"form-select\"></select>",
+                component: "// StatusSummaryViewComponent",
+                js: "// Save handler returns updated partial"
+            },
+            "proposal-data": {
+                title: "Data Management Plan",
+                fileTree: "/Pages/Shared/Sections/_DataManagementPlan.cshtml",
+                page: "@* Data Management *@\n<partial name=\"Sections/_DataManagementPlan\" model=\"Model.DataPlan\" />",
+                model: "public Task<IActionResult> OnPostSaveDataPlanAsync(int id)",
+                partial: "@model DataPlanVm\n<textarea class=\"form-control\"></textarea>",
+                component: "// ViewComponent for status summary",
+                js: "// Save handler returns updated partial"
+            },
+            "proposal-attachments": {
+                title: "Attachments Section",
+                fileTree: "/Pages/Shared/Sections/_AttachmentsCard.cshtml",
+                page: "@* Attachments *@\n<partial name=\"Sections/_AttachmentsCard\" model=\"Model.Attachments\" />",
+                model: "public Task<IActionResult> OnPostSaveAttachmentsAsync(int id)",
+                partial: "@model AttachmentsVm\n<input type=\"file\" multiple />",
+                component: "// UploadSummaryViewComponent",
+                js: "// Client-side file validation"
             }
         };
-        <span class="keyword">return</span> Ok(data);
-    }
 
-    [HttpGet(<span class="string">"dashboard"</span>)]
-    <span class="keyword">public async</span> Task&lt;IActionResult&gt; GetDashboardData()
-    {
-        <span class="comment">// Fetch from database using Entity Framework</span>
-        <span class="keyword">var</span> salesData = <span class="keyword">await</span> _context.Sales
-            .Where(s => s.Date >= DateTime.Now.AddMonths(-6))
-            .GroupBy(s => s.Date.Month)
-            .Select(g => <span class="keyword">new</span> { Month = g.Key, Total = g.Sum(s => s.Amount) })
-            .ToListAsync();
+        const promptText = `Goal: Replace the existing chart.js demo site with a ".NET Core Razor Standardization Playbook" single-page static site (GitHub Pages) that teaches our department's best practices through interactive visuals and code-snippet inspection.
 
-        <span class="keyword">return</span> Ok(salesData);
-    }
-}
-                </div>
-            </div>
+Constraints:
+- Must be static: HTML/CSS/JS only (no build system required).
+- Use Bootstrap 5 + Chart.js via CDN.
+- Styling is not the priority; clarity and modularity are.
+- The page should simulate a Razor Pages app shell and modular "section workspace" UX.
+- Include an "Under the Hood" right-side panel that updates in realtime as the user interacts, showing example file tree + Razor Page + PageModel + partial + view component + JS snippets. Snippets can be static strings in JS.
+- Everything stays on-prem (Azure DevOps Server + self-hosted agents); no external cloud services.
 
-            <div class="feature-card">
-                <h4>Step 2: Create Razor View with Chart.js</h4>
-                <div class="code-block">
-<span class="comment">@* Views/Dashboard/Index.cshtml *@</span>
-&lt;div class=<span class="string">"container"</span>&gt;
-    &lt;h2&gt;Sales Dashboard&lt;/h2&gt;
-    &lt;canvas id=<span class="string">"salesChart"</span>&gt;&lt;/canvas&gt;
-&lt;/div&gt;
+Information Architecture:
+- Top navbar: title, version/date, "Copy Copilot Prompt" button.
+- Left sidebar (scrollspy): sections:
+    1) App Shell (Layout, Nav, Sidebar)
+    2) Page Types (Index/Details/Edit/Review)
+    3) Composition Rules (partials vs view components vs tag helpers)
+    4) Form Workspace Pattern (sections save independently; draft vs submit)
+    5) Practical SPA UX in Razor (partial updates concept; deep links)
+    6) Chart.js in Razor without APIs (DAL -> PageModel -> JSON -> Chart.js)
+    7) Bootstrap Building Blocks (cards, accordion, offcanvas, toasts, tables)
+    8) Gov Proposal Workspace Example
+    9) Azure DevOps CI/CD (On-Prem)
+    10) Recommended Repo Structure + Conventions
+    11) Standards Checklist
 
-@section Scripts {
-    &lt;script src=<span class="string">"https://cdn.jsdelivr.net/npm/chart.js"</span>&gt;&lt;/script&gt;
-    &lt;script&gt;
-        <span class="comment">// Fetch data from API</span>
-        fetch(<span class="string">'/api/chartdata/sales'</span>)
-            .then(response => response.json())
-            .then(data => {
-                <span class="keyword">const</span> ctx = document.getElementById(<span class="string">'salesChart'</span>).getContext(<span class="string">'2d'</span>);
-                <span class="keyword">new</span> Chart(ctx, {
-                    type: <span class="string">'line'</span>,
-                    data: data,
+Interactive requirements:
+- "Workspace" demo: show 4-6 section cards with statuses (Not Started/Draft/Complete/Needs Review). Clicking "Edit" toggles a card into edit mode; "Save" toggles back, updates status chip, and triggers a toast.
+- Clicking any module or button updates the Under-the-Hood panel to the corresponding snippets (Razor markup + PageModel handler names + partial file path + JS chart init snippet).
+- Include at least one Chart.js example ("Run counts by status" bar chart) that reads its data from a <script type="application/json" id="chart-data"> blob to demonstrate how Razor would emit JSON safely.
+
+Content requirements (what to explain):
+- Define enforceable rules:
+    - Razor Pages own routing, auth boundary, orchestration.
+    - Partials render section UI; no DAL calls.
+    - ViewComponents encapsulate reusable widgets like RecordHeader/StatusSummary.
+    - TagHelpers are for tiny repetitive markup (status badges).
+    - Draft-save validation vs submit validation.
+    - SPA-like UX via partial updates (conceptual; simulate in JS in static site).
+    - Chart.js integration without controllers/services/APIs: DAL -> PageModel -> JSON -> Chart.js.
+    - On-prem CI/CD using Azure DevOps Server with self-hosted agents; include DAL unit tests in pipeline.
+- Provide example snippets for:
+  - _Layout.cshtml shell
+  - Record workspace page (Index.cshtml)
+  - PageModel with named handlers (OnPostSaveContact, OnPostSaveUploads, etc.)
+  - A section partial (_ContactCard.cshtml)
+  - A view component (RecordHeaderViewComponent)
+  - A tag helper (StatusBadgeTagHelper)
+  - Chart data serialization and JS init
+
+Implementation details:
+- Use Bootstrap components: navbar, offcanvas (help panel), accordion (optional), toasts, badges, cards, grid.
+- Use data attributes to connect UI elements to snippet IDs.
+- Store snippet strings in a JS map object; render into <pre><code>.
+- Provide a "Copy snippet" button in Under-the-Hood panel.
+- Keep code readable and modular: separate JS into small functions in one file.
+
+Output:
+- Update chartjs-demo.html to the new playbook.
+- Keep everything self-contained so it runs on GitHub Pages.`;
+
+        const snippetTitle = document.getElementById("snippetTitle");
+        const snippetFile = document.getElementById("snippetFile");
+        const snippetPage = document.getElementById("snippetPage");
+        const snippetModel = document.getElementById("snippetModel");
+        const snippetPartial = document.getElementById("snippetPartial");
+        const snippetComponent = document.getElementById("snippetComponent");
+        const snippetJs = document.getElementById("snippetJs");
+
+        const updateUnderHood = (snippetId) => {
+            const payload = snippets[snippetId];
+            if (!payload) {
+                return;
+            }
+            snippetTitle.textContent = payload.title;
+            snippetFile.textContent = payload.fileTree;
+            snippetPage.textContent = payload.page;
+            snippetModel.textContent = payload.model;
+            snippetPartial.textContent = payload.partial;
+            snippetComponent.textContent = payload.component;
+            snippetJs.textContent = payload.js;
+        };
+
+        document.querySelectorAll("[data-hood]").forEach((element) => {
+            element.addEventListener("click", (event) => {
+                const snippetId = event.currentTarget.getAttribute("data-snippet-id");
+                updateUnderHood(snippetId);
+            });
+        });
+
+        document.querySelectorAll(".standard-card").forEach((card) => {
+            card.addEventListener("click", () => {
+                const snippetId = card.getAttribute("data-snippet-id");
+                updateUnderHood(snippetId);
+            });
+        });
+
+        const workspaceCards = document.querySelectorAll(".workspace-card");
+        const saveToast = document.getElementById("saveToast");
+
+        const updateCardDisplay = (card) => {
+            const fields = card.querySelectorAll("[data-field]");
+            fields.forEach((field) => {
+                const key = field.getAttribute("data-field");
+                const display = card.querySelector(`[data-display="${key}"]`);
+                if (!display) {
+                    return;
+                }
+
+                if (field.type === "file") {
+                    const count = field.files ? field.files.length : 0;
+                    display.textContent = count > 0 ? `${count} file${count > 1 ? "s" : ""} selected` : "No files selected";
+                    return;
+                }
+
+                const value = field.value.trim();
+                display.textContent = value.length > 0 ? value : "Not provided";
+            });
+        };
+
+        workspaceCards.forEach((card) => {
+            card.addEventListener("click", (event) => {
+                const action = event.target.getAttribute("data-action");
+                if (!action) {
+                    return;
+                }
+
+                if (action === "edit") {
+                    card.classList.add("is-editing");
+                }
+
+                if (action === "cancel") {
+                    card.classList.remove("is-editing");
+                }
+
+                if (action === "save") {
+                    card.classList.remove("is-editing");
+                    updateCardDisplay(card);
+                    const chip = card.querySelector("[data-status]");
+                    if (chip) {
+                        chip.textContent = "Draft";
+                        chip.className = "status-chip status-draft";
+                    }
+                    const demo = card.closest(".workspace-demo");
+                    if (demo) {
+                        const recordChip = demo.querySelector("[data-record-status]");
+                        const lastSaved = demo.querySelector("[data-last-saved]");
+                        if (recordChip) {
+                            recordChip.textContent = "Draft";
+                            recordChip.className = "status-chip status-draft";
+                        }
+                        if (lastSaved) {
+                            lastSaved.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                        }
+                    }
+                    const toast = new bootstrap.Toast(saveToast);
+                    toast.show();
+                }
+
+                const snippetId = card.getAttribute("data-snippet-id");
+                updateUnderHood(snippetId);
+            });
+        });
+
+        const chartData = document.getElementById("chart-data");
+        if (chartData) {
+            const chartConfigs = JSON.parse(chartData.textContent);
+            const ctx = document.getElementById("runCountsChart").getContext("2d");
+            const chartSelect = document.getElementById("chartSelect");
+            let activeChart = null;
+
+            const renderChart = (key) => {
+                const config = chartConfigs.charts[key];
+                if (!config) {
+                    return;
+                }
+                if (activeChart) {
+                    activeChart.destroy();
+                }
+                activeChart = new Chart(ctx, {
+                    type: config.type,
+                    data: config.data,
                     options: {
-                        responsive: <span class="keyword">true</span>,
+                        responsive: true,
                         plugins: {
-                            title: {
-                                display: <span class="keyword">true</span>,
-                                text: <span class="string">'Monthly Sales Data'</span>
-                            }
+                            legend: { display: config.type !== "bar" },
+                            title: { display: true, text: config.data.datasets[0].label }
                         }
                     }
                 });
+            };
+
+            renderChart(chartSelect.value);
+            chartSelect.addEventListener("change", (event) => {
+                renderChart(event.target.value);
+                updateUnderHood("chart-module");
             });
-    &lt;/script&gt;
-}
-                </div>
-            </div>
-
-            <div class="feature-card">
-                <h4>Step 3: Using with Razor Pages (Alternative)</h4>
-                <div class="code-block">
-<span class="comment">// Pages/Dashboard.cshtml.cs</span>
-<span class="keyword">public class</span> DashboardModel : PageModel
-{
-    <span class="keyword">private readonly</span> IChartService _chartService;
-
-    <span class="keyword">public</span> DashboardModel(IChartService chartService)
-    {
-        _chartService = chartService;
-    }
-
-    <span class="keyword">public</span> string ChartDataJson { get; <span class="keyword">set</span>; }
-
-    <span class="keyword">public async</span> Task OnGetAsync()
-    {
-        <span class="keyword">var</span> chartData = <span class="keyword">await</span> _chartService.GetSalesDataAsync();
-        ChartDataJson = JsonSerializer.Serialize(chartData);
-    }
-}
-
-<span class="comment">// In the Razor Page:</span>
-&lt;script&gt;
-    <span class="keyword">const</span> chartData = @Html.Raw(Model.ChartDataJson);
-    <span class="keyword">const</span> ctx = document.getElementById(<span class="string">'myChart'</span>).getContext(<span class="string">'2d'</span>);
-    <span class="keyword">new</span> Chart(ctx, {
-        type: <span class="string">'bar'</span>,
-        data: chartData
-    });
-&lt;/script&gt;
-                </div>
-            </div>
-
-            <div class="best-practice-box">
-                <h5>🎯 .NET Core Best Practices</h5>
-                <ul>
-                    <li><strong>Separate API Layer:</strong> Create dedicated API controllers for chart data</li>
-                    <li><strong>Use DTOs:</strong> Map database entities to Data Transfer Objects</li>
-                    <li><strong>Implement Caching:</strong> Cache frequently accessed chart data using IMemoryCache</li>
-                    <li><strong>Async Operations:</strong> Use async/await for database queries</li>
-                    <li><strong>Error Handling:</strong> Implement proper exception handling and return appropriate status codes</li>
-                    <li><strong>Authorization:</strong> Secure API endpoints with [Authorize] attributes</li>
-                    <li><strong>Validation:</strong> Validate query parameters using model validation</li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- Best Design Practices Section -->
-        <section class="mb-5">
-            <h2 class="section-title">Best Design Practices</h2>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="feature-card">
-                        <h4>🎨 Visual Design</h4>
-                        <ul>
-                            <li><strong>Color Consistency:</strong> Use your brand colors for charts</li>
-                            <li><strong>Accessibility:</strong> Ensure sufficient color contrast (WCAG 2.1)</li>
-                            <li><strong>Simplicity:</strong> Don't overcrowd charts with too much data</li>
-                            <li><strong>Responsive:</strong> Charts should adapt to all screen sizes</li>
-                            <li><strong>Animations:</strong> Use subtle animations for better UX</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="feature-card">
-                        <h4>⚡ Performance</h4>
-                        <ul>
-                            <li><strong>Lazy Loading:</strong> Load charts only when visible</li>
-                            <li><strong>Data Decimation:</strong> Sample large datasets</li>
-                            <li><strong>Destroy Charts:</strong> Clean up chart instances when not needed</li>
-                            <li><strong>Debounce Updates:</strong> Limit real-time update frequency</li>
-                            <li><strong>Canvas vs SVG:</strong> Use Canvas for better performance</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="feature-card">
-                        <h4>📱 Bootstrap Integration</h4>
-                        <ul>
-                            <li><strong>Grid System:</strong> Use Bootstrap's responsive grid for chart layout</li>
-                            <li><strong>Cards:</strong> Wrap charts in Bootstrap cards for consistent styling</li>
-                            <li><strong>Spacing:</strong> Utilize Bootstrap's spacing utilities (mt, mb, p-*)</li>
-                            <li><strong>Themes:</strong> Leverage Bootstrap's color scheme</li>
-                            <li><strong>Responsive Breakpoints:</strong> Adjust chart sizes at different breakpoints</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="feature-card">
-                        <h4>♿ Accessibility</h4>
-                        <ul>
-                            <li><strong>Alt Text:</strong> Provide text descriptions for screen readers</li>
-                            <li><strong>Keyboard Navigation:</strong> Ensure charts are keyboard accessible</li>
-                            <li><strong>ARIA Labels:</strong> Use appropriate ARIA attributes</li>
-                            <li><strong>Color Blind Friendly:</strong> Don't rely solely on color</li>
-                            <li><strong>Data Tables:</strong> Provide tabular data as alternative</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Single Page Application Demo -->
-        <section class="mb-5">
-            <h2 class="section-title">Single Page Application - Complex Form Example</h2>
-            
-            <div class="best-practice-box">
-                <h5>🚀 SPA Form Best Practices</h5>
-                <ul>
-                    <li><strong>Progressive Disclosure:</strong> Show form sections step-by-step to reduce cognitive load</li>
-                    <li><strong>Client-Side Validation:</strong> Validate inputs immediately for better UX</li>
-                    <li><strong>State Management:</strong> Persist form data in case of page refresh</li>
-                    <li><strong>Visual Progress:</strong> Show users where they are in the process</li>
-                    <li><strong>Save & Continue:</strong> Allow users to save progress and return later</li>
-                    <li><strong>Responsive Design:</strong> Ensure forms work on all devices</li>
-                </ul>
-            </div>
-
-            <div class="form-section">
-                <h3 class="mb-4">Data Analytics Survey Form</h3>
-                
-                <!-- Progress Indicator -->
-                <div class="d-flex mb-4" id="progressIndicator">
-                    <div class="progress-step active" data-step="1">
-                        <strong>1.</strong> Personal Info
-                    </div>
-                    <div class="progress-step" data-step="2">
-                        <strong>2.</strong> Analytics Preferences
-                    </div>
-                    <div class="progress-step" data-step="3">
-                        <strong>3.</strong> Chart Preferences
-                    </div>
-                    <div class="progress-step" data-step="4">
-                        <strong>4.</strong> Review & Submit
-                    </div>
-                </div>
-
-                <form id="multiStepForm">
-                    <!-- Step 1: Personal Information -->
-                    <div class="form-step active" data-step="1">
-                        <h4 class="mb-4">Personal Information</h4>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="firstName" class="form-label">First Name *</label>
-                                <input type="text" class="form-control" id="firstName" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="lastName" class="form-label">Last Name *</label>
-                                <input type="text" class="form-control" id="lastName" required>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email *</label>
-                            <input type="email" class="form-control" id="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="company" class="form-label">Company</label>
-                            <input type="text" class="form-control" id="company">
-                        </div>
-                        <div class="mb-3">
-                            <label for="role" class="form-label">Role *</label>
-                            <select class="form-select" id="role" required>
-                                <option value="">Select your role...</option>
-                                <option value="developer">Developer</option>
-                                <option value="designer">Designer</option>
-                                <option value="analyst">Data Analyst</option>
-                                <option value="manager">Manager</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Step 2: Analytics Preferences -->
-                    <div class="form-step" data-step="2">
-                        <h4 class="mb-4">Analytics Preferences</h4>
-                        <div class="mb-4">
-                            <label class="form-label">How often do you work with data visualization? *</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="frequency" id="daily" value="daily" required>
-                                <label class="form-check-label" for="daily">Daily</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="frequency" id="weekly" value="weekly">
-                                <label class="form-check-label" for="weekly">Weekly</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="frequency" id="monthly" value="monthly">
-                                <label class="form-check-label" for="monthly">Monthly</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="frequency" id="rarely" value="rarely">
-                                <label class="form-check-label" for="rarely">Rarely</label>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Primary use cases (select all that apply):</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="usecase1" value="business-intelligence">
-                                <label class="form-check-label" for="usecase1">Business Intelligence Dashboards</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="usecase2" value="reporting">
-                                <label class="form-check-label" for="usecase2">Reporting & Analytics</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="usecase3" value="real-time">
-                                <label class="form-check-label" for="usecase3">Real-time Monitoring</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="usecase4" value="presentations">
-                                <label class="form-check-label" for="usecase4">Presentations</label>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="dataSize" class="form-label">Typical Dataset Size</label>
-                            <input type="range" class="form-range" id="dataSize" min="1" max="5" step="1" value="3">
-                            <div class="d-flex justify-content-between">
-                                <small>&lt;100 rows</small>
-                                <small>100-1K</small>
-                                <small>1K-10K</small>
-                                <small>10K-100K</small>
-                                <small>&gt;100K</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 3: Chart Preferences -->
-                    <div class="form-step" data-step="3">
-                        <h4 class="mb-4">Chart Preferences</h4>
-                        <div class="mb-3">
-                            <label for="favoriteChart" class="form-label">Favorite Chart Type *</label>
-                            <select class="form-select" id="favoriteChart" required>
-                                <option value="">Select chart type...</option>
-                                <option value="line">Line Chart</option>
-                                <option value="bar">Bar Chart</option>
-                                <option value="pie">Pie Chart</option>
-                                <option value="doughnut">Doughnut Chart</option>
-                                <option value="radar">Radar Chart</option>
-                                <option value="scatter">Scatter Chart</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Important Chart Features (select top 3):</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="feature1" value="interactivity">
-                                <label class="form-check-label" for="feature1">Interactivity & Tooltips</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="feature2" value="animations">
-                                <label class="form-check-label" for="feature2">Smooth Animations</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="feature3" value="responsive">
-                                <label class="form-check-label" for="feature3">Responsive Design</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="feature4" value="customization">
-                                <label class="form-check-label" for="feature4">Customization Options</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="feature5" value="performance">
-                                <label class="form-check-label" for="feature5">Performance</label>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="feedback" class="form-label">Additional Feedback</label>
-                            <textarea class="form-control" id="feedback" rows="4" placeholder="Share your thoughts about Chart.js..."></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Step 4: Review -->
-                    <div class="form-step" data-step="4">
-                        <h4 class="mb-4">Review Your Information</h4>
-                        <div class="alert alert-info">
-                            <strong>Please review your information before submitting.</strong>
-                        </div>
-                        <div id="reviewContent" class="mb-4">
-                            <!-- Review content will be populated by JavaScript -->
-                        </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
-                            <label class="form-check-label" for="agreeTerms">
-                                I agree to the terms and conditions *
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Navigation Buttons -->
-                    <div class="d-flex justify-content-between mt-4">
-                        <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
-                            ← Previous
-                        </button>
-                        <button type="button" class="btn btn-primary" id="nextBtn">
-                            Next →
-                        </button>
-                        <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
-                            Submit Form
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Implementation Details -->
-            <div class="feature-card mt-4">
-                <h4>🔧 SPA Form Implementation Details</h4>
-                <p>This multi-step form demonstrates key SPA concepts:</p>
-                <ul>
-                    <li><strong>State Management:</strong> Form data is stored in JavaScript objects and can be persisted to localStorage</li>
-                    <li><strong>Progressive Disclosure:</strong> Complex form is broken into digestible sections</li>
-                    <li><strong>Client-Side Validation:</strong> Immediate feedback on user input</li>
-                    <li><strong>Visual Feedback:</strong> Progress indicator shows completion status</li>
-                    <li><strong>Smooth Transitions:</strong> CSS animations enhance user experience</li>
-                    <li><strong>Responsive Design:</strong> Bootstrap ensures mobile compatibility</li>
-                </ul>
-                <div class="code-block">
-<span class="comment">// Example: Saving form state to localStorage</span>
-<span class="keyword">function</span> saveFormState() {
-    <span class="keyword">const</span> formData = {
-        firstName: document.getElementById(<span class="string">'firstName'</span>).value,
-        lastName: document.getElementById(<span class="string">'lastName'</span>).value,
-        email: document.getElementById(<span class="string">'email'</span>).value,
-        <span class="comment">// ... other fields</span>
-    };
-    localStorage.setItem(<span class="string">'surveyFormData'</span>, JSON.stringify(formData));
-}
-
-<span class="comment">// Restore form state on page load</span>
-<span class="keyword">function</span> restoreFormState() {
-    <span class="keyword">const</span> savedData = localStorage.getItem(<span class="string">'surveyFormData'</span>);
-    <span class="keyword">if</span> (savedData) {
-        <span class="keyword">const</span> formData = JSON.parse(savedData);
-        document.getElementById(<span class="string">'firstName'</span>).value = formData.firstName || <span class="string">''</span>;
-        <span class="comment">// ... restore other fields</span>
-    }
-}
-                </div>
-            </div>
-        </section>
-
-        <!-- Code Examples Section -->
-        <section class="mb-5">
-            <h2 class="section-title">Quick Start Code Examples</h2>
-            
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="tab" href="#basicSetup">Basic Setup</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#advancedConfig">Advanced Config</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#dynamicUpdate">Dynamic Updates</a>
-                </li>
-            </ul>
-
-            <div class="tab-content mt-3">
-                <div class="tab-pane fade show active" id="basicSetup">
-                    <div class="code-block">
-<span class="comment">// Basic Chart.js Setup</span>
-<span class="keyword">const</span> ctx = document.getElementById(<span class="string">'myChart'</span>).getContext(<span class="string">'2d'</span>);
-<span class="keyword">const</span> myChart = <span class="keyword">new</span> Chart(ctx, {
-    type: <span class="string">'bar'</span>,
-    data: {
-        labels: [<span class="string">'Red'</span>, <span class="string">'Blue'</span>, <span class="string">'Yellow'</span>, <span class="string">'Green'</span>, <span class="string">'Purple'</span>, <span class="string">'Orange'</span>],
-        datasets: [{
-            label: <span class="string">'# of Votes'</span>,
-            data: [12, 19, 3, 5, 2, 3],
-            backgroundColor: [
-                <span class="string">'rgba(255, 99, 132, 0.2)'</span>,
-                <span class="string">'rgba(54, 162, 235, 0.2)'</span>,
-                <span class="string">'rgba(255, 206, 86, 0.2)'</span>,
-                <span class="string">'rgba(75, 192, 192, 0.2)'</span>,
-                <span class="string">'rgba(153, 102, 255, 0.2)'</span>,
-                <span class="string">'rgba(255, 159, 64, 0.2)'</span>
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: <span class="keyword">true</span>
-            }
-        }
-    }
-});
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="advancedConfig">
-                    <div class="code-block">
-<span class="comment">// Advanced Configuration with Plugins</span>
-<span class="keyword">const</span> config = {
-    type: <span class="string">'line'</span>,
-    data: data,
-    options: {
-        responsive: <span class="keyword">true</span>,
-        maintainAspectRatio: <span class="keyword">false</span>,
-        plugins: {
-            title: {
-                display: <span class="keyword">true</span>,
-                text: <span class="string">'Custom Chart Title'</span>,
-                font: { size: 18 }
-            },
-            legend: {
-                position: <span class="string">'bottom'</span>,
-                labels: {
-                    usePointStyle: <span class="keyword">true</span>,
-                    padding: 15
-                }
-            },
-            tooltip: {
-                backgroundColor: <span class="string">'rgba(0,0,0,0.8)'</span>,
-                callbacks: {
-                    label: <span class="keyword">function</span>(context) {
-                        <span class="keyword">return</span> context.dataset.label + <span class="string">': $'</span> + context.parsed.y;
-                    }
-                }
-            }
-        },
-        scales: {
-            x: {
-                grid: { display: <span class="keyword">false</span> }
-            },
-            y: {
-                beginAtZero: <span class="keyword">true</span>,
-                ticks: {
-                    callback: <span class="keyword">function</span>(value) {
-                        <span class="keyword">return</span> <span class="string">'$'</span> + value;
-                    }
-                }
-            }
-        },
-        animation: {
-            duration: 2000,
-            easing: <span class="string">'easeInOutQuart'</span>
-        }
-    }
-};
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="dynamicUpdate">
-                    <div class="code-block">
-<span class="comment">// Dynamically Update Chart Data</span>
-<span class="keyword">function</span> addData(chart, label, data) {
-    chart.data.labels.push(label);
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.push(data);
-    });
-    chart.update();
-}
-
-<span class="keyword">function</span> removeData(chart) {
-    chart.data.labels.pop();
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.pop();
-    });
-    chart.update();
-}
-
-<span class="comment">// Real-time data update example</span>
-setInterval(() => {
-    <span class="keyword">const</span> newValue = Math.random() * 100;
-    addData(myChart, <span class="string">'New'</span>, newValue);
-    
-    <span class="comment">// Keep only last 10 data points</span>
-    <span class="keyword">if</span> (myChart.data.labels.length > 10) {
-        removeData(myChart);
-    }
-}, 5000);
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Resources Section -->
-        <section class="mb-5">
-            <h2 class="section-title">Additional Resources</h2>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <h4>📖 Learning Resources</h4>
-                        <ul class="list-unstyled">
-                            <li><a href="https://www.chartjs.org/docs/latest/" target="_blank">Official Documentation</a></li>
-                            <li><a href="https://www.chartjs.org/docs/latest/samples/" target="_blank">Sample Gallery</a></li>
-                            <li><a href="https://github.com/chartjs/awesome" target="_blank">Awesome Chart.js</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <h4>🛠️ Tools & Plugins</h4>
-                        <ul class="list-unstyled">
-                            <li><a href="https://www.chartjs.org/docs/latest/developers/plugins.html" target="_blank">Plugin Development</a></li>
-                            <li><a href="https://github.com/chartjs/chartjs-plugin-datalabels" target="_blank">Data Labels Plugin</a></li>
-                            <li><a href="https://github.com/chartjs/chartjs-plugin-zoom" target="_blank">Zoom Plugin</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <h4>💼 .NET Resources</h4>
-                        <ul class="list-unstyled">
-                            <li><a href="https://docs.microsoft.com/en-us/aspnet/core/" target="_blank">ASP.NET Core Docs</a></li>
-                            <li><a href="https://getbootstrap.com/docs/5.3/" target="_blank">Bootstrap Documentation</a></li>
-                            <li><a href="https://docs.microsoft.com/en-us/ef/core/" target="_blank">Entity Framework Core</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container text-center">
-            <p class="mb-0">&copy; 2025 unclegun.github.io | Built with Chart.js & Bootstrap</p>
-            <p class="mb-0 mt-2">
-                <a href="https://www.chartjs.org/" target="_blank" class="text-white">Chart.js</a> | 
-                <a href="https://getbootstrap.com/" target="_blank" class="text-white">Bootstrap</a> | 
-                <a href="index.html" class="text-white">Home</a>
-            </p>
-        </div>
-    </footer>
-
-    <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Chart.js Initialization -->
-    <script>
-        // Line Chart
-        const lineCtx = document.getElementById('lineChart').getContext('2d');
-        const lineChart = new Chart(lineCtx, {
-            type: 'line',
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                datasets: [{
-                    label: 'Sales 2024',
-                    data: [65, 59, 80, 81, 56, 55, 70],
-                    borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.4
-                }, {
-                    label: 'Sales 2023',
-                    data: [45, 49, 60, 71, 46, 45, 60],
-                    borderColor: 'rgb(255, 99, 132)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Year-over-Year Sales Comparison'
-                    },
-                    legend: {
-                        position: 'top'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + value + 'K';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Bar Chart
-        const barCtx = document.getElementById('barChart').getContext('2d');
-        const barChart = new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-                datasets: [{
-                    label: 'Revenue',
-                    data: [120, 150, 180, 200],
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.8)',
-                        'rgba(75, 192, 192, 0.8)',
-                        'rgba(255, 206, 86, 0.8)',
-                        'rgba(153, 102, 255, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(153, 102, 255, 1)'
-                    ],
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Quarterly Revenue Performance'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + value + 'M';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Pie Chart
-        const pieCtx = document.getElementById('pieChart').getContext('2d');
-        const pieChart = new Chart(pieCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Product A', 'Product B', 'Product C', 'Product D'],
-                datasets: [{
-                    data: [30, 25, 25, 20],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.8)',
-                        'rgba(54, 162, 235, 0.8)',
-                        'rgba(255, 206, 86, 0.8)',
-                        'rgba(75, 192, 192, 0.8)'
-                    ],
-                    borderColor: '#fff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.label + ': ' + context.parsed + '%';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Doughnut Chart
-        const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
-        const doughnutChart = new Chart(doughnutCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Development', 'Marketing', 'Sales', 'Operations', 'Support'],
-                datasets: [{
-                    data: [35, 20, 15, 20, 10],
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.8)',
-                        'rgba(255, 99, 132, 0.8)',
-                        'rgba(75, 192, 192, 0.8)',
-                        'rgba(255, 206, 86, 0.8)',
-                        'rgba(153, 102, 255, 0.8)'
-                    ],
-                    borderColor: '#fff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.label + ': ' + context.parsed + '%';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Radar Chart
-        const radarCtx = document.getElementById('radarChart').getContext('2d');
-        const radarChart = new Chart(radarCtx, {
-            type: 'radar',
-            data: {
-                labels: ['JavaScript', 'Python', 'C#', 'Java', 'Go', 'SQL'],
-                datasets: [{
-                    label: 'Developer A',
-                    data: [90, 75, 85, 70, 60, 80],
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 2
-                }, {
-                    label: 'Developer B',
-                    data: [70, 90, 60, 85, 80, 75],
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                scales: {
-                    r: {
-                        beginAtZero: true,
-                        max: 100
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-
-        // Mixed Chart
-        const mixedCtx = document.getElementById('mixedChart').getContext('2d');
-        const mixedChart = new Chart(mixedCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                    type: 'line',
-                    label: 'Profit Margin %',
-                    data: [15, 18, 22, 20, 25, 28],
-                    borderColor: 'rgb(255, 99, 132)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    yAxisID: 'y1',
-                    tension: 0.4
-                }, {
-                    type: 'bar',
-                    label: 'Revenue',
-                    data: [50, 60, 70, 80, 90, 100],
-                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
-                    yAxisID: 'y'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Revenue vs Profit Margin'
-                    }
-                },
-                scales: {
-                    y: {
-                        type: 'linear',
-                        position: 'left',
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + value + 'K';
-                            }
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        position: 'right',
-                        beginAtZero: true,
-                        grid: {
-                            drawOnChartArea: false
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Multi-step Form Logic
-        let currentStep = 1;
-        const totalSteps = 4;
-
-        function showStep(step) {
-            document.querySelectorAll('.form-step').forEach(el => {
-                el.classList.remove('active');
-            });
-            document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
-
-            // Update progress indicator
-            document.querySelectorAll('.progress-step').forEach((el, index) => {
-                el.classList.remove('active', 'completed');
-                if (index + 1 < step) {
-                    el.classList.add('completed');
-                } else if (index + 1 === step) {
-                    el.classList.add('active');
-                }
-            });
-
-            // Update buttons
-            document.getElementById('prevBtn').style.display = step === 1 ? 'none' : 'inline-block';
-            document.getElementById('nextBtn').style.display = step === totalSteps ? 'none' : 'inline-block';
-            document.getElementById('submitBtn').style.display = step === totalSteps ? 'inline-block' : 'none';
-
-            // If on review step, populate review content
-            if (step === 4) {
-                populateReview();
-            }
-
-            currentStep = step;
         }
 
-        function populateReview() {
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const email = document.getElementById('email').value;
-            const company = document.getElementById('company').value;
-            const role = document.getElementById('role').value;
-            const frequency = document.querySelector('input[name="frequency"]:checked')?.value || 'Not specified';
-            const favoriteChart = document.getElementById('favoriteChart').value;
-
-            const reviewHTML = `
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Personal Information</h5>
-                        <p><strong>Name:</strong> ${firstName} ${lastName}</p>
-                        <p><strong>Email:</strong> ${email}</p>
-                        <p><strong>Company:</strong> ${company || 'Not provided'}</p>
-                        <p><strong>Role:</strong> ${role}</p>
-                    </div>
-                </div>
-                <div class="card mt-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Analytics Preferences</h5>
-                        <p><strong>Frequency:</strong> ${frequency}</p>
-                    </div>
-                </div>
-                <div class="card mt-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Chart Preferences</h5>
-                        <p><strong>Favorite Chart:</strong> ${favoriteChart}</p>
-                    </div>
-                </div>
-            `;
-            document.getElementById('reviewContent').innerHTML = reviewHTML;
-        }
-
-        document.getElementById('nextBtn').addEventListener('click', () => {
-            if (currentStep < totalSteps) {
-                // Basic validation
-                const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
-                const requiredFields = currentStepEl.querySelectorAll('[required]');
-                let valid = true;
-
-                requiredFields.forEach(field => {
-                    if (!field.value && field.type !== 'radio' && field.type !== 'checkbox') {
-                        valid = false;
-                        field.classList.add('is-invalid');
-                    } else if (field.type === 'radio') {
-                        const radioGroup = currentStepEl.querySelectorAll(`input[name="${field.name}"]`);
-                        const checked = Array.from(radioGroup).some(radio => radio.checked);
-                        if (!checked) valid = false;
-                    } else {
-                        field.classList.remove('is-invalid');
-                    }
-                });
-
-                if (valid) {
-                    showStep(currentStep + 1);
-                } else {
-                    alert('Please fill in all required fields.');
-                }
-            }
+        const promptToast = new bootstrap.Toast(document.getElementById("promptToast"));
+        document.getElementById("copyPrompt").addEventListener("click", async () => {
+            await navigator.clipboard.writeText(promptText);
+            promptToast.show();
         });
 
-        document.getElementById('prevBtn').addEventListener('click', () => {
-            if (currentStep > 1) {
-                showStep(currentStep - 1);
-            }
+        document.getElementById("copySnippet").addEventListener("click", async () => {
+            const current = [
+                snippetFile.textContent,
+                snippetPage.textContent,
+                snippetModel.textContent,
+                snippetPartial.textContent,
+                snippetComponent.textContent,
+                snippetJs.textContent
+            ].join("\n\n");
+            await navigator.clipboard.writeText(current);
+            promptToast.show();
         });
 
-        document.getElementById('multiStepForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (document.getElementById('agreeTerms').checked) {
-                alert('Form submitted successfully! This is a demo, so no data is actually sent.');
-                // Here you would typically send the data to your server
-                // Example: fetch('/api/submit-survey', { method: 'POST', body: JSON.stringify(formData) })
-            } else {
-                alert('Please agree to the terms and conditions.');
-            }
-        });
-
-        // Initialize form
-        showStep(1);
-
-        // Save form state on input change
-        document.querySelectorAll('input, select, textarea').forEach(field => {
-            field.addEventListener('change', () => {
-                // In a real application, you would save to localStorage here
-                // localStorage.setItem('formData', JSON.stringify(getFormData()));
-            });
-        });
+        updateUnderHood("app-shell");
     </script>
 </body>
 </html>
