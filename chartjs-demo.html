@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Razor Playbook - .NET Core Standards</title>
+    <title>.Net Core Playbook</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
@@ -35,9 +35,10 @@
 
         .app-shell {
             display: grid;
-            grid-template-columns: 240px 1fr 320px;
+            grid-template-columns: 240px 1fr;
             gap: 24px;
             align-items: start;
+            padding-right: 16px;
         }
 
         .playbook-nav {
@@ -71,6 +72,8 @@
             padding: 20px;
             margin-bottom: 24px;
             box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+            position: relative;
+            overflow: hidden;
         }
 
         .standard-card:hover {
@@ -190,25 +193,6 @@
             font-size: 0.9rem;
         }
 
-        .under-hood {
-            position: sticky;
-            top: 90px;
-            background: var(--surface);
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            border-top: 4px solid var(--accent-2);
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
-        }
-
-        .under-hood .nav-link {
-            font-weight: 600;
-            color: var(--muted);
-        }
-
-        .under-hood .nav-link.active {
-            color: var(--accent);
-        }
-
         pre {
             background: #0f172a;
             color: #e2e8f0;
@@ -226,14 +210,341 @@
             z-index: 1080;
         }
 
+        .data-table-shell {
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .table-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .table-toolbar .btn-group {
+            flex-wrap: wrap;
+        }
+
+        .table-toolbar .input-group {
+            max-width: 320px;
+        }
+
+        .table-filter-row {
+            display: grid;
+            grid-template-columns: max-content repeat(3, minmax(140px, 170px)) max-content minmax(240px, 1fr);
+            gap: 10px 12px;
+            align-items: end;
+        }
+
+        .table-filter-row > * {
+            min-width: 0;
+        }
+
+        .table-filter-row .form-select {
+            width: 100%;
+            min-width: 140px;
+        }
+
+        .table-filter-row .dropdown .btn {
+            white-space: nowrap;
+        }
+
+        .table-filter-row .dropdown-menu {
+            min-width: 220px;
+        }
+
+        .table-filter-row .filter-date-range {
+            justify-content: flex-start;
+        }
+
+        .data-table thead th {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--ink);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            z-index: 1;
+        }
+
+        .data-table thead th .sort-indicator {
+            margin-left: 6px;
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+
+        .data-table thead th.sort-asc .sort-indicator::after {
+            content: "^";
+        }
+
+        .data-table thead th.sort-desc .sort-indicator::after {
+            content: "v";
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #e2e8f0;
+            color: var(--ink);
+        }
+
+        .filter-chip button {
+            border: 0;
+            background: transparent;
+            color: inherit;
+        }
+
+        .bulk-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border: 1px dashed #cbd5f5;
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+
+        .table-footer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .table-responsive {
+            max-height: 420px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .health-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .health-ontrack {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .health-atrisk {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .health-blocked {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-inprogress {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-inreview {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .status-blocked {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-onhold {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .dod-editor {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .dod-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .dod-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 8px;
+            align-items: center;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 10px;
+        }
+
+        .dod-item.is-done {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .dod-item.is-done .dod-text {
+            text-decoration: line-through;
+            color: var(--muted);
+        }
+
+        .notes-toggle {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 3;
+        }
+
+        .notes-drawer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 320px;
+            background: #ffffff;
+            border-left: 1px solid #e2e8f0;
+            box-shadow: -12px 0 24px rgba(15, 23, 42, 0.12);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transform: translateX(100%);
+            transition: transform 0.25s ease;
+            z-index: 2;
+        }
+
+        .notes-open .notes-drawer {
+            transform: translateX(0);
+        }
+
+        .notes-open .notes-toggle {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .notes-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .notes-input-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .notes-list {
+            margin: 0;
+            padding-left: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .notes-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .notes-item .note-text {
+            flex: 1;
+        }
+
+        .mini-chart-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .mini-chart-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.7);
+        }
+
+        .btn,
+        .form-control,
+        .form-select,
+        .dropdown-menu,
+        .table-responsive,
+        .playbook-nav .nav-link,
+        .workspace-card,
+        .standard-card {
+            transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.16);
+        }
+
+        .playbook-nav .nav-link:hover {
+            color: var(--ink);
+            background: #f1f5f9;
+        }
+
+        .data-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
         @media (max-width: 1200px) {
             .app-shell {
                 grid-template-columns: 1fr;
             }
 
-            .playbook-nav,
-            .under-hood {
+            .playbook-nav {
                 position: static;
+            }
+
+            .table-filter-row {
+                grid-template-columns: max-content repeat(2, minmax(160px, 1fr));
+            }
+
+            .table-filter-row .filter-date-range {
+                grid-column: 1 / -1;
             }
         }
 
@@ -247,6 +558,52 @@
                 padding: 12px;
             }
 
+            .table-filter-row {
+                grid-template-columns: 1fr;
+                align-items: stretch;
+            }
+
+            .table-filter-row .filter-date-range {
+                flex-wrap: wrap;
+            }
+
+
+        @media (max-width: 576px) {
+            .dod-item {
+                grid-template-columns: auto 1fr;
+            }
+
+            .dod-item .dod-delete {
+                grid-column: 1 / -1;
+                width: 100%;
+            }
+
+            .notes-drawer {
+                width: 100%;
+            }
+
+            .mini-chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .btn,
+            .form-control,
+            .form-select,
+            .dropdown-menu,
+            .table-responsive,
+            .playbook-nav .nav-link,
+            .workspace-card,
+            .standard-card,
+            .data-table tbody tr {
+                transition: none;
+            }
+
+            .btn:hover {
+                transform: none;
+            }
+        }
             .standard-card {
                 padding: 16px;
             }
@@ -316,10 +673,10 @@
 <body data-bs-spy="scroll" data-bs-target="#playbookSidebar" data-bs-offset="120" tabindex="0">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container-fluid">
-            <span class="navbar-brand fw-semibold">Razor Playbook</span>
+            <span class="navbar-brand fw-semibold">.Net Standardization Playbook</span>
             <div class="d-flex align-items-center gap-3 ms-auto">
                 <span class="text-white-50 small">v1.0 | 2026-02-06</span>
-                <button class="btn btn-outline-light btn-sm" id="copyPrompt">Copy prompt</button>
+                <!-- <button class="btn btn-outline-light btn-sm" id="copyPrompt">Copy prompt</button> -->
             </div>
         </div>
     </nav>
@@ -327,41 +684,42 @@
     <div class="container-fluid my-4">
         <div class="app-shell">
             <aside class="playbook-nav" id="playbookSidebar">
-                <h6 class="text-uppercase text-muted">Playbook</h6>
+                <h6 class="text-uppercase text-muted">Sections</h6>
                 <nav class="nav flex-column">
-                    <a class="nav-link" href="#app-shell" data-snippet-id="app-shell" data-hood>1. Standard App Shell</a>
+                    <a class="nav-link" href="#app-shell" data-snippet-id="app-shell" data-hood>1. Standard App Template</a>
                     <a class="nav-link" href="#page-types" data-snippet-id="page-types" data-hood>2. Page Types</a>
                     <a class="nav-link" href="#composition" data-snippet-id="composition" data-hood>3. Composition Rules</a>
                     <a class="nav-link" href="#workspace" data-snippet-id="workspace" data-hood>4. Form Workspace Pattern</a>
                     <a class="nav-link" href="#spa-ux" data-snippet-id="spa-ux" data-hood>5. Practical SPA UX</a>
-                    <a class="nav-link" href="#chartjs" data-snippet-id="chartjs" data-hood>6. Chart.js Integration</a>
-                    <a class="nav-link" href="#bootstrap" data-snippet-id="bootstrap" data-hood>7. Bootstrap Modularity</a>
-                    <a class="nav-link" href="#proposal-demo" data-snippet-id="proposal-demo" data-hood>8. Gov Proposal Example</a>
-                    <a class="nav-link" href="#devops" data-snippet-id="devops" data-hood>9. Azure DevOps CI/CD</a>
-                    <a class="nav-link" href="#structure" data-snippet-id="structure" data-hood>10. Folder Template</a>
-                    <a class="nav-link" href="#checklist" data-snippet-id="checklist" data-hood>11. Definition of Done</a>
+                    <a class="nav-link" href="#partials-forms" data-snippet-id="partials-forms" data-hood>6. Section Partials and Handlers</a>
+                    <a class="nav-link" href="#chartjs" data-snippet-id="chartjs" data-hood>7. Chart.js Integration</a>
+                    <a class="nav-link" href="#bootstrap" data-snippet-id="bootstrap" data-hood>8. Bootstrap Modularity</a>
+                    <a class="nav-link" href="#datatable" data-snippet-id="datatable" data-hood>9. Modern Data Tables</a>
+                    <a class="nav-link" href="#proposal-demo" data-snippet-id="proposal-demo" data-hood>10. Program Proposal Example</a>
+                    <a class="nav-link" href="#devops" data-snippet-id="devops" data-hood>11. Azure DevOps CI/CD</a>
+                    <a class="nav-link" href="#structure" data-snippet-id="structure" data-hood>12. Folder Template</a>
+                    <a class="nav-link" href="#checklist" data-snippet-id="checklist" data-hood>13. Definition of Done</a>
                 </nav>
             </aside>
 
             <main>
                 <div class="alert alert-info d-flex align-items-center" role="alert">
                     <span class="badge text-bg-primary me-2">Tip</span>
-                    Click any sidebar item, section card, or button with a preview to load snippets in the Under the Hood panel.
+                    Use the Notes button on each card to capture decisions and action items.
                 </div>
                 <section class="standard-card" id="app-shell" data-snippet-id="app-shell">
                     <div class="workspace-header mb-3">
                         <div>
-                            <h3>Standard App Shell</h3>
+                            <h3>Standard App Template</h3>
                             <div class="workspace-meta">Layout, nav, sidebar, notifications, and consistent status language.</div>
                         </div>
-                        <button class="btn btn-outline-primary btn-sm" data-snippet-id="layout" data-hood>View layout snippet</button>
                     </div>
                     <div class="row g-3">
                         <div class="col-lg-6">
                             <h4>What</h4>
-                            <p>Every Razor app uses a shared shell that defines navigation, page chrome, and a predictable surface for modules.</p>
+                            <p>Every app uses a shared template that defines navigation, page chrome, and a predictable surface for modules.</p>
                             <h4>Why</h4>
-                            <p>NIH and governance requirements demand auditability, accessibility, and consistency across records.</p>
+                            <p>Enterprise programs demand auditability, accessibility, and consistency across records.</p>
                             <h4>How</h4>
                             <ul>
                                 <li>_Layout.cshtml owns header, sidebar, and notification stack.</li>
@@ -414,7 +772,7 @@
                                     <span class="badge bg-dark">Review</span>
                                     <span class="badge bg-dark">Workspace</span>
                                 </div>
-                                <div class="small text-muted">Workspace is the SPA-like shell for long-lived records.</div>
+                                <div class="small text-muted">Workspace is the SPA-like template for long-lived records.</div>
                             </div>
                         </div>
                     </div>
@@ -502,7 +860,7 @@
                                     <div class="workspace-view">
                                         <div class="text-muted">
                                             <div><strong>Insurance:</strong> <span data-display="insuranceStatus">Missing</span></div>
-                                            <div><strong>OFAC:</strong> <span data-display="ofacStatus">Pending</span></div>
+                                            <div><strong>Policy check:</strong> <span data-display="ofacStatus">Pending</span></div>
                                         </div>
                                         <button class="btn btn-sm btn-outline-primary mt-2" data-action="edit">Edit</button>
                                     </div>
@@ -514,7 +872,7 @@
                                         <select class="form-select mb-2" data-field="ofacStatus">
                                             <option>Pending</option>
                                             <option>Passed</option>
-                                            <option>Failed</option>
+                                            <option>Flagged</option>
                                         </select>
                                         <button class="btn btn-sm btn-success" data-action="save">Save</button>
                                         <button class="btn btn-sm btn-outline-secondary" data-action="cancel">Cancel</button>
@@ -526,7 +884,7 @@
                 </section>
 
                 <section class="standard-card" id="spa-ux" data-snippet-id="spa-ux">
-                    <h3>Practical SPA UX in Razor</h3>
+                    <h3>Practical SPA UX in Razor Pages</h3>
                     <div class="row g-3">
                         <div class="col-lg-6">
                             <h4>What</h4>
@@ -550,6 +908,61 @@
                     </div>
                 </section>
 
+                <section class="standard-card" id="partials-forms" data-snippet-id="partials-forms">
+                    <h3>Section Partials and Handlers (OnPostSaveX)</h3>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <h4>How the handler works</h4>
+                            <p>In Razor Pages, `OnPostSaveContactAsync()` is a named POST handler. The difference is what you return and how the form posts.</p>
+                            <ul>
+                                <li>Classic Razor: POST saves and returns `Page()` or `RedirectToPage()` and refreshes.</li>
+                                <li>SPA-like Razor: POST saves and returns only the updated section partial and swaps it in-place.</li>
+                            </ul>
+                            <h4>Multiple sections and async</h4>
+                            <ul>
+                                <li>Each section is a mini form with its own handler and validation rules.</li>
+                                <li>Saves persist immediately and do not affect other sections unless you choose to.</li>
+                                <li>Async means IO is non-blocking; each save is its own HTTP request.</li>
+                            </ul>
+                            <h4>Validation and concurrency</h4>
+                            <ul>
+                                <li>Draft saves validate section-only; submit validates cross-section rules.</li>
+                                <li>Prefer section-scoped persistence or a RowVersion token per section.</li>
+                                <li>Avoid whole-record updates when multiple sections can save at once.</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4>HTMX pattern (recommended)</h4>
+                            <div class="visual-box small mb-3">
+                                <pre>&lt;form hx-post="?handler=SaveContact"
+      hx-target="#contact-section"
+      hx-swap="outerHTML"&gt;
+  &lt;!-- inputs --&gt;
+  &lt;button class="btn btn-primary"&gt;Save&lt;/button&gt;
+&lt;/form&gt;
+
+// Handler
+public async Task<IActionResult> OnPostSaveContactAsync()
+{
+  // save via DAL
+  return Partial("_ContactSection", Contact);
+}</pre>
+                            </div>
+                            <div class="visual-box small">
+                                <h6 class="text-uppercase text-muted">HTMX business value and security</h6>
+                                <ul class="mb-2">
+                                    <li>One vendored JS file, hosted internally, no npm required.</li>
+                                    <li>Reduces custom JS and keeps server-rendered HTML.</li>
+                                    <li>Keep antiforgery on for all POST handlers.</li>
+                                    <li>Encode user input; never render raw HTML without sanitizing.</li>
+                                    <li>Lock down CSP and avoid user-controlled `hx-*` attributes.</li>
+                                </ul>
+                                <div class="text-muted">If HTMX is not allowed, use `fetch()` plus JSON and update the DOM manually.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <section class="standard-card" id="chartjs" data-snippet-id="chartjs">
                     <h3>Chart.js Integration (No Controllers)</h3>
                     <div class="row g-3">
@@ -565,6 +978,19 @@
                                 <li>Razor serializes to JSON blob.</li>
                                 <li>Chart.js reads JSON and renders.</li>
                             </ul>
+                            <h4>Business impact</h4>
+                            <ul>
+                                <li>Shorter decision loops with shared, trusted metrics.</li>
+                                <li>Consistent visuals reduce reporting drift across teams.</li>
+                                <li>Dashboards stay usable without exposing new APIs.</li>
+                            </ul>
+                            <h4>Security implications</h4>
+                            <ul>
+                                <li>Keep chart data server-rendered in JSON, not user-generated HTML.</li>
+                                <li>Validate and encode all values before serialization.</li>
+                                <li>Apply CSP rules and block third-party chart plugins.</li>
+                                <li>Log data access and keep raw exports behind RBAC.</li>
+                            </ul>
                         </div>
                         <div class="col-lg-6">
                             <h4>Visual</h4>
@@ -575,11 +1001,28 @@
                                         <option value="runCounts">Run counts</option>
                                         <option value="reviewTimes">Review times</option>
                                         <option value="budgetMix">Budget mix</option>
+                                        <option value="workload">Workload balance</option>
+                                        <option value="riskTrend">Risk trend</option>
+                                        <option value="throughput">Throughput</option>
                                     </select>
                                 </div>
-                                <canvas id="runCountsChart" height="180"></canvas>
+                                <canvas id="runCountsChart" height="190"></canvas>
+                                <div class="mini-chart-grid">
+                                    <div class="mini-chart-card">
+                                        <div class="small text-muted mb-1">Service mix</div>
+                                        <canvas id="miniChartService" height="120"></canvas>
+                                    </div>
+                                    <div class="mini-chart-card">
+                                        <div class="small text-muted mb-1">Risk scatter</div>
+                                        <canvas id="miniChartRisk" height="120"></canvas>
+                                    </div>
+                                    <div class="mini-chart-card">
+                                        <div class="small text-muted mb-1">Compliance radar</div>
+                                        <canvas id="miniChartCompliance" height="120"></canvas>
+                                    </div>
+                                </div>
                                 <script type="application/json" id="chart-data">
-                                    {"charts":{"runCounts":{"type":"bar","data":{"labels":["Pending","In Review","Approved","Rejected"],"datasets":[{"label":"Run counts","data":[12,9,18,4],"backgroundColor":["#3b82f6","#f59e0b","#10b981","#ef4444"]}]}},"reviewTimes":{"type":"line","data":{"labels":["Week 1","Week 2","Week 3","Week 4"],"datasets":[{"label":"Days to review","data":[6,4,8,5],"borderColor":"#2563eb","backgroundColor":"rgba(37,99,235,0.2)","tension":0.4}]}},"budgetMix":{"type":"doughnut","data":{"labels":["Personnel","Equipment","Travel","Other"],"datasets":[{"label":"Budget mix","data":[52,18,12,18],"backgroundColor":["#14b8a6","#6366f1","#f59e0b","#94a3b8"]}]}}}}
+                                    {"charts":{"runCounts":{"type":"bar","title":"Run counts","data":{"labels":["Pending","In Review","Approved","Rejected"],"datasets":[{"label":"Run counts","data":[12,9,18,4],"backgroundColor":["#3b82f6","#f59e0b","#10b981","#ef4444"]}]}},"reviewTimes":{"type":"line","title":"Days to review","data":{"labels":["Week 1","Week 2","Week 3","Week 4"],"datasets":[{"label":"Days to review","data":[6,4,8,5],"borderColor":"#2563eb","backgroundColor":"rgba(37,99,235,0.2)","tension":0.4,"fill":true}]}},"budgetMix":{"type":"doughnut","title":"Budget mix","data":{"labels":["Personnel","Equipment","Travel","Other"],"datasets":[{"label":"Budget mix","data":[52,18,12,18],"backgroundColor":["#14b8a6","#6366f1","#f59e0b","#94a3b8"]}]}},"workload":{"type":"bar","title":"Workload balance","data":{"labels":["Team A","Team B","Team C","Team D"],"datasets":[{"label":"Planned","data":[18,14,16,12],"backgroundColor":"rgba(37,99,235,0.7)"},{"label":"Actual","data":[16,15,12,10],"backgroundColor":"rgba(16,185,129,0.7)"}]},"options":{"scales":{"x":{"stacked":true},"y":{"stacked":true}}}},"riskTrend":{"type":"line","title":"Risk trend","data":{"labels":["Jan","Feb","Mar","Apr","May","Jun"],"datasets":[{"label":"Open risks","data":[14,12,11,9,8,6],"borderColor":"#f97316","backgroundColor":"rgba(249,115,22,0.2)","tension":0.35,"fill":true},{"label":"Mitigations","data":[4,6,7,8,9,10],"borderColor":"#0ea5e9","backgroundColor":"rgba(14,165,233,0.2)","tension":0.35,"fill":true}]}},"throughput":{"type":"bar","title":"Throughput","data":{"labels":["Mon","Tue","Wed","Thu","Fri"],"datasets":[{"label":"Stories closed","data":[5,7,6,8,4],"backgroundColor":"#6366f1"}]}}},"gallery":[{"id":"miniChartService","type":"polarArea","data":{"labels":["API","ETL","UI","Data"],"datasets":[{"data":[28,18,22,16],"backgroundColor":["#3b82f6","#14b8a6","#f59e0b","#94a3b8"]}]}},{"id":"miniChartRisk","type":"scatter","data":{"datasets":[{"label":"Risk", "data":[{"x":2,"y":8},{"x":4,"y":6},{"x":5,"y":7},{"x":7,"y":3},{"x":8,"y":4}],"backgroundColor":"rgba(239,68,68,0.7)"}]},"options":{"scales":{"x":{"title":{"display":true,"text":"Likelihood"}},"y":{"title":{"display":true,"text":"Impact"}}}}},{"id":"miniChartCompliance","type":"radar","data":{"labels":["Audit","Privacy","Auth","Logging","Availability"],"datasets":[{"label":"Coverage","data":[80,72,85,78,70],"backgroundColor":"rgba(37,99,235,0.25)","borderColor":"#2563eb"}]}}]}
                                 </script>
                             </div>
                         </div>
@@ -662,13 +1105,169 @@
                     </div>
                 </section>
 
+                <section class="standard-card" id="datatable" data-snippet-id="datatable">
+                    <div class="workspace-header mb-3">
+                        <div>
+                            <h3>Modern Data Tables (Bootstrap + JS)</h3>
+                            <div class="workspace-meta">Search, filter, sort, and bulk act on project status records without leaving the page.</div>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button class="btn btn-sm btn-outline-secondary" id="resetTable" type="button">Reset filters</button>
+                            <button class="btn btn-sm btn-outline-primary" id="copyTableCsv" type="button">Copy CSV</button>
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-2">
+                        <div class="col-lg-4">
+                            <div class="visual-box small h-100">
+                                <h4>How search works</h4>
+                                <p>Search scans ID, project name, sponsor, owner, status, phase, and tags. Results update on each keystroke.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="visual-box small h-100">
+                                <h4>How filters work</h4>
+                                <ul>
+                                    <li>Status is multi-select (All or specific statuses).</li>
+                                    <li>Owner, phase, and health filters are additive.</li>
+                                    <li>Date filters apply to updated and due dates.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="visual-box small h-100">
+                                <h4>How teams use it</h4>
+                                <div class="mb-1"><strong>Sort:</strong> click headers to toggle ascending/descending.</div>
+                                <div class="mb-1"><strong>Bulk:</strong> select rows for review or export.</div>
+                                <div><strong>Pagination:</strong> page size control keeps grids snappy.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="data-table-shell" data-snippet-id="datatable" data-hood>
+                        <div class="table-toolbar">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">Search</span>
+                                <input class="form-control" id="tableSearch" placeholder="ID, project, sponsor, owner, tag" aria-label="Search project table">
+                                <button class="btn btn-outline-secondary" type="button" id="clearSearch">Clear</button>
+                            </div>
+                            <div class="btn-group" role="group" aria-label="Table tools">
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#tableFilters" aria-expanded="true" aria-controls="tableFilters">Filters</button>
+                                <select class="form-select form-select-sm" id="pageSize" aria-label="Page size">
+                                    <option value="6">6 rows</option>
+                                    <option value="10">10 rows</option>
+                                    <option value="20">20 rows</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="collapse show" id="tableFilters">
+                            <div class="table-filter-row mb-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Status</button>
+                                    <div class="dropdown-menu p-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="statusAll" checked>
+                                            <label class="form-check-label" for="statusAll">All statuses</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input status-option" type="checkbox" value="Not Started" id="statusNotStarted" checked>
+                                            <label class="form-check-label" for="statusNotStarted">Not started</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input status-option" type="checkbox" value="In Progress" id="statusInProgress" checked>
+                                            <label class="form-check-label" for="statusInProgress">In progress</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input status-option" type="checkbox" value="In Review" id="statusInReview" checked>
+                                            <label class="form-check-label" for="statusInReview">In review</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input status-option" type="checkbox" value="Blocked" id="statusBlocked" checked>
+                                            <label class="form-check-label" for="statusBlocked">Blocked</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input status-option" type="checkbox" value="Complete" id="statusComplete" checked>
+                                            <label class="form-check-label" for="statusComplete">Complete</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input status-option" type="checkbox" value="On Hold" id="statusOnHold" checked>
+                                            <label class="form-check-label" for="statusOnHold">On hold</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <select class="form-select form-select-sm" id="ownerFilter" aria-label="Filter by owner">
+                                    <option value="all">All owners</option>
+                                </select>
+                                <select class="form-select form-select-sm" id="phaseFilter" aria-label="Filter by phase">
+                                    <option value="all">All phases</option>
+                                </select>
+                                <select class="form-select form-select-sm" id="healthFilter" aria-label="Filter by health">
+                                    <option value="all">All health</option>
+                                </select>
+                                <div class="form-check form-switch ms-1">
+                                    <input class="form-check-input" type="checkbox" id="dueSoonFilter">
+                                    <label class="form-check-label small" for="dueSoonFilter">Due in 30 days</label>
+                                </div>
+                                <div class="d-flex gap-2 align-items-end filter-date-range">
+                                    <div>
+                                        <label class="form-label small mb-0" for="updatedFromFilter">Updated from</label>
+                                        <input class="form-control form-control-sm" type="date" id="updatedFromFilter">
+                                    </div>
+                                    <div>
+                                        <label class="form-label small mb-0" for="dueBeforeFilter">Due before</label>
+                                        <input class="form-control form-control-sm" type="date" id="dueBeforeFilter">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mb-2" id="activeFilters"></div>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm data-table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">
+                                            <input class="form-check-input" type="checkbox" id="selectAllRows" aria-label="Select all rows">
+                                        </th>
+                                        <th scope="col" data-sort="id">ID <span class="sort-indicator"></span></th>
+                                        <th scope="col" data-sort="name">Project <span class="sort-indicator"></span></th>
+                                        <th scope="col" data-sort="owner">Owner <span class="sort-indicator"></span></th>
+                                        <th scope="col" data-sort="status">Status <span class="sort-indicator"></span></th>
+                                        <th scope="col" data-sort="health">Health <span class="sort-indicator"></span></th>
+                                        <th scope="col" data-sort="phase">Phase <span class="sort-indicator"></span></th>
+                                        <th scope="col" data-sort="budget">Budget <span class="sort-indicator"></span></th>
+                                        <th scope="col" data-sort="updated">Updated <span class="sort-indicator"></span></th>
+                                        <th scope="col" data-sort="due">Due <span class="sort-indicator"></span></th>
+                                        <th scope="col" data-sort="progress">Progress <span class="sort-indicator"></span></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="table-footer">
+                            <div id="tableSummary">Showing 0 of 0</div>
+                            <nav aria-label="Table pagination">
+                                <ul class="pagination pagination-sm mb-0" id="tablePagination"></ul>
+                            </nav>
+                        </div>
+                        <div class="bulk-bar">
+                            <div><strong id="selectedCount">0 selected</strong> <span class="text-muted">Use bulk actions to update or export.</span></div>
+                            <div class="d-flex gap-2">
+                                <select class="form-select form-select-sm" id="bulkAction" aria-label="Bulk action">
+                                    <option value="">Bulk action</option>
+                                    <option value="mark-reviewed">Mark as reviewed</option>
+                                    <option value="export-selected">Export selected</option>
+                                </select>
+                                <button class="btn btn-sm btn-primary" type="button" id="applyBulkAction">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <section class="standard-card" id="proposal-demo" data-snippet-id="proposal-demo">
-                    <h3>Government Research Proposal Workspace (SPA Example)</h3>
+                    <h3>Enterprise Program Proposal Workspace (SPA Example)</h3>
                     <div class="mb-3">
                         <h4>What</h4>
                         <p>A real-world example of a long-lived proposal with multiple sections that can be completed over time.</p>
                         <h4>Why</h4>
-                        <p>Government submissions require auditability, incremental saves, and structured review cycles.</p>
+                        <p>Enterprise programs require auditability, incremental saves, and structured review cycles.</p>
                         <h4>How</h4>
                         <ul>
                             <li>Each section is a module with its own save handler.</li>
@@ -677,7 +1276,7 @@
                         </ul>
                         <h4>Uses</h4>
                         <div class="d-flex flex-wrap gap-2">
-                            <span class="badge bg-primary">App shell</span>
+                            <span class="badge bg-primary">App template</span>
                             <span class="badge bg-success">Workspace modules</span>
                             <span class="badge bg-info text-dark">Chart module</span>
                             <span class="badge bg-warning text-dark">Offcanvas help</span>
@@ -688,7 +1287,7 @@
                     <div class="workspace-shell workspace-demo" data-snippet-id="proposal-module" data-hood>
                         <div class="workspace-header mb-3">
                             <div>
-                                <h5>NIH Proposal: Neurogenomics 2026</h5>
+                                <h5>Program Proposal: Neurogenomics 2026</h5>
                                 <div class="workspace-meta">Last saved: <span data-last-saved>09:40 AM</span></div>
                             </div>
                             <div class="d-flex align-items-center gap-2">
@@ -761,9 +1360,9 @@
                                         <div class="text-muted">
                                             <div><strong>Title:</strong> <span data-display="projectTitle">Neurogenomics Atlas</span></div>
                                             <div><strong>Dates:</strong> <span data-display="startDate">2026-03-01</span> to <span data-display="endDate">2027-02-28</span></div>
-                                            <div><strong>Mechanism:</strong> <span data-display="fundingMechanism">R01</span></div>
-                                            <div><strong>Sponsor:</strong> <span data-display="sponsorName">NIH</span></div>
-                                            <div><strong>Route:</strong> <span data-display="submissionRoute">NIH eRA Commons</span></div>
+                                            <div><strong>Mechanism:</strong> <span data-display="fundingMechanism">Capital</span></div>
+                                            <div><strong>Sponsor:</strong> <span data-display="sponsorName">Executive Steering</span></div>
+                                            <div><strong>Route:</strong> <span data-display="submissionRoute">Internal PMO</span></div>
                                         </div>
                                         <button class="btn btn-sm btn-outline-primary mt-2" data-action="edit">Edit</button>
                                     </div>
@@ -785,9 +1384,9 @@
                                             <div class="col-md-4">
                                                 <label class="form-label">Funding mechanism</label>
                                                 <select class="form-select" data-field="fundingMechanism">
-                                                    <option>R01</option>
-                                                    <option>R21</option>
-                                                    <option>U01</option>
+                                                    <option>Capital</option>
+                                                    <option>Operating</option>
+                                                    <option>Grant</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-4">
@@ -797,9 +1396,9 @@
                                             <div class="col-md-4">
                                                 <label class="form-label">Submission route</label>
                                                 <select class="form-select" data-field="submissionRoute">
-                                                    <option>NIH eRA Commons</option>
-                                                    <option>Grants.gov</option>
-                                                    <option>Internal review</option>
+                                                    <option>Internal PMO</option>
+                                                    <option>Portfolio review</option>
+                                                    <option>Executive council</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -836,12 +1435,12 @@
                                 </div>
                                 <div class="workspace-card" data-section="compliance" data-snippet-id="proposal-compliance" data-hood>
                                     <div class="d-flex justify-content-between mb-2">
-                                        <strong>Compliance & IRB</strong>
+                                        <strong>Risk & Compliance</strong>
                                         <span class="status-chip status-complete" data-status>Complete</span>
                                     </div>
                                     <div class="workspace-view">
                                         <div class="text-muted">
-                                            <div><strong>IRB:</strong> <span data-display="irbStatus">Approved</span></div>
+                                            <div><strong>Review board:</strong> <span data-display="irbStatus">Approved</span></div>
                                             <div><strong>Documentation:</strong> <span data-display="irbDocs">Attached</span></div>
                                         </div>
                                         <button class="btn btn-sm btn-outline-primary mt-2" data-action="edit">Edit</button>
@@ -910,15 +1509,24 @@
                     <div class="row g-3">
                         <div class="col-lg-6">
                             <h4>What</h4>
-                            <p>Use Azure DevOps Server (TFS) with self-hosted agents to run builds, tests, and deployments entirely on-prem.</p>
+                            <p>Use Azure DevOps Server with self-hosted agents to run builds, tests, environment provisioning, and template publishing entirely on-prem.</p>
                             <h4>Why</h4>
-                            <p>Improves department efficiency by standardizing builds, enforcing quality gates, and reducing manual handoffs.</p>
+                            <p>Improves enterprise delivery by standardizing builds, enforcing quality gates, and keeping templates consistent across teams without exposing source or artifacts outside the enclave.</p>
                             <h4>How</h4>
                             <ul>
-                                <li>CI pipeline runs on every PR: restore, build, unit tests, and coverage.</li>
-                                <li>DAL and core components get unit-tested with database mocks or local SQL test containers.</li>
-                                <li>CD pipeline deploys to internal dev/test servers with approvals.</li>
-                                <li>Policy gates enforce security scanning and artifact retention.</li>
+                                <li>Template repo is the source of truth with versioned releases.</li>
+                                <li>CI validates template changes: restore, build, lint, unit tests, and coverage.</li>
+                                <li>Publish a signed template package to an internal feed for teams to consume.</li>
+                                <li>Downstream apps pin template versions and update via PRs.</li>
+                                <li>Policy gates enforce security scanning, SBOMs, and artifact retention.</li>
+                                <li>CD targets dev/test only; production deployments are blocked by policy.</li>
+                            </ul>
+                            <h4>On-prem dev/test focus</h4>
+                            <ul>
+                                <li>Use isolated agent pools per environment (dev, test, staging).</li>
+                                <li>Gate deployments with approvals and change tickets.</li>
+                                <li>Promote immutable artifacts from CI to test without rebuilding.</li>
+                                <li>Run smoke tests and data seeding scripts inside the network.</li>
                             </ul>
                         </div>
                         <div class="col-lg-6">
@@ -929,14 +1537,22 @@
                                     <span class="badge bg-info text-dark">Unit Tests</span>
                                     <span class="badge bg-warning text-dark">Security</span>
                                     <span class="badge bg-success">Package</span>
-                                    <span class="badge bg-secondary">CD (On-Prem)</span>
+                                    <span class="badge bg-secondary">CD (Dev/Test)</span>
                                 </div>
-                                <div class="small text-muted">Self-hosted agents only. No external cloud services or SaaS dependencies.</div>
+                                <div class="small text-muted">Self-hosted agents only. Artifacts stay internal and promotion is dev/test only.</div>
                             </div>
                             <div class="mt-3">
+                                <h4>Security notes (gov sites)</h4>
+                                <ul>
+                                    <li>Least-privilege service accounts; no shared agent credentials.</li>
+                                    <li>Secrets in ADO variable groups with hardware-backed storage.</li>
+                                    <li>Disable public extensions, restrict outbound egress, and enforce TLS.</li>
+                                    <li>Scan artifacts and dependencies; block unsigned packages.</li>
+                                    <li>Log retention and audit trails aligned with policy.</li>
+                                </ul>
                                 <h4>Efficiency impact</h4>
                                 <ul>
-                                    <li>Fast feedback on DAL regressions before merge.</li>
+                                    <li>Template updates roll out in controlled, versioned steps.</li>
                                     <li>Repeatable deployments reduce release risk.</li>
                                     <li>Audit-ready logs for change tracking.</li>
                                 </ul>
@@ -992,87 +1608,43 @@
                 </section>
 
                 <section class="standard-card" id="checklist" data-snippet-id="checklist">
-                    <h3>Definition of Done Checklist</h3>
+                    <h3>Definition of Done (Editable)</h3>
                     <div class="row g-3">
                         <div class="col-lg-6">
                             <h4>What</h4>
-                            <p>A repeatable checklist for performance, accessibility, and security.</p>
+                            <p>A shared checklist that captures the outcomes of standardization meetings and stays editable over time.</p>
                         </div>
                         <div class="col-lg-6">
                             <h4>Why</h4>
-                            <p>Standardized quality gates across the department.</p>
+                            <p>Clarifies expectations for teams and keeps delivery aligned across dev/test environments.</p>
                         </div>
                     </div>
-                    <div class="row g-2 mt-2">
-                        <div class="col-md-6">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label">WCAG contrast verified</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label">Audit logging enabled</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label">Rowversion concurrency checks</label>
+                    <div class="row g-3 mt-2">
+                        <div class="col-lg-8">
+                            <div class="dod-editor">
+                                <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+                                    <label class="form-label mb-0" for="dodNewItem">Add item</label>
+                                    <input class="form-control form-control-sm" id="dodNewItem" placeholder="Add a new definition of done item" aria-label="Add definition of done item">
+                                    <button class="btn btn-sm btn-primary" type="button" id="dodAddItem">Add</button>
+                                    <button class="btn btn-sm btn-outline-secondary" type="button" id="dodReset">Reset defaults</button>
+                                </div>
+                                <div class="dod-list" id="dodList" aria-live="polite"></div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label">Toast + inline validation</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label">Performance budget checked</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label">Security headers applied</label>
+                        <div class="col-lg-4">
+                            <div class="visual-box small h-100">
+                                <h4>How to use</h4>
+                                <ul>
+                                    <li>Update items as decisions are made.</li>
+                                    <li>Check off milestones for dev/test readiness.</li>
+                                    <li>Keep wording concise and measurable.</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </section>
             </main>
 
-            <aside class="under-hood">
-                <div class="border-bottom p-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <strong>Under the Hood</strong>
-                        <button class="btn btn-sm btn-outline-secondary" id="copySnippet">Copy snippet</button>
-                    </div>
-                    <div class="text-muted small" id="snippetTitle">Select a module or card to inspect its implementation.</div>
-                </div>
-                <ul class="nav nav-tabs px-3 pt-3" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#hood-file">File tree</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#hood-page">Razor page</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#hood-model">PageModel</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#hood-partial">Partial</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#hood-component">ViewComponent</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#hood-js">JS</button>
-                    </li>
-                </ul>
-                <div class="tab-content p-3">
-                    <div class="tab-pane fade show active" id="hood-file"><pre id="snippetFile"></pre></div>
-                    <div class="tab-pane fade" id="hood-page"><pre id="snippetPage"></pre></div>
-                    <div class="tab-pane fade" id="hood-model"><pre id="snippetModel"></pre></div>
-                    <div class="tab-pane fade" id="hood-partial"><pre id="snippetPartial"></pre></div>
-                    <div class="tab-pane fade" id="hood-component"><pre id="snippetComponent"></pre></div>
-                    <div class="tab-pane fade" id="hood-js"><pre id="snippetJs"></pre></div>
-                </div>
-            </aside>
         </div>
     </div>
 
@@ -1091,6 +1663,14 @@
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">Draft saved. Continue to the next section.</div>
+        </div>
+        <div id="tableToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Table update</strong>
+                <small>Just now</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="tableToastBody">Table action completed.</div>
         </div>
     </div>
 
@@ -1133,258 +1713,32 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const snippets = {
-            "app-shell": {
-                title: "Standard App Shell",
-                fileTree: "/Pages/Shared/_Layout.cshtml\n/Pages/Shared/Partials/_AppSidebar.cshtml\n/ViewComponents/RecordHeaderViewComponent.cs",
-                page: "@* _Layout.cshtml *@\n<body>\n  <header>...navigation...</header>\n  <main class=\"container-fluid\">@RenderBody()</main>\n</body>",
-                model: "// Not applicable for layout",
-                partial: "@* _AppSidebar.cshtml *@\n<nav>\n  <a asp-page=\"/Records/Index\">Records</a>\n</nav>",
-                component: "public class RecordHeaderViewComponent : ViewComponent\n{\n  public IViewComponentResult Invoke(RecordSummary summary)\n  {\n    return View(summary);\n  }\n}",
-                js: "// Toast stack initializes in _Layout"
-            },
-            "layout": {
-                title: "_Layout.cshtml",
-                fileTree: "/Pages/Shared/_Layout.cshtml",
-                page: "@* _Layout.cshtml *@\n<div class=\"app-shell\">\n  <partial name=\"Partials/_AppSidebar\" />\n  <main>@RenderBody()</main>\n  <vc:record-header model=\"Model.Summary\" />\n</div>",
-                model: "// Layout uses ViewComponents or ViewData",
-                partial: "@* _AppSidebar.cshtml *@\n<ul class=\"nav flex-column\">\n  <li class=\"nav-item\">Records</li>\n</ul>",
-                component: "public class RecordHeaderViewComponent : ViewComponent\n{\n  public IViewComponentResult Invoke(RecordSummary summary) => View(summary);\n}",
-                js: "// No JS required for layout"
-            },
-            "page-types": {
-                title: "Page Types",
-                fileTree: "/Pages/Records/{id}/Index.cshtml\n/Pages/Records/{id}/Review.cshtml",
-                page: "@page \"/records/{id}\"\n@model RecordIndexModel\n<h1>@Model.Summary.Title</h1>",
-                model: "public class RecordIndexModel : PageModel\n{\n  public Task OnGetAsync(int id) { /* load data */ }\n}",
-                partial: "@* _SectionCardShell.cshtml *@\n<div class=\"card\">@RenderBody()</div>",
-                component: "// Optional ViewComponent for status summary",
-                js: "// Minimal JS for toast notifications"
-            },
-            "composition": {
-                title: "Composition Rules",
-                fileTree: "/Pages/Shared/Sections/_ContactCard.cshtml\n/ViewComponents/RecordHeaderViewComponent.cs\n/TagHelpers/StatusBadgeTagHelper.cs",
-                page: "@page\n<partial name=\"Sections/_ContactCard\" model=\"Model.Contact\" />",
-                model: "public class RecordDetailsModel : PageModel\n{\n  public ContactVm Contact { get; set; }\n}",
-                partial: "@model ContactVm\n<div class=\"card\">\n  <h5>Contact</h5>\n</div>",
-                component: "public class RecordHeaderViewComponent : ViewComponent\n{\n  public IViewComponentResult Invoke(RecordSummary summary) => View(summary);\n}",
-                js: "// TagHelpers use server-side rendering"
-            },
-            "workspace": {
-                title: "Workspace Pattern",
-                fileTree: "/Pages/Records/{id}/Index.cshtml\n/Pages/Records/{id}/Index.cshtml.cs\n/Pages/Shared/Sections/_ContactCard.cshtml",
-                page: "@page \"/records/{id}\"\n<partial name=\"Sections/_ContactCard\" model=\"Model.Contact\" />",
-                model: "public class RecordIndexModel : PageModel\n{\n  public async Task<IActionResult> OnPostSaveContactAsync(int id)\n  {\n    // Save draft section\n    return Partial(\"Sections/_ContactCard\", Contact);\n  }\n}",
-                partial: "@model ContactVm\n<div class=\"section-card\">\n  <button asp-page-handler=\"SaveContact\">Save</button>\n</div>",
-                component: "// StatusSummaryViewComponent renders overall state",
-                js: "// HTMX or fetch swaps the section HTML"
-            },
-            "spa-ux": {
-                title: "Practical SPA UX",
-                fileTree: "/Pages/Records/{id}/Sections/Contact.cshtml\n/wwwroot/js/sections.js",
-                page: "<div hx-get=\"/records/123/sections/contact\" hx-trigger=\"load\"></div>",
-                model: "public async Task<IActionResult> OnPostSaveContactAsync()\n{\n  // Return updated partial\n}",
-                partial: "@* Sections/_ContactCard.cshtml *@\n<form hx-post=\"/records/123/sections/contact\">...</form>",
-                component: "// RecordHeaderViewComponent persists across swaps",
-                js: "// JS only handles toasts and scroll"
-            },
-            "chartjs": {
-                title: "Chart.js Module",
-                fileTree: "/Pages/Records/{id}/Index.cshtml.cs\n/Pages/Shared/Sections/_RunCountsChart.cshtml\n/wwwroot/js/charts/runCounts.js",
-                page: "@* _RunCountsChart.cshtml *@\n<script type=\"application/json\" id=\"run-counts-data\">@Model.ChartJson<\\/script>\n<canvas id=\"runCountsChart\"></canvas>",
-                model: "public class RecordIndexModel : PageModel\n{\n  public string ChartJson { get; set; }\n  public async Task OnGetAsync(int id)\n  {\n    var data = await _dal.GetRunCountsAsync(id);\n    ChartJson = JsonSerializer.Serialize(data);\n  }\n}",
-                partial: "@model ChartVm\n<canvas id=\"runCountsChart\"></canvas>",
-                component: "// Optional view component for chart wrappers",
-                js: "const payload = JSON.parse(document.getElementById('run-counts-data').textContent);\nnew Chart(ctx, { type: 'bar', data: payload });"
-            },
-            "bootstrap": {
-                title: "Bootstrap Building Blocks",
-                fileTree: "/Pages/Shared/Sections/_SectionCardShell.cshtml\n/Pages/Shared/Partials/_ToastStack.cshtml",
-                page: "<div class=\"card\">...section...</div>",
-                model: "// No PageModel needed for static layout",
-                partial: "@* _SectionCardShell.cshtml *@\n<div class=\"card\">@RenderBody()</div>",
-                component: "// ToastStackViewComponent can be shared",
-                js: "// Bootstrap bundle handles accordion/offcanvas"
-            },
-            "devops": {
-                title: "Azure DevOps CI/CD (On-Prem)",
-                fileTree: "/azure-pipelines.yml\n/build/\n/tests/\n/scripts/",
-                page: "// Pipeline configuration lives in the repo root",
-                model: "// No PageModel for CI/CD",
-                partial: "// Internal scripts for packaging and deployment",
-                component: "// Quality gates applied via branch policies",
-                js: "// CI runs on self-hosted agents only"
-            },
-            "devops-pipeline": {
-                title: "Azure DevOps Pipeline",
-                fileTree: "/azure-pipelines.yml",
-                page: "trigger:\n- main\n\npool:\n  name: OnPrem-Agent-Pool\n\nsteps:\n- task: DotNetCoreCLI@2\n  inputs:\n    command: 'restore'\n- task: DotNetCoreCLI@2\n  inputs:\n    command: 'build'\n    arguments: '--configuration Release'\n- task: DotNetCoreCLI@2\n  inputs:\n    command: 'test'\n    arguments: '--collect \"XPlat Code Coverage\"'\n- task: PublishTestResults@2\n  inputs:\n    testResultsFiles: '**/*.trx'\n- task: PublishBuildArtifacts@1\n  inputs:\n    pathToPublish: '$(Build.ArtifactStagingDirectory)'\n    artifactName: 'drop'",
-                model: "// Self-hosted agent executes inside your network",
-                partial: "// DAL unit tests run here",
-                component: "// Deployment gated by approvals",
-                js: "// No JS required"
-            },
-            "structure": {
-                title: "Repo Structure",
-                fileTree: "/Pages\n/Pages/Shared\n/ViewComponents\n/TagHelpers\n/wwwroot",
-                page: "// See folder template",
-                model: "// Conventions enforced via review",
-                partial: "// Section partials live in /Pages/Shared/Sections",
-                component: "// ViewComponents live in /ViewComponents",
-                js: "// JS modules live in /wwwroot/js"
-            },
-            "checklist": {
-                title: "Definition of Done",
-                fileTree: "/docs/standards/checklist.md",
-                page: "// Checklist referenced in PRs",
-                model: "// Required checks for each release",
-                partial: "// Validation summary partial",
-                component: "// StatusSummaryViewComponent",
-                js: "// Minimal JS for client-only validation"
-            },
-            "workspace-module": {
-                title: "Workspace Section Module",
-                fileTree: "/Pages/Records/{id}/Sections/Contact.cshtml\n/Pages/Records/{id}/Sections/Contact.cshtml.cs",
-                page: "@page\n<partial name=\"Sections/_ContactCard\" model=\"Model.Contact\" />",
-                model: "public async Task<IActionResult> OnPostSaveContactAsync(int id) { /* save */ }",
-                partial: "@model ContactVm\n<div class=\"section-card\">...inputs...</div>",
-                component: "// RecordHeaderViewComponent",
-                js: "// JS toggles edit state in the static demo"
-            },
-            "section-contact": {
-                title: "Contact Section",
-                fileTree: "/Pages/Shared/Sections/_ContactCard.cshtml",
-                page: "@* Contact card *@\n<partial name=\"Sections/_ContactCard\" model=\"Model.Contact\" />",
-                model: "public async Task<IActionResult> OnPostSaveContactAsync() { /* save */ }",
-                partial: "@model ContactVm\n<div class=\"card\">\n  <label>Primary Contact</label>\n</div>",
-                component: "// StatusBadgeTagHelper used inside partial",
-                js: "// Toast shown after save"
-            },
-            "section-compliance": {
-                title: "Compliance Section",
-                fileTree: "/Pages/Shared/Sections/_ComplianceCard.cshtml",
-                page: "@* Compliance card *@\n<partial name=\"Sections/_ComplianceCard\" model=\"Model.Compliance\" />",
-                model: "public async Task<IActionResult> OnPostSaveComplianceAsync() { /* save */ }",
-                partial: "@model ComplianceVm\n<div class=\"card\">\n  <select>...</select>\n</div>",
-                component: "// ViewComponent for status summary",
-                js: "// Toast shown after save"
-            },
-            "chart-module": {
-                title: "Run Counts Chart",
-                fileTree: "/Pages/Shared/Sections/_RunCountsChart.cshtml\n/wwwroot/js/charts/runCounts.js",
-                page: "<script type=\"application/json\" id=\"run-counts-data\">@Model.ChartJson<\\/script>",
-                model: "public string ChartJson { get; set; }",
-                partial: "@model ChartVm\n<canvas id=\"runCountsChart\"></canvas>",
-                component: "// Optional wrapper component",
-                js: "const data = JSON.parse(document.getElementById('run-counts-data').textContent);"
-            },
-            "proposal-demo": {
-                title: "Proposal Workspace Example",
-                fileTree: "/Pages/Proposals/{id}/Index.cshtml\n/Pages/Proposals/{id}/Index.cshtml.cs",
-                page: "@page \"/proposals/{id}\"\n<partial name=\"Sections/_ProjectSummary\" model=\"Model.Summary\" />",
-                model: "public class ProposalIndexModel : PageModel\n{\n  public Task<IActionResult> OnPostSaveSummaryAsync(int id) { /* save */ }\n  public Task<IActionResult> OnPostSaveAimsAsync(int id) { /* save */ }\n}",
-                partial: "@model ProposalSummaryVm\n<div class=\"section-card\">Project Summary</div>",
-                component: "// ViewComponent for proposal header",
-                js: "// Section swaps emulate HTMX behavior"
-            },
-            "proposal-module": {
-                title: "Proposal Module",
-                fileTree: "/Pages/Shared/Sections/_ProjectSummary.cshtml\n/Pages/Shared/Sections/_SpecificAims.cshtml",
-                page: "@* Proposal workspace *@\n<partial name=\"Sections/_ProjectSummary\" model=\"Model.Summary\" />",
-                model: "public class ProposalIndexModel : PageModel { /* handlers */ }",
-                partial: "@model ProposalSummaryVm\n<div class=\"card\">Project Summary</div>",
-                component: "// ProposalHeaderViewComponent",
-                js: "// Toast triggered after save"
-            },
-            "proposal-summary": {
-                title: "Project Summary Section",
-                fileTree: "/Pages/Shared/Sections/_ProjectSummary.cshtml",
-                page: "@* Project Summary *@\n<partial name=\"Sections/_ProjectSummary\" model=\"Model.Summary\" />",
-                model: "public Task<IActionResult> OnPostSaveSummaryAsync(int id)",
-                partial: "@model ProposalSummaryVm\n<textarea class=\"form-control\"></textarea>",
-                component: "// StatusBadgeTagHelper",
-                js: "// Draft save updates status chip"
-            },
-            "proposal-aims": {
-                title: "Specific Aims Section",
-                fileTree: "/Pages/Shared/Sections/_SpecificAims.cshtml",
-                page: "@* Specific Aims *@\n<partial name=\"Sections/_SpecificAims\" model=\"Model.Aims\" />",
-                model: "public Task<IActionResult> OnPostSaveAimsAsync(int id)",
-                partial: "@model SpecificAimsVm\n<input class=\"form-control\" />",
-                component: "// ProposalHeaderViewComponent",
-                js: "// Save handler returns updated partial"
-            },
-            "proposal-logistics": {
-                title: "Project Logistics (Standard Fields)",
-                fileTree: "/Pages/Shared/Sections/_ProjectLogistics.cshtml",
-                page: "@* Project Logistics *@\n<partial name=\"Sections/_ProjectLogistics\" model=\"Model.Logistics\" />",
-                model: "public Task<IActionResult> OnPostSaveLogisticsAsync(int id)",
-                partial: "@model LogisticsVm\n<input class=\"form-control\" />\n<select class=\"form-select\"></select>",
-                component: "// TagHelpers handle required markers",
-                js: "// Save handler returns updated partial"
-            },
-            "proposal-budget": {
-                title: "Budget Section",
-                fileTree: "/Pages/Shared/Sections/_BudgetCard.cshtml",
-                page: "@* Budget *@\n<partial name=\"Sections/_BudgetCard\" model=\"Model.Budget\" />",
-                model: "public Task<IActionResult> OnPostSaveBudgetAsync(int id)",
-                partial: "@model BudgetVm\n<input class=\"form-control\" />",
-                component: "// BudgetSummaryViewComponent",
-                js: "// Validation summary rendered on save"
-            },
-            "proposal-compliance": {
-                title: "Compliance Section",
-                fileTree: "/Pages/Shared/Sections/_ComplianceCard.cshtml",
-                page: "@* Compliance *@\n<partial name=\"Sections/_ComplianceCard\" model=\"Model.Compliance\" />",
-                model: "public Task<IActionResult> OnPostSaveComplianceAsync(int id)",
-                partial: "@model ComplianceVm\n<select class=\"form-select\"></select>",
-                component: "// StatusSummaryViewComponent",
-                js: "// Save handler returns updated partial"
-            },
-            "proposal-data": {
-                title: "Data Management Plan",
-                fileTree: "/Pages/Shared/Sections/_DataManagementPlan.cshtml",
-                page: "@* Data Management *@\n<partial name=\"Sections/_DataManagementPlan\" model=\"Model.DataPlan\" />",
-                model: "public Task<IActionResult> OnPostSaveDataPlanAsync(int id)",
-                partial: "@model DataPlanVm\n<textarea class=\"form-control\"></textarea>",
-                component: "// ViewComponent for status summary",
-                js: "// Save handler returns updated partial"
-            },
-            "proposal-attachments": {
-                title: "Attachments Section",
-                fileTree: "/Pages/Shared/Sections/_AttachmentsCard.cshtml",
-                page: "@* Attachments *@\n<partial name=\"Sections/_AttachmentsCard\" model=\"Model.Attachments\" />",
-                model: "public Task<IActionResult> OnPostSaveAttachmentsAsync(int id)",
-                partial: "@model AttachmentsVm\n<input type=\"file\" multiple />",
-                component: "// UploadSummaryViewComponent",
-                js: "// Client-side file validation"
-            }
-        };
-
-        const promptText = `Goal: Replace the existing chart.js demo site with a ".NET Core Razor Standardization Playbook" single-page static site (GitHub Pages) that teaches our department's best practices through interactive visuals and code-snippet inspection.
+        const promptText = `Goal: Replace the existing chart.js demo site with a ".NET Core Template Standardization Playbook" single-page static site (GitHub Pages) that teaches enterprise best practices through interactive visuals and code-snippet inspection.
 
 Constraints:
 - Must be static: HTML/CSS/JS only (no build system required).
 - Use Bootstrap 5 + Chart.js via CDN.
 - Styling is not the priority; clarity and modularity are.
-- The page should simulate a Razor Pages app shell and modular "section workspace" UX.
+- The page should simulate a Razor Pages app template and modular "section workspace" UX.
 - Include an "Under the Hood" right-side panel that updates in realtime as the user interacts, showing example file tree + Razor Page + PageModel + partial + view component + JS snippets. Snippets can be static strings in JS.
 - Everything stays on-prem (Azure DevOps Server + self-hosted agents); no external cloud services.
 
 Information Architecture:
 - Top navbar: title, version/date, "Copy Copilot Prompt" button.
 - Left sidebar (scrollspy): sections:
-    1) App Shell (Layout, Nav, Sidebar)
+    1) App Template (Layout, Nav, Sidebar)
     2) Page Types (Index/Details/Edit/Review)
     3) Composition Rules (partials vs view components vs tag helpers)
     4) Form Workspace Pattern (sections save independently; draft vs submit)
-    5) Practical SPA UX in Razor (partial updates concept; deep links)
-    6) Chart.js in Razor without APIs (DAL -> PageModel -> JSON -> Chart.js)
-    7) Bootstrap Building Blocks (cards, accordion, offcanvas, toasts, tables)
-    8) Gov Proposal Workspace Example
-    9) Azure DevOps CI/CD (On-Prem)
-    10) Recommended Repo Structure + Conventions
-    11) Standards Checklist
+    5) Practical SPA UX in Razor Pages (partial updates concept; deep links)
+    6) Section Partials and Handlers (OnPostSaveX, HTMX swaps)
+    7) Chart.js in Razor Pages without APIs (DAL -> PageModel -> JSON -> Chart.js)
+    8) Bootstrap Building Blocks (cards, accordion, offcanvas, toasts, tables)
+    9) Modern Data Tables (search, filters, sort, paginate)
+    10) Program Proposal Workspace Example
+    11) Azure DevOps CI/CD (On-Prem)
+    12) Recommended Repo Structure + Conventions
+    13) Standards Checklist
 
 Interactive requirements:
 - "Workspace" demo: show 4-6 section cards with statuses (Not Started/Draft/Complete/Needs Review). Clicking "Edit" toggles a card into edit mode; "Save" toggles back, updates status chip, and triggers a toast.
@@ -1400,9 +1754,10 @@ Content requirements (what to explain):
     - Draft-save validation vs submit validation.
     - SPA-like UX via partial updates (conceptual; simulate in JS in static site).
     - Chart.js integration without controllers/services/APIs: DAL -> PageModel -> JSON -> Chart.js.
-    - On-prem CI/CD using Azure DevOps Server with self-hosted agents; include DAL unit tests in pipeline.
+    - HTMX swap model, on-prem hosting, and security controls (XSS, CSRF, CSP).
+    - On-prem CI/CD using Azure DevOps Server with self-hosted agents; include DAL unit tests and template packaging in the pipeline.
 - Provide example snippets for:
-  - _Layout.cshtml shell
+    - _Layout.cshtml template
   - Record workspace page (Index.cshtml)
   - PageModel with named handlers (OnPostSaveContact, OnPostSaveUploads, etc.)
   - A section partial (_ContactCard.cshtml)
@@ -1420,42 +1775,6 @@ Implementation details:
 Output:
 - Update chartjs-demo.html to the new playbook.
 - Keep everything self-contained so it runs on GitHub Pages.`;
-
-        const snippetTitle = document.getElementById("snippetTitle");
-        const snippetFile = document.getElementById("snippetFile");
-        const snippetPage = document.getElementById("snippetPage");
-        const snippetModel = document.getElementById("snippetModel");
-        const snippetPartial = document.getElementById("snippetPartial");
-        const snippetComponent = document.getElementById("snippetComponent");
-        const snippetJs = document.getElementById("snippetJs");
-
-        const updateUnderHood = (snippetId) => {
-            const payload = snippets[snippetId];
-            if (!payload) {
-                return;
-            }
-            snippetTitle.textContent = payload.title;
-            snippetFile.textContent = payload.fileTree;
-            snippetPage.textContent = payload.page;
-            snippetModel.textContent = payload.model;
-            snippetPartial.textContent = payload.partial;
-            snippetComponent.textContent = payload.component;
-            snippetJs.textContent = payload.js;
-        };
-
-        document.querySelectorAll("[data-hood]").forEach((element) => {
-            element.addEventListener("click", (event) => {
-                const snippetId = event.currentTarget.getAttribute("data-snippet-id");
-                updateUnderHood(snippetId);
-            });
-        });
-
-        document.querySelectorAll(".standard-card").forEach((card) => {
-            card.addEventListener("click", () => {
-                const snippetId = card.getAttribute("data-snippet-id");
-                updateUnderHood(snippetId);
-            });
-        });
 
         const workspaceCards = document.querySelectorAll(".workspace-card");
         const saveToast = document.getElementById("saveToast");
@@ -1519,8 +1838,6 @@ Output:
                     toast.show();
                 }
 
-                const snippetId = card.getAttribute("data-snippet-id");
-                updateUnderHood(snippetId);
             });
         });
 
@@ -1539,46 +1856,1156 @@ Output:
                 if (activeChart) {
                     activeChart.destroy();
                 }
+                const baseOptions = {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: config.type !== "bar" },
+                        title: { display: true, text: config.title || config.data.datasets[0]?.label || "" }
+                    }
+                };
+                const mergedOptions = config.options
+                    ? {
+                        ...baseOptions,
+                        ...config.options,
+                        plugins: { ...baseOptions.plugins, ...(config.options.plugins || {}) }
+                    }
+                    : baseOptions;
                 activeChart = new Chart(ctx, {
                     type: config.type,
                     data: config.data,
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { display: config.type !== "bar" },
-                            title: { display: true, text: config.data.datasets[0].label }
-                        }
-                    }
+                    options: mergedOptions
                 });
             };
 
             renderChart(chartSelect.value);
             chartSelect.addEventListener("change", (event) => {
                 renderChart(event.target.value);
-                updateUnderHood("chart-module");
             });
+
+            if (Array.isArray(chartConfigs.gallery)) {
+                chartConfigs.gallery.forEach((entry) => {
+                    const canvas = document.getElementById(entry.id);
+                    if (!canvas) {
+                        return;
+                    }
+                    new Chart(canvas.getContext("2d"), {
+                        type: entry.type,
+                        data: entry.data,
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            ...(entry.options || {})
+                        }
+                    });
+                });
+            }
         }
 
+        const projectRecords = [
+            {
+                id: "PRJ-1021",
+                name: "Neurogenomics Data Lake",
+                sponsor: "Strategy Office",
+                owner: "Ava Patel",
+                status: "In Progress",
+                health: "On Track",
+                phase: "Build",
+                budget: 1.8,
+                updated: "2026-02-03",
+                due: "2026-06-18",
+                progress: 62,
+                tags: ["Genomics", "Platform"]
+            },
+            {
+                id: "PRJ-1034",
+                name: "Clinical Trial Tracker",
+                sponsor: "Quality Office",
+                owner: "Marcus Lee",
+                status: "In Review",
+                health: "At Risk",
+                phase: "Validate",
+                budget: 0.9,
+                updated: "2026-02-01",
+                due: "2026-03-28",
+                progress: 48,
+                tags: ["Clinical", "Regulatory"]
+            },
+            {
+                id: "PRJ-1042",
+                name: "Oncology Decision Support",
+                sponsor: "Executive Steering",
+                owner: "Riley Chen",
+                status: "Blocked",
+                health: "Blocked",
+                phase: "Build",
+                budget: 2.3,
+                updated: "2026-01-27",
+                due: "2026-04-10",
+                progress: 35,
+                tags: ["Oncology", "Decision"]
+            },
+            {
+                id: "PRJ-1055",
+                name: "Regional Health Analytics",
+                sponsor: "Operations",
+                owner: "Elena Ruiz",
+                status: "In Progress",
+                health: "On Track",
+                phase: "Discover",
+                budget: 1.1,
+                updated: "2026-02-04",
+                due: "2026-05-22",
+                progress: 58,
+                tags: ["Analytics", "Equity"]
+            },
+            {
+                id: "PRJ-1063",
+                name: "Security Access Portal",
+                sponsor: "Security Office",
+                owner: "Noah Brooks",
+                status: "Not Started",
+                health: "On Track",
+                phase: "Plan",
+                budget: 0.6,
+                updated: "2026-01-18",
+                due: "2026-06-30",
+                progress: 12,
+                tags: ["Security", "Portal"]
+            },
+            {
+                id: "PRJ-1071",
+                name: "Immunology Insights Hub",
+                sponsor: "Research Office",
+                owner: "Priya Singh",
+                status: "In Review",
+                health: "On Track",
+                phase: "Validate",
+                budget: 1.4,
+                updated: "2026-02-05",
+                due: "2026-04-25",
+                progress: 71,
+                tags: ["Immunology", "Insights"]
+            },
+            {
+                id: "PRJ-1087",
+                name: "Care Response Dashboard",
+                sponsor: "Service Delivery",
+                owner: "Ava Patel",
+                status: "Complete",
+                health: "On Track",
+                phase: "Closeout",
+                budget: 0.7,
+                updated: "2026-01-30",
+                due: "2026-02-15",
+                progress: 100,
+                tags: ["Public Health", "Dashboards"]
+            },
+            {
+                id: "PRJ-1094",
+                name: "Supply Chain Optimizer",
+                sponsor: "Supply Chain",
+                owner: "Miles Greene",
+                status: "On Hold",
+                health: "At Risk",
+                phase: "Plan",
+                budget: 1.0,
+                updated: "2026-01-22",
+                due: "2026-08-01",
+                progress: 22,
+                tags: ["Supply", "Optimization"]
+            },
+            {
+                id: "PRJ-1109",
+                name: "FHIR Integration Toolkit",
+                sponsor: "Enterprise Architecture",
+                owner: "Jordan Kim",
+                status: "In Progress",
+                health: "On Track",
+                phase: "Build",
+                budget: 1.6,
+                updated: "2026-02-02",
+                due: "2026-07-12",
+                progress: 54,
+                tags: ["Interoperability", "FHIR"]
+            },
+            {
+                id: "PRJ-1120",
+                name: "AI Ethics Review Board",
+                sponsor: "Risk & Compliance",
+                owner: "Tara Lopez",
+                status: "In Review",
+                health: "At Risk",
+                phase: "Validate",
+                budget: 0.8,
+                updated: "2026-02-06",
+                due: "2026-03-12",
+                progress: 45,
+                tags: ["AI", "Governance"]
+            },
+            {
+                id: "PRJ-1133",
+                name: "Member Intake Experience",
+                sponsor: "Customer Experience",
+                owner: "Elena Ruiz",
+                status: "In Progress",
+                health: "On Track",
+                phase: "Build",
+                budget: 1.2,
+                updated: "2026-01-29",
+                due: "2026-05-05",
+                progress: 67,
+                tags: ["Behavioral", "Intake"]
+            },
+            {
+                id: "PRJ-1148",
+                name: "Genomic Consent Registry",
+                sponsor: "Data Governance",
+                owner: "Riley Chen",
+                status: "Blocked",
+                health: "Blocked",
+                phase: "Build",
+                budget: 1.9,
+                updated: "2026-01-24",
+                due: "2026-04-02",
+                progress: 31,
+                tags: ["Genomics", "Compliance"]
+            },
+            {
+                id: "PRJ-1162",
+                name: "Population Health Signals",
+                sponsor: "Analytics Council",
+                owner: "Marcus Lee",
+                status: "Not Started",
+                health: "On Track",
+                phase: "Plan",
+                budget: 0.5,
+                updated: "2026-01-15",
+                due: "2026-09-15",
+                progress: 8,
+                tags: ["Maternal", "Surveillance"]
+            }
+        ];
+
+        const tableElements = {
+            search: document.getElementById("tableSearch"),
+            clearSearch: document.getElementById("clearSearch"),
+            statusAll: document.getElementById("statusAll"),
+            statusOptions: Array.from(document.querySelectorAll(".status-option")),
+            owner: document.getElementById("ownerFilter"),
+            phase: document.getElementById("phaseFilter"),
+            health: document.getElementById("healthFilter"),
+            dueSoon: document.getElementById("dueSoonFilter"),
+            updatedFrom: document.getElementById("updatedFromFilter"),
+            dueBefore: document.getElementById("dueBeforeFilter"),
+            pageSize: document.getElementById("pageSize"),
+            tableBody: document.getElementById("tableBody"),
+            tableSummary: document.getElementById("tableSummary"),
+            pagination: document.getElementById("tablePagination"),
+            activeFilters: document.getElementById("activeFilters"),
+            selectAll: document.getElementById("selectAllRows"),
+            selectedCount: document.getElementById("selectedCount"),
+            bulkAction: document.getElementById("bulkAction"),
+            applyBulk: document.getElementById("applyBulkAction"),
+            reset: document.getElementById("resetTable"),
+            copyCsv: document.getElementById("copyTableCsv")
+        };
+
+        const initDataTable = () => {
+            if (!tableElements.tableBody) {
+                return;
+            }
+
+            const allStatuses = [...new Set(projectRecords.map((record) => record.status))];
+            const tableState = {
+                search: "",
+                statuses: new Set(allStatuses),
+                owner: "all",
+                phase: "all",
+                health: "all",
+                updatedFrom: "",
+                dueBefore: "",
+                dueSoon: false,
+                sort: { key: "updated", direction: "desc" },
+                page: 1,
+                pageSize: parseInt(tableElements.pageSize.value, 10),
+                selected: new Set()
+            };
+
+            const tableToastElement = document.getElementById("tableToast");
+            const tableToastBody = document.getElementById("tableToastBody");
+            const tableToast = tableToastElement ? new bootstrap.Toast(tableToastElement) : null;
+            let currentPageIds = [];
+
+            const formatCurrency = (value) => `$${value.toFixed(1)}M`;
+            const formatDate = (value) => new Date(value).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
+
+            const statusClassMap = {
+                "Not Started": "status-notstarted",
+                "In Progress": "status-inprogress",
+                "In Review": "status-inreview",
+                "Blocked": "status-blocked",
+                "Complete": "status-complete",
+                "On Hold": "status-onhold"
+            };
+
+            const healthClassMap = {
+                "On Track": "health-ontrack",
+                "At Risk": "health-atrisk",
+                "Blocked": "health-blocked"
+            };
+
+            const showTableToast = (message) => {
+                if (!tableToast) {
+                    return;
+                }
+                tableToastBody.textContent = message;
+                tableToast.show();
+            };
+
+            const uniqueValues = (key) => {
+                return [...new Set(projectRecords.map((record) => record[key]).filter(Boolean))].sort();
+            };
+
+            const populateSelect = (select, values) => {
+                values.forEach((value) => {
+                    const option = document.createElement("option");
+                    option.value = value;
+                    option.textContent = value;
+                    select.append(option);
+                });
+            };
+
+            populateSelect(tableElements.owner, uniqueValues("owner"));
+            populateSelect(tableElements.phase, uniqueValues("phase"));
+            populateSelect(tableElements.health, uniqueValues("health"));
+
+            const getSearchableText = (record) => {
+                return [
+                    record.id,
+                    record.name,
+                    record.sponsor,
+                    record.owner,
+                    record.status,
+                    record.phase,
+                    record.health,
+                    record.tags.join(" ")
+                ]
+                    .join(" ")
+                    .toLowerCase();
+            };
+
+            const compareValues = (a, b, key) => {
+                const direction = tableState.sort.direction === "asc" ? 1 : -1;
+                if (["budget", "progress"].includes(key)) {
+                    return (a[key] - b[key]) * direction;
+                }
+                if (["updated", "due"].includes(key)) {
+                    return (new Date(a[key]) - new Date(b[key])) * direction;
+                }
+                return a[key].localeCompare(b[key]) * direction;
+            };
+
+            const getFilteredRecords = () => {
+                const term = tableState.search.trim().toLowerCase();
+                const today = new Date();
+                const dueSoonCutoff = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+                const updatedFrom = tableState.updatedFrom ? new Date(tableState.updatedFrom) : null;
+                const dueBefore = tableState.dueBefore ? new Date(tableState.dueBefore) : null;
+
+                const filtered = projectRecords.filter((record) => {
+                    if (term && !getSearchableText(record).includes(term)) {
+                        return false;
+                    }
+                    if (tableState.statuses.size !== allStatuses.length && !tableState.statuses.has(record.status)) {
+                        return false;
+                    }
+                    if (tableState.owner !== "all" && record.owner !== tableState.owner) {
+                        return false;
+                    }
+                    if (tableState.phase !== "all" && record.phase !== tableState.phase) {
+                        return false;
+                    }
+                    if (tableState.health !== "all" && record.health !== tableState.health) {
+                        return false;
+                    }
+                    if (updatedFrom && new Date(record.updated) < updatedFrom) {
+                        return false;
+                    }
+                    if (dueBefore && new Date(record.due) > dueBefore) {
+                        return false;
+                    }
+                    if (tableState.dueSoon) {
+                        const dueDate = new Date(record.due);
+                        if (dueDate < today || dueDate > dueSoonCutoff) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+
+                return filtered.sort((a, b) => compareValues(a, b, tableState.sort.key));
+            };
+
+            const renderActiveFilters = () => {
+                const chips = [];
+                if (tableState.search.trim()) {
+                    chips.push({ label: `Search: ${tableState.search.trim()}`, type: "search" });
+                }
+                if (tableState.statuses.size !== allStatuses.length) {
+                    tableState.statuses.forEach((status) => chips.push({ label: `Status: ${status}`, type: "status", value: status }));
+                }
+                if (tableState.owner !== "all") {
+                    chips.push({ label: `Owner: ${tableState.owner}`, type: "owner" });
+                }
+                if (tableState.phase !== "all") {
+                    chips.push({ label: `Phase: ${tableState.phase}`, type: "phase" });
+                }
+                if (tableState.health !== "all") {
+                    chips.push({ label: `Health: ${tableState.health}`, type: "health" });
+                }
+                if (tableState.updatedFrom) {
+                    chips.push({ label: `Updated from: ${tableState.updatedFrom}`, type: "updatedFrom" });
+                }
+                if (tableState.dueBefore) {
+                    chips.push({ label: `Due before: ${tableState.dueBefore}`, type: "dueBefore" });
+                }
+                if (tableState.dueSoon) {
+                    chips.push({ label: "Due in 30 days", type: "dueSoon" });
+                }
+
+                tableElements.activeFilters.innerHTML = chips
+                    .map((chip) => {
+                        const valueAttr = chip.value ? `data-value="${chip.value}"` : "";
+                        return `<span class="filter-chip">${chip.label}<button type="button" data-remove="${chip.type}" ${valueAttr} aria-label="Remove filter">x</button></span>`;
+                    })
+                    .join("");
+            };
+
+            const updateSortIndicators = () => {
+                document.querySelectorAll("[data-sort]").forEach((header) => {
+                    header.classList.remove("sort-asc", "sort-desc");
+                    if (header.getAttribute("data-sort") === tableState.sort.key) {
+                        header.classList.add(tableState.sort.direction === "asc" ? "sort-asc" : "sort-desc");
+                    }
+                });
+            };
+
+            const updateSelectedCount = () => {
+                tableElements.selectedCount.textContent = `${tableState.selected.size} selected`;
+            };
+
+            const renderPagination = (totalPages) => {
+                const maxPages = 5;
+                let start = Math.max(1, tableState.page - 2);
+                let end = Math.min(totalPages, start + maxPages - 1);
+                if (end - start < maxPages - 1) {
+                    start = Math.max(1, end - maxPages + 1);
+                }
+
+                const pages = [];
+                const addPage = (page, label, disabled, active) => {
+                    pages.push(
+                        `<li class="page-item ${disabled ? "disabled" : ""} ${active ? "active" : ""}">` +
+                            `<button class="page-link" data-page="${page}" type="button">${label}</button>` +
+                        "</li>"
+                    );
+                };
+
+                addPage(Math.max(1, tableState.page - 1), "Prev", tableState.page === 1, false);
+                if (start > 1) {
+                    addPage(1, "1", false, tableState.page === 1);
+                    if (start > 2) {
+                        pages.push("<li class=\"page-item disabled\"><span class=\"page-link\">...</span></li>");
+                    }
+                }
+                for (let page = start; page <= end; page += 1) {
+                    addPage(page, `${page}`, false, tableState.page === page);
+                }
+                if (end < totalPages) {
+                    if (end < totalPages - 1) {
+                        pages.push("<li class=\"page-item disabled\"><span class=\"page-link\">...</span></li>");
+                    }
+                    addPage(totalPages, `${totalPages}`, false, tableState.page === totalPages);
+                }
+                addPage(Math.min(totalPages, tableState.page + 1), "Next", tableState.page === totalPages, false);
+
+                tableElements.pagination.innerHTML = pages.join("");
+            };
+
+            const renderTable = () => {
+                const filtered = getFilteredRecords();
+                const totalPages = Math.max(1, Math.ceil(filtered.length / tableState.pageSize));
+                if (tableState.page > totalPages) {
+                    tableState.page = totalPages;
+                }
+
+                const startIndex = (tableState.page - 1) * tableState.pageSize;
+                const pageItems = filtered.slice(startIndex, startIndex + tableState.pageSize);
+                currentPageIds = pageItems.map((record) => record.id);
+
+                tableElements.tableBody.innerHTML = pageItems
+                    .map((record) => {
+                        const statusClass = statusClassMap[record.status] || "status-notstarted";
+                        const healthClass = healthClassMap[record.health] || "health-ontrack";
+                        const progressClass = record.progress >= 70 ? "bg-success" : record.progress >= 40 ? "bg-warning" : "bg-danger";
+                        const selected = tableState.selected.has(record.id) ? "checked" : "";
+                        return `
+                            <tr>
+                                <td><input class="form-check-input row-select" type="checkbox" data-id="${record.id}" ${selected}></td>
+                                <td class="text-muted">${record.id}</td>
+                                <td>
+                                    <div class="fw-semibold">${record.name}</div>
+                                    <div class="small text-muted">${record.sponsor} • ${record.tags.join(", ")}</div>
+                                </td>
+                                <td>${record.owner}</td>
+                                <td><span class="status-chip ${statusClass}">${record.status}</span></td>
+                                <td><span class="health-chip ${healthClass}">${record.health}</span></td>
+                                <td><span class="badge bg-light text-dark border">${record.phase}</span></td>
+                                <td>${formatCurrency(record.budget)}</td>
+                                <td>${formatDate(record.updated)}</td>
+                                <td>${formatDate(record.due)}</td>
+                                <td>
+                                    <div class="progress" role="progressbar" aria-valuenow="${record.progress}" aria-valuemin="0" aria-valuemax="100">
+                                        <div class="progress-bar ${progressClass}" style="width: ${record.progress}%">${record.progress}%</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    })
+                    .join("");
+
+                const start = filtered.length === 0 ? 0 : startIndex + 1;
+                const end = startIndex + pageItems.length;
+                tableElements.tableSummary.textContent = `Showing ${start}-${end} of ${filtered.length} (from ${projectRecords.length} total)`;
+
+                renderPagination(totalPages);
+                renderActiveFilters();
+                updateSortIndicators();
+                updateSelectedCount();
+
+                const allSelected = currentPageIds.length > 0 && currentPageIds.every((id) => tableState.selected.has(id));
+                tableElements.selectAll.checked = allSelected;
+            };
+
+            const syncControls = () => {
+                tableElements.search.value = tableState.search;
+                tableElements.owner.value = tableState.owner;
+                tableElements.phase.value = tableState.phase;
+                tableElements.health.value = tableState.health;
+                tableElements.updatedFrom.value = tableState.updatedFrom;
+                tableElements.dueBefore.value = tableState.dueBefore;
+                tableElements.dueSoon.checked = tableState.dueSoon;
+                tableElements.pageSize.value = `${tableState.pageSize}`;
+
+                tableElements.statusOptions.forEach((option) => {
+                    option.checked = tableState.statuses.has(option.value);
+                });
+                tableElements.statusAll.checked = tableState.statuses.size === allStatuses.length;
+            };
+
+            const resetFilters = () => {
+                tableState.search = "";
+                tableState.statuses = new Set(allStatuses);
+                tableState.owner = "all";
+                tableState.phase = "all";
+                tableState.health = "all";
+                tableState.updatedFrom = "";
+                tableState.dueBefore = "";
+                tableState.dueSoon = false;
+                tableState.page = 1;
+                tableState.selected.clear();
+                syncControls();
+                renderTable();
+            };
+
+            const buildCsv = (records) => {
+                const headers = ["ID", "Project", "Owner", "Sponsor", "Status", "Health", "Phase", "Budget", "Updated", "Due", "Progress", "Tags"];
+                const escape = (value) => {
+                    const text = String(value ?? "");
+                    return text.includes(",") || text.includes("\"") || text.includes("\n")
+                        ? `"${text.replace(/\"/g, '""')}"`
+                        : text;
+                };
+                const rows = records.map((record) => [
+                    record.id,
+                    record.name,
+                    record.owner,
+                    record.sponsor,
+                    record.status,
+                    record.health,
+                    record.phase,
+                    `${record.budget}M`,
+                    record.updated,
+                    record.due,
+                    record.progress,
+                    record.tags.join(" | ")
+                ]);
+                return [headers, ...rows].map((row) => row.map(escape).join(",")).join("\n");
+            };
+
+            tableElements.search.addEventListener("input", (event) => {
+                tableState.search = event.target.value;
+                tableState.page = 1;
+                renderTable();
+            });
+
+            tableElements.clearSearch.addEventListener("click", () => {
+                tableState.search = "";
+                tableState.page = 1;
+                syncControls();
+                renderTable();
+            });
+
+            tableElements.statusAll.addEventListener("change", () => {
+                if (tableElements.statusAll.checked) {
+                    tableState.statuses = new Set(allStatuses);
+                    tableElements.statusOptions.forEach((option) => {
+                        option.checked = true;
+                    });
+                }
+                tableState.page = 1;
+                renderTable();
+            });
+
+            tableElements.statusOptions.forEach((option) => {
+                option.addEventListener("change", () => {
+                    const selected = tableElements.statusOptions.filter((item) => item.checked).map((item) => item.value);
+                    if (selected.length === 0) {
+                        tableElements.statusAll.checked = true;
+                        tableElements.statusOptions.forEach((item) => {
+                            item.checked = true;
+                        });
+                        tableState.statuses = new Set(allStatuses);
+                    } else {
+                        tableState.statuses = new Set(selected);
+                        tableElements.statusAll.checked = selected.length === allStatuses.length;
+                    }
+                    tableState.page = 1;
+                    renderTable();
+                });
+            });
+
+            [tableElements.owner, tableElements.phase, tableElements.health].forEach((select) => {
+                select.addEventListener("change", (event) => {
+                    tableState[event.target.id.replace("Filter", "")] = event.target.value;
+                    tableState.page = 1;
+                    renderTable();
+                });
+            });
+
+            tableElements.updatedFrom.addEventListener("change", (event) => {
+                tableState.updatedFrom = event.target.value;
+                tableState.page = 1;
+                renderTable();
+            });
+
+            tableElements.dueBefore.addEventListener("change", (event) => {
+                tableState.dueBefore = event.target.value;
+                tableState.page = 1;
+                renderTable();
+            });
+
+            tableElements.dueSoon.addEventListener("change", (event) => {
+                tableState.dueSoon = event.target.checked;
+                tableState.page = 1;
+                renderTable();
+            });
+
+            tableElements.pageSize.addEventListener("change", (event) => {
+                tableState.pageSize = parseInt(event.target.value, 10);
+                tableState.page = 1;
+                renderTable();
+            });
+
+            tableElements.tableBody.addEventListener("change", (event) => {
+                if (!event.target.classList.contains("row-select")) {
+                    return;
+                }
+                const id = event.target.getAttribute("data-id");
+                if (event.target.checked) {
+                    tableState.selected.add(id);
+                } else {
+                    tableState.selected.delete(id);
+                }
+                updateSelectedCount();
+                tableElements.selectAll.checked = currentPageIds.length > 0 && currentPageIds.every((pageId) => tableState.selected.has(pageId));
+            });
+
+            tableElements.selectAll.addEventListener("change", (event) => {
+                if (event.target.checked) {
+                    currentPageIds.forEach((id) => tableState.selected.add(id));
+                } else {
+                    currentPageIds.forEach((id) => tableState.selected.delete(id));
+                }
+                renderTable();
+            });
+
+            tableElements.pagination.addEventListener("click", (event) => {
+                if (!event.target.classList.contains("page-link")) {
+                    return;
+                }
+                const page = parseInt(event.target.getAttribute("data-page"), 10);
+                if (!Number.isNaN(page) && page !== tableState.page) {
+                    tableState.page = page;
+                    renderTable();
+                }
+            });
+
+            document.querySelectorAll("[data-sort]").forEach((header) => {
+                header.addEventListener("click", () => {
+                    const key = header.getAttribute("data-sort");
+                    if (tableState.sort.key === key) {
+                        tableState.sort.direction = tableState.sort.direction === "asc" ? "desc" : "asc";
+                    } else {
+                        tableState.sort.key = key;
+                        tableState.sort.direction = "asc";
+                    }
+                    renderTable();
+                });
+            });
+
+            tableElements.activeFilters.addEventListener("click", (event) => {
+                if (!event.target.matches("[data-remove]")) {
+                    return;
+                }
+                const type = event.target.getAttribute("data-remove");
+                const value = event.target.getAttribute("data-value");
+                if (type === "search") {
+                    tableState.search = "";
+                }
+                if (type === "status" && value) {
+                    tableState.statuses.delete(value);
+                    if (tableState.statuses.size === 0) {
+                        tableState.statuses = new Set(allStatuses);
+                    }
+                }
+                if (type === "owner") {
+                    tableState.owner = "all";
+                }
+                if (type === "phase") {
+                    tableState.phase = "all";
+                }
+                if (type === "health") {
+                    tableState.health = "all";
+                }
+                if (type === "updatedFrom") {
+                    tableState.updatedFrom = "";
+                }
+                if (type === "dueBefore") {
+                    tableState.dueBefore = "";
+                }
+                if (type === "dueSoon") {
+                    tableState.dueSoon = false;
+                }
+                tableState.page = 1;
+                syncControls();
+                renderTable();
+            });
+
+            tableElements.reset.addEventListener("click", resetFilters);
+
+            tableElements.copyCsv.addEventListener("click", async () => {
+                const filtered = getFilteredRecords();
+                if (!filtered.length) {
+                    showTableToast("No rows to export.");
+                    return;
+                }
+                await navigator.clipboard.writeText(buildCsv(filtered));
+                showTableToast("Filtered rows copied to clipboard.");
+            });
+
+            tableElements.applyBulk.addEventListener("click", async () => {
+                const action = tableElements.bulkAction.value;
+                const selectedRecords = projectRecords.filter((record) => tableState.selected.has(record.id));
+                if (!action) {
+                    showTableToast("Choose a bulk action first.");
+                    return;
+                }
+                if (!selectedRecords.length) {
+                    showTableToast("Select at least one row.");
+                    return;
+                }
+                if (action === "mark-reviewed") {
+                    selectedRecords.forEach((record) => {
+                        record.status = "In Review";
+                        record.health = "On Track";
+                        record.updated = new Date().toISOString().split("T")[0];
+                    });
+                    renderTable();
+                    showTableToast("Selected rows marked as In Review.");
+                }
+                if (action === "export-selected") {
+                    await navigator.clipboard.writeText(buildCsv(selectedRecords));
+                    showTableToast("Selected rows copied to clipboard.");
+                }
+                tableElements.bulkAction.value = "";
+            });
+
+            renderTable();
+        };
+
+        const initDefinitionOfDone = () => {
+            const dodElements = {
+                list: document.getElementById("dodList"),
+                newItem: document.getElementById("dodNewItem"),
+                addItem: document.getElementById("dodAddItem"),
+                reset: document.getElementById("dodReset")
+            };
+
+            if (!dodElements.list || !dodElements.newItem || !dodElements.addItem || !dodElements.reset) {
+                return;
+            }
+
+            const storageKey = "dodDefinitionOfDone";
+            const buildDefaults = () => [
+                { id: "dod-1", text: "Clear understanding of standards and scope", done: false },
+                { id: "dod-2", text: "Fully thought out dev/test pipeline and approvals", done: false },
+                { id: "dod-3", text: "Security controls reviewed for government requirements", done: false },
+                { id: "dod-4", text: "Template versions documented and reproducible", done: false },
+                { id: "dod-5", text: "Accessibility, logging, and performance criteria agreed", done: false }
+            ];
+
+            const loadItems = () => {
+                try {
+                    const raw = localStorage.getItem(storageKey);
+                    const parsed = raw ? JSON.parse(raw) : null;
+                    if (Array.isArray(parsed) && parsed.length) {
+                        return parsed;
+                    }
+                } catch (error) {
+                    return buildDefaults();
+                }
+                return buildDefaults();
+            };
+
+            const saveItems = (items) => {
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(items));
+                } catch (error) {
+                    // Ignore storage errors in locked down environments.
+                }
+            };
+
+            let items = loadItems();
+
+            const render = () => {
+                dodElements.list.innerHTML = "";
+                items.forEach((item) => {
+                    const row = document.createElement("div");
+                    row.className = `dod-item${item.done ? " is-done" : ""}`;
+                    row.dataset.id = item.id;
+
+                    const checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+                    checkbox.className = "form-check-input";
+                    checkbox.checked = item.done;
+                    checkbox.setAttribute("aria-label", "Mark item done");
+
+                    const textInput = document.createElement("input");
+                    textInput.type = "text";
+                    textInput.className = "form-control form-control-sm dod-text";
+                    textInput.value = item.text;
+                    textInput.setAttribute("aria-label", "Definition of done item");
+
+                    const removeButton = document.createElement("button");
+                    removeButton.type = "button";
+                    removeButton.className = "btn btn-sm btn-outline-secondary dod-delete";
+                    removeButton.textContent = "Remove";
+                    removeButton.setAttribute("aria-label", "Remove item");
+
+                    row.append(checkbox, textInput, removeButton);
+                    dodElements.list.appendChild(row);
+                });
+            };
+
+            const commit = () => {
+                saveItems(items);
+                render();
+            };
+
+            const addItem = () => {
+                const value = dodElements.newItem.value.trim();
+                if (!value) {
+                    return;
+                }
+                items.push({
+                    id: `dod-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                    text: value,
+                    done: false
+                });
+                dodElements.newItem.value = "";
+                commit();
+            };
+
+            dodElements.addItem.addEventListener("click", addItem);
+            dodElements.newItem.addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    addItem();
+                }
+            });
+
+            dodElements.reset.addEventListener("click", () => {
+                items = buildDefaults();
+                commit();
+            });
+
+            dodElements.list.addEventListener("change", (event) => {
+                const row = event.target.closest(".dod-item");
+                if (!row) {
+                    return;
+                }
+                const item = items.find((entry) => entry.id === row.dataset.id);
+                if (!item) {
+                    return;
+                }
+                if (event.target.matches(".form-check-input")) {
+                    item.done = event.target.checked;
+                    commit();
+                }
+            });
+
+            dodElements.list.addEventListener("input", (event) => {
+                if (!event.target.classList.contains("dod-text")) {
+                    return;
+                }
+                const row = event.target.closest(".dod-item");
+                const item = row ? items.find((entry) => entry.id === row.dataset.id) : null;
+                if (!item) {
+                    return;
+                }
+                item.text = event.target.value;
+                saveItems(items);
+            });
+
+            dodElements.list.addEventListener("click", (event) => {
+                if (!event.target.classList.contains("dod-delete")) {
+                    return;
+                }
+                const row = event.target.closest(".dod-item");
+                if (!row) {
+                    return;
+                }
+                items = items.filter((entry) => entry.id !== row.dataset.id);
+                commit();
+            });
+
+            dodElements.list.addEventListener(
+                "blur",
+                (event) => {
+                    if (!event.target.classList.contains("dod-text")) {
+                        return;
+                    }
+                    if (event.target.value.trim()) {
+                        return;
+                    }
+                    event.target.value = "New item";
+                    const row = event.target.closest(".dod-item");
+                    const item = row ? items.find((entry) => entry.id === row.dataset.id) : null;
+                    if (item) {
+                        item.text = event.target.value;
+                        commit();
+                    }
+                },
+                true
+            );
+
+            render();
+        };
+
+        const initSectionNotes = () => {
+            const cards = Array.from(document.querySelectorAll(".standard-card"));
+            if (!cards.length) {
+                return;
+            }
+
+            const storageKey = (sectionId) => `sectionNotes:${sectionId}`;
+
+            const loadNotes = (sectionId) => {
+                try {
+                    const raw = localStorage.getItem(storageKey(sectionId));
+                    const parsed = raw ? JSON.parse(raw) : [];
+                    return Array.isArray(parsed) ? parsed : [];
+                } catch (error) {
+                    return [];
+                }
+            };
+
+            const saveNotes = (sectionId, notes) => {
+                try {
+                    localStorage.setItem(storageKey(sectionId), JSON.stringify(notes));
+                } catch (error) {
+                    // Ignore storage errors in locked down environments.
+                }
+            };
+
+            cards.forEach((card, index) => {
+                const sectionId = card.id ? card.id : `card-${index + 1}`;
+                const notes = loadNotes(sectionId);
+                const drawerId = `notes-drawer-${sectionId}`;
+
+                const toggle = document.createElement("button");
+                toggle.type = "button";
+                toggle.className = "btn btn-sm btn-outline-secondary notes-toggle";
+                toggle.textContent = "Notes";
+                toggle.setAttribute("aria-expanded", "false");
+                toggle.setAttribute("aria-controls", drawerId);
+
+                const drawer = document.createElement("div");
+                drawer.className = "notes-drawer";
+                drawer.id = drawerId;
+                drawer.setAttribute("role", "dialog");
+                drawer.setAttribute("aria-label", `Notes for ${sectionId}`);
+
+                const header = document.createElement("div");
+                header.className = "notes-header";
+
+                const title = document.createElement("strong");
+                title.textContent = "Notes";
+
+                const close = document.createElement("button");
+                close.type = "button";
+                close.className = "btn btn-sm btn-outline-secondary";
+                close.textContent = "Close";
+                close.setAttribute("aria-label", "Close notes drawer");
+
+                header.append(title, close);
+
+                const helper = document.createElement("div");
+                helper.className = "text-muted small";
+                helper.textContent = "Capture decisions, open questions, and next actions for this section.";
+
+                const inputRow = document.createElement("div");
+                inputRow.className = "notes-input-row";
+
+                const input = document.createElement("input");
+                input.type = "text";
+                input.className = "form-control form-control-sm";
+                input.placeholder = "Add a note...";
+                input.setAttribute("aria-label", `Add note for ${sectionId}`);
+
+                const addButton = document.createElement("button");
+                addButton.type = "button";
+                addButton.className = "btn btn-sm btn-primary";
+                addButton.textContent = "Add";
+
+                inputRow.append(input, addButton);
+
+                const empty = document.createElement("div");
+                empty.className = "text-muted small";
+                empty.textContent = "No notes yet.";
+
+                const list = document.createElement("ul");
+                list.className = "notes-list";
+                list.setAttribute("aria-live", "polite");
+
+                const render = () => {
+                    list.innerHTML = "";
+                    if (!notes.length) {
+                        empty.style.display = "block";
+                        return;
+                    }
+                    empty.style.display = "none";
+                    notes.forEach((note, noteIndex) => {
+                        const item = document.createElement("li");
+                        item.className = "notes-item";
+
+                        const text = document.createElement("span");
+                        text.className = "note-text";
+                        text.textContent = note;
+
+                        const remove = document.createElement("button");
+                        remove.type = "button";
+                        remove.className = "btn btn-sm btn-outline-secondary";
+                        remove.textContent = "Remove";
+                        remove.setAttribute("data-note-index", `${noteIndex}`);
+                        remove.setAttribute("aria-label", "Remove note");
+
+                        item.append(text, remove);
+                        list.appendChild(item);
+                    });
+                };
+
+                const addNote = () => {
+                    const value = input.value.trim();
+                    if (!value) {
+                        return;
+                    }
+                    notes.push(value);
+                    input.value = "";
+                    saveNotes(sectionId, notes);
+                    render();
+                };
+
+                const openDrawer = () => {
+                    card.classList.add("notes-open");
+                    toggle.setAttribute("aria-expanded", "true");
+                    input.focus();
+                };
+
+                const closeDrawer = () => {
+                    card.classList.remove("notes-open");
+                    toggle.setAttribute("aria-expanded", "false");
+                };
+
+                toggle.addEventListener("click", () => {
+                    if (card.classList.contains("notes-open")) {
+                        closeDrawer();
+                    } else {
+                        openDrawer();
+                    }
+                });
+
+                close.addEventListener("click", closeDrawer);
+
+                drawer.addEventListener("keydown", (event) => {
+                    if (event.key === "Escape") {
+                        closeDrawer();
+                    }
+                });
+
+                addButton.addEventListener("click", addNote);
+                input.addEventListener("keydown", (event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        addNote();
+                    }
+                });
+
+                list.addEventListener("click", (event) => {
+                    const removeButton = event.target.closest("button[data-note-index]");
+                    if (!removeButton) {
+                        return;
+                    }
+                    const removeIndex = parseInt(removeButton.dataset.noteIndex, 10);
+                    if (Number.isNaN(removeIndex)) {
+                        return;
+                    }
+                    notes.splice(removeIndex, 1);
+                    saveNotes(sectionId, notes);
+                    render();
+                });
+
+                drawer.append(header, helper, inputRow, empty, list);
+                card.append(toggle, drawer);
+                render();
+            });
+        };
+
+        initDataTable();
+        initDefinitionOfDone();
+        initSectionNotes();
+
         const promptToast = new bootstrap.Toast(document.getElementById("promptToast"));
-        document.getElementById("copyPrompt").addEventListener("click", async () => {
-            await navigator.clipboard.writeText(promptText);
-            promptToast.show();
-        });
-
-        document.getElementById("copySnippet").addEventListener("click", async () => {
-            const current = [
-                snippetFile.textContent,
-                snippetPage.textContent,
-                snippetModel.textContent,
-                snippetPartial.textContent,
-                snippetComponent.textContent,
-                snippetJs.textContent
-            ].join("\n\n");
-            await navigator.clipboard.writeText(current);
-            promptToast.show();
-        });
-
-        updateUnderHood("app-shell");
+        const copyPrompt = document.getElementById("copyPrompt");
+        if (copyPrompt) {
+            copyPrompt.addEventListener("click", async () => {
+                await navigator.clipboard.writeText(promptText);
+                promptToast.show();
+            });
+        }
     </script>
 </body>
 </html>
