@@ -1,7 +1,8 @@
 {
   "version": 1,
+  "gardenId": "main",
   "userId": "alice",
-  "updatedAt": 1708977600000,
+  "updatedAt": 1770587477744,
   "plants": [
     {
       "id": "alice_0",
@@ -50,6 +51,22 @@
         "rarity": 0
       },
       "updatedAt": 1708920000000
+    },
+    {
+      "id": "alice_0004",
+      "x": 3,
+      "y": 3,
+      "plantedAt": 1770587477743,
+      "watered": 0,
+      "lastWateredAt": 0,
+      "genes": {
+        "archetype": 2,
+        "palette": 2,
+        "pattern": 1,
+        "accent": 3,
+        "rarity": 0
+      },
+      "updatedAt": 1770587477743
     }
   ]
 }

@@ -1,0 +1,69 @@
+name: Garden Command
+description: Submit changes to the community garden (save, add user, create garden)
+title: "[garden] "
+labels: ["garden"]
+body:
+  - type: dropdown
+    id: commandType
+    attributes:
+      label: Command Type
+      description: What action are you performing?
+      options:
+        - save
+        - add_user
+        - create_garden
+    validations:
+      required: true
+
+  - type: text
+    id: gardenId
+    attributes:
+      label: Garden ID
+      description: The garden to modify (e.g., "main")
+      placeholder: main
+    validations:
+      required: true
+
+  - type: text
+    id: userId
+    attributes:
+      label: User ID (for save/add_user)
+      description: Your username or new user ID slug
+      placeholder: alice
+
+  - type: text
+    id: displayName
+    attributes:
+      label: Display Name (for add_user)
+      description: Human-readable name for new user
+      placeholder: "Alice Smith"
+
+  - type: textarea
+    id: payload
+    attributes:
+      label: Command Payload
+      description: |
+        For **save**: Plant/water operations in compact format.
+        For **add_user**: Leave empty (will use displayName).
+        For **create_garden**: Leave empty (will use gardenId as name).
+        
+        Example save payload:
+        ```
+        ops:
+        - plant x=2 y=3
+        - water plantId=alice_0007
+        clientTs=1708977600000
+        ```
+      placeholder: "ops:\n- plant x=2 y=3\n- water plantId=alice_0001"
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Instructions
+        - **Save**: Your garden changes will be committed to the repository
+        - **Add User**: Creates a new user and assigns them a plot
+        - **Create Garden**: Creates a new garden with given ID
+        
+        Check the Actions tab after posting to see if the command succeeded.

@@ -1,18 +1,20 @@
 /**
  * Community Garden - Main Application
- * Orchestrates UI, state, networking, and rendering
+ * Orchestrates UI, state, networking, and rendering using GitHub Issue Form for persistence
  */
 
 // App state
 const appState = {
+  gardens: [], // Array of { id, name }
+  currentGardenId: 'main',
   manifest: null,
   allUserGardens: {}, // { userId: garden }
   currentUserId: null,
   selectedTile: null, // { tileX, tileY }
   selectedPlantId: null,
-  etagsByUser: {}, // { userId: etag }
   waterActionsToday: [], // timestamps of successful waters today
-  lastRainDay: -1
+  lastRainDay: -1,
+  pendingOps: [] // [ { type: 'plant'|'water', x, y, plantId } ]
 };
 
 // DOM elements
@@ -27,14 +29,24 @@ async function init() {
   console.log('🌱 Initializing Community Garden...');
 
   try {
+    // Load gardens and set current
+    const gardensData = await window.Net.loadGardens();
+    appState.gardens = gardensData.gardens;
+    
+    // Restore garden from localStorage if available
+    const savedGardenId = localStorage.getItem('gardenSelected');
+    if (savedGardenId && appState.gardens.some(g => g.id === savedGardenId)) {
+      appState.currentGardenId = savedGardenId;
+    }
+
     // Restore user from localStorage
-    appState.currentUserId = localStorage.getItem('gardenUserId');
+    appState.currentUserId = localStorage.getItem(`gardenUserId_${appState.currentGardenId}`);
 
     // Initialize DOM
     initDOM();
 
-    // Load manifest
-    appState.manifest = await window.Net.fetchManifest();
+    // Load manifest for current garden
+    appState.manifest = await window.Net.fetchManifest(appState.currentGardenId);
     console.log('📋 Manifest loaded:', appState.manifest);
 
     if (!appState.manifest || !appState.manifest.plots || appState.manifest.plots.length === 0) {
@@ -43,12 +55,12 @@ async function init() {
 
     // Load all user gardens
     const userIds = appState.manifest.plots.map(p => p.userId);
-    const { gardens, etags } = await window.Net.loadAllUserGardens(userIds);
+    const { gardens } = await window.Net.loadAllUserGardens(appState.currentGardenId, userIds);
     appState.allUserGardens = gardens;
-    appState.etagsByUser = etags;
     console.log('🌿 User gardens loaded:', Object.keys(gardens).length, 'users');
 
     // Rebuild UI
+    populateGardenDropdown();
     populateUserDropdown();
     render();
 
@@ -64,11 +76,12 @@ async function init() {
     console.log('✅ Garden ready!');
   } catch (err) {
     console.error('❌ Initialization error:', err);
-    const main = document.querySelector('main');
-    main.innerHTML = `<div style="padding: 40px; color: #ff6b6b; font-size: 1.2rem; text-align: center;">
-      <p>⚠️ Error loading garden</p>
-      <p style="font-size: 0.9rem; color: #e8c89f;">Check console (F12) for details</p>
-      <pre style="text-align: left; background: #1a1a1a; padding: 15px; border-radius: 4px; color: #00ff00; overflow-x: auto;">${err.message}</pre>
+    const appDiv = document.getElementById('garden-app');
+    appDiv.innerHTML = `<div class="alert alert-danger m-4" role="alert">
+      <h4 class="alert-heading">⚠️ Error Loading Garden</h4>
+      <p>${err.message}</p>
+      <hr>
+      <p class="mb-0" style="font-size: 0.9rem;">Check console (F12) for details</p>
     </div>`;
   }
 }
@@ -77,24 +90,80 @@ async function init() {
  * Initialize DOM elements
  */
 function initDOM() {
-  const main = document.querySelector('main');
-  let container = document.querySelector('.container');
-
+  const appDiv = document.getElementById('garden-app');
+  
+  // Create Bootstrap grid layout
+  let container = document.querySelector('.garden-container');
   if (!container) {
     container = document.createElement('div');
-    container.className = 'container';
-    main.appendChild(container);
+    container.className = 'container-lg py-4';
+    appDiv.appendChild(container);
+    
+    const row = document.createElement('div');
+    row.className = 'row g-3';
+    container.appendChild(row);
+    
+    // Left column: Garden
+    const leftCol = document.createElement('div');
+    leftCol.className = 'col-lg-8';
+    row.appendChild(leftCol);
+    
+    gardenContainer = document.createElement('div');
+    gardenContainer.className = 'card h-100';
+    gardenContainer.style.background = 'linear-gradient(135deg, #3a5a40 0%, #2d4a35 100%)';
+    gardenContainer.style.border = '3px solid #8b7355';
+    gardenContainer.style.borderRadius = '8px';
+    gardenContainer.innerHTML = '<div class="card-body p-3" style="overflow: auto; max-height: 500px;"></div>';
+    leftCol.appendChild(gardenContainer);
+    
+    // Right column: Sidebar
+    const rightCol = document.createElement('div');
+    rightCol.className = 'col-lg-4';
+    row.appendChild(rightCol);
+    
+    sidebarDiv = document.createElement('div');
+    sidebarDiv.className = 'card h-100 sticky-lg-top';
+    sidebarDiv.style.background = 'linear-gradient(135deg, #3a5a40 0%, #2d4a35 100%)';
+    sidebarDiv.style.border = '3px solid #8b7355';
+    sidebarDiv.style.borderRadius = '8px';
+    rightCol.appendChild(sidebarDiv);
   }
+}
 
-  // Garden container
-  gardenContainer = document.querySelector('.garden-container') || document.createElement('div');
-  gardenContainer.className = 'garden-container';
-  if (!gardenContainer.parentElement) container.appendChild(gardenContainer);
+/**
+ * Populate garden dropdown
+ */
+function populateGardenDropdown() {
+  let gardenSelect = document.getElementById('gardenDropdown');
+  if (!gardenSelect) return;
+  
+  gardenSelect.innerHTML = '';
+  appState.gardens.forEach(garden => {
+    const option = document.createElement('option');
+    option.value = garden.id;
+    option.textContent = garden.name;
+    option.selected = garden.id === appState.currentGardenId;
+    gardenSelect.appendChild(option);
+  });
+}
 
-  // Sidebar
-  sidebarDiv = document.querySelector('.sidebar') || document.createElement('div');
-  sidebarDiv.className = 'sidebar';
-  if (!sidebarDiv.parentElement) container.appendChild(sidebarDiv);
+/**
+ * Populate user dropdown
+ */
+function populateUserDropdown() {
+  let userSelect = document.getElementById('userDropdown');
+  if (!userSelect) return;
+  
+  userSelect.innerHTML = '<option value="">-- Choose a user --</option>';
+  if (appState.manifest && appState.manifest.plots) {
+    appState.manifest.plots.forEach(plot => {
+      const option = document.createElement('option');
+      option.value = plot.userId;
+      option.textContent = plot.name;
+      option.selected = plot.userId === appState.currentUserId;
+      userSelect.appendChild(option);
+    });
+  }
 }
 
 /**
@@ -123,8 +192,11 @@ function renderGarden() {
   gardenSvg.addEventListener('click', (e) => handleGardenClick(e, now));
 
   // Clear and replace
-  gardenContainer.innerHTML = '';
-  gardenContainer.appendChild(gardenSvg);
+  const cardBody = gardenContainer.querySelector('.card-body');
+  if (cardBody) {
+    cardBody.innerHTML = '';
+    cardBody.appendChild(gardenSvg);
+  }
 }
 
 /**
@@ -181,137 +253,161 @@ function selectPlant(plantId) {
  */
 function renderSidebar() {
   const now = Date.now();
-  let html = '<h2>🌿 Garden</h2>';
+  let html = '<div class="card-body">';
+  html += '<h5 class="card-title" style="color: #ffd700;">🌱 Controls</h5>';
 
-  // User section
-  html += '<div class="user-section">';
-  html += '<h3>Select Your Plot</h3>';
-
-  // Dropdown
-  html += '<select class="user-dropdown" id="userDropdown">';
-  html += '<option value="">-- Choose a user --</option>';
-  appState.manifest.plots.forEach(plot => {
-    const selected = plot.userId === appState.currentUserId ? 'selected' : '';
-    html += `<option value="${plot.userId}" ${selected}>${plot.name}</option>`;
+  // Garden section
+  html += '<div class="mb-3">';
+  html += '<label for="gardenDropdown" class="form-label" style="color: #e8c89f;">Garden</label>';
+  html += '<div class="input-group input-group-sm">';
+  html += '<select class="form-select form-select-sm" id="gardenDropdown" style="background: #2d3a2d; color: #e8c89f; border-color: #8b7355;">';
+  appState.gardens.forEach(garden => {
+    const selected = garden.id === appState.currentGardenId ? 'selected' : '';
+    html += `<option value="${garden.id}" ${selected}>${garden.name}</option>`;
   });
   html += '</select>';
-
-  // Add user form
-  html += '<div class="user-add-section">';
-  html += '<input class="user-input" id="newUserName" placeholder="Your name" />';
-  html += '<button class="user-add-btn" id="addUserBtn">Add</button>';
+  html += '<button class="btn btn-sm btn-outline-light" id="createGardenBtn" title="Create Garden"><strong>+</strong></button>';
+  html += '</div>';
   html += '</div>';
 
-  if (appState.currentUserId) {
-    html += `<div class="user-info">✓ Logged in as <strong>${getDisplayName(appState.currentUserId)}</strong></div>`;
-  } else {
-    html += '<div class="user-info">Select or create a user to begin.</div>';
+  // User section
+  html += '<div class="mb-3">';
+  html += '<label for="userDropdown" class="form-label" style="color: #e8c89f;">Your Plot</label>';
+  html += '<div class="input-group input-group-sm">';
+  html += '<select class="form-select form-select-sm" id="userDropdown" style="background: #2d3a2d; color: #e8c89f; border-color: #8b7355;">';
+  html += '<option value="">-- Choose a user --</option>';
+  if (appState.manifest && appState.manifest.plots) {
+    appState.manifest.plots.forEach(plot => {
+      const selected = plot.userId === appState.currentUserId ? 'selected' : '';
+      html += `<option value="${plot.userId}" ${selected}>${plot.name}</option>`;
+    });
   }
-
+  html += '</select>';
+  html += '<button class="btn btn-sm btn-outline-light" id="addUserBtn" title="Add User"><strong>+</strong></button>';
+  html += '</div>';
   html += '</div>';
 
-  // Info section
+  // Tile/plant info
+  html += '<div class="mb-3 p-2" style="background: rgba(0,0,0,0.3); border-radius: 4px; border: 1px solid #8b7355;">';
+  
   if (appState.selectedPlantId) {
-    const plant = findPlantById(appState.selectedPlantId);
-    if (plant) {
-      html += renderPlantInfo(plant, appState.currentUserId, now);
+    const plantInfo = getSelectedPlantInfo();
+    if (plantInfo) {
+      html += renderPlantInfo(plantInfo, now);
+    } else {
+      html += '<p style="color: #e8c89f; font-size: 0.9rem;">Plant not found</p>';
     }
   } else if (appState.selectedTile) {
-    html += renderTileInfo(appState.selectedTile, now);
+    html += renderTileInfo(appState.selectedTile);
   } else {
-    html += '<div class="tile-info empty">Click a tile or plant to select.</div>';
+    html += '<p style="color: #c9a961; font-size: 0.9rem;">Click a tile or plant to select</p>';
   }
 
+  html += '</div>';
+
+  // Pending operations
+  if (appState.pendingOps.length > 0) {
+    html += '<div class="mb-3 p-2" style="background: rgba(255,215,0,0.1); border-radius: 4px; border: 1px solid #ffd700;">';
+    html += '<p style="color: #ffd700; font-weight: bold; font-size: 0.9rem; margin-bottom: 8px;">📋 Pending Changes:</p>';
+    appState.pendingOps.forEach(op => {
+      if (op.type === 'plant') {
+        html += `<small style="color: #e8c89f; display: block;">🌱 Plant at (${op.x}, ${op.y})</small>`;
+      } else if (op.type === 'water') {
+        html += `<small style="color: #e8c89f; display: block;">💧 Water ${op.plantId}</small>`;
+      }
+    });
+    html += '</div>';
+  }
+
+  // Action buttons
+  html += '<div class="d-grid gap-2">';
+  
+  if (appState.pendingOps.length > 0) {
+    html += '<button class="btn btn-warning btn-sm" id="saveBtn" style="background-color: #ffd700; color: #2d3a2d; border: none; font-weight: bold;">💾 Save to GitHub</button>';
+    html += '<button class="btn btn-outline-light btn-sm" id="clearBtn">Clear</button>';
+  } else {
+    html += '<button class="btn btn-outline-light btn-sm" disabled>No changes</button>';
+  }
+  
+  html += '</div>';
+
+  html += '</div>';
+  
   sidebarDiv.innerHTML = html;
 
-  // Attach event listeners
-  document.getElementById('userDropdown').addEventListener('change', (e) => {
-    changeUser(e.target.value);
-  });
-
-  document.getElementById('addUserBtn').addEventListener('click', addUser);
-  document.getElementById('newUserName').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') addUser();
-  });
+  // Event listeners
+  document.getElementById('gardenDropdown')?.addEventListener('change', changeGarden);
+  document.getElementById('userDropdown')?.addEventListener('change', (e) => changeUser(e.target.value));
+  document.getElementById('plantBtn')?.addEventListener('click', plantSeed);
+  document.getElementById('waterBtn')?.addEventListener('click', waterPlant);
+  document.getElementById('addUserBtn')?.addEventListener('click', showAddUserModal);
+  document.getElementById('createGardenBtn')?.addEventListener('click', showCreateGardenModal);
+  document.getElementById('saveBtn')?.addEventListener('click', showSaveModal);
+  document.getElementById('clearBtn')?.addEventListener('click', clearPendingOps);
 }
 
 /**
- * Render plant info panel
+ * Get selected plant info
  */
-function renderPlantInfo(plant, currentUserId, now) {
-  const stage = window.State.deriveStage(plant, now);
-  const genes = plant.genes;
-  const archetype = window.Genes.ARCHETYPES[genes.archetype];
-  const palette = window.Genes.PALETTES[genes.palette];
-  const pattern = window.Genes.PATTERNS[genes.pattern];
-  const isOwner = plant.id.startsWith(currentUserId + '_');
-
-  let html = '<div class="plant-info">';
-  html += `<strong>${archetype.toUpperCase()}</strong>`;
-  html += `<div class="plant-stat"><span class="label">Age:</span><span class="value">${formatAge(plant.plantedAt, now)}</span></div>`;
-  html += `<div class="plant-stat"><span class="label">Growth Stage:</span><span class="value">${stage} / 3</span></div>`;
-  html += `<div class="plant-stat"><span class="label">Waterings:</span><span class="value">${plant.watered}</span></div>`;
-
-  if (isOwner) {
-    html += '<hr style="border: none; border-top: 1px solid #6b5344; margin: 10px 0;">';
-
-    const canWater = window.State.canWaterPlant(plant, now);
-    if (canWater) {
-      html += '<button id="waterBtn" class="primary">💧 Water Plant</button>';
-      html += '<p class="hint">Watering helps your plant grow faster and look more lush!</p>';
-    } else {
-      const remaining = window.State.getWaterCooldownRemaining(plant, now);
-      const timeStr = formatTime(remaining);
-      html += `<div class="cooldown-timer">⏳ Water again in ${timeStr}</div>`;
-      html += '<p class="hint">Plants need time between waterings.</p>';
+function getSelectedPlantInfo() {
+  if (!appState.selectedPlantId) return null;
+  
+  for (const userId in appState.allUserGardens) {
+    const plant = appState.allUserGardens[userId].plants.find(p => p.id === appState.selectedPlantId);
+    if (plant) {
+      return { userId, plant };
     }
+  }
+  return null;
+}
+
+/**
+ * Render plant info section
+ */
+function renderPlantInfo(info, now) {
+  const { userId, plant } = info;
+  const stage = window.State.deriveStage(plant, now);
+  const ageMs = now - plant.plantedAt;
+  const ageDays = Math.floor(ageMs / 86400000);
+  
+  let html = '';
+  html += `<strong style="color: #ffd700;">${plant.id}</strong>`;
+  html += `<p style="color: #e8c89f; font-size: 0.85rem; margin: 4px 0;">`;
+  html += `📍 (${plant.x}, ${plant.y}) | 🌱 Age: ${ageDays}d | 💧 Watered: ${plant.watered}x | 📈 Stage: ${stage}/3`;
+  html += `</p>`;
+  
+  const isOwner = plant.id.startsWith(appState.currentUserId + '_');
+  if (isOwner) {
+    html += '<button class="btn btn-sm btn-primary" id="waterBtn" style="background-color: #8DD3FF; color: #2d3a2d; border: none;">💧 Water</button>';
   } else {
-    html += `<div class="hint">This is ${getDisplayName(plant.id.split('_')[0])}'s plant. Read-only.</div>`;
+    html += `<p style="color: #c9a961; font-size: 0.85rem;">Owner: ${getDisplayName(userId)}</p>`;
   }
-
-  html += '</div>';
-
-  // Check device-level rate limit
-  cleanupWaterActionsToday();
-  const actionsRemaining = window.State.MAX_WATERS_PER_DAY - appState.waterActionsToday.length;
-  if (actionsRemaining <= 1) {
-    html += `<div class="message warning">⚠️ You have ${actionsRemaining} water action(s) left today.</div>`;
-  }
-
+  
   return html;
 }
 
 /**
- * Render tile info panel
+ * Render tile info section
  */
-function renderTileInfo(tile, now) {
-  const plant = window.State.getPlantAt(appState.allUserGardens, tile.tileX, tile.tileY);
-
+function renderTileInfo(tile) {
+  const { tileX, tileY } = tile;
+  const isInMyPlot = appState.currentUserId && window.State.isTileInUserPlot(appState.currentUserId, tileX, tileY, appState.manifest);
+  
   let html = '';
-  if (plant) {
-    return renderPlantInfo(plant, appState.currentUserId, now);
-  }
-
-  // Empty tile
-  const isInMyPlot =
-    appState.currentUserId &&
-    window.State.isTileInUserPlot(appState.currentUserId, tile.tileX, tile.tileY, appState.manifest);
-
-  html += '<div class="tile-info">';
-  html += `<strong>Tile (${tile.tileX}, ${tile.tileY})</strong>`;
+  html += `<strong style="color: #ffd700;">Tile (${tileX}, ${tileY})</strong>`;
+  
   if (isInMyPlot) {
-    html += '<p>Empty. Ready to plant!</p>';
-    html += '<button id="plantBtn" class="primary">🌱 Plant Seed</button>';
+    html += '<p style="color: #e8c89f; font-size: 0.85rem; margin: 4px 0;">Empty. Ready to plant!</p>';
+    html += '<button class="btn btn-sm btn-success" id="plantBtn" style="background-color: #6a8a70; border: none;">🌱 Plant</button>';
   } else {
-    const plotUserId = findPlotAtTile(tile.tileX, tile.tileY);
+    const plotUserId = findPlotAtTile(tileX, tileY);
     if (plotUserId) {
-      html += `<p>This tile is in ${getDisplayName(plotUserId)}'s plot.</p>`;
+      html += `<p style="color: #c9a961; font-size: 0.85rem;">Belongs to ${getDisplayName(plotUserId)}</p>`;
     } else {
-      html += '<p>This tile is outside all plots.</p>';
+      html += '<p style="color: #c9a961; font-size: 0.85rem;">Outside all plots</p>`;
     }
   }
-  html += '</div>';
-
+  
   return html;
 }
 
@@ -331,9 +427,6 @@ function findPlotAtTile(x, y) {
  * Get display name for a userId
  */
 function getDisplayName(userId) {
-  const local = JSON.parse(localStorage.getItem('gardenUsers') || '{}');
-  if (local[userId]) return local[userId].name;
-
   const plot = appState.manifest.plots.find(p => p.userId === userId);
   return plot ? plot.name : userId;
 }
@@ -344,32 +437,12 @@ function getDisplayName(userId) {
 function plantSeed() {
   if (!appState.selectedTile || !appState.currentUserId) return;
 
-  const now = Date.now();
   const { tileX, tileY } = appState.selectedTile;
 
-  // Check if in user's plot
-  if (!window.State.isTileInUserPlot(appState.currentUserId, tileX, tileY, appState.manifest)) {
-    return;
-  }
+  if (!window.State.isTileInUserPlot(appState.currentUserId, tileX, tileY, appState.manifest)) return;
+  if (window.State.getPlantAt(appState.allUserGardens, tileX, tileY)) return;
 
-  // Check if already occupied
-  if (window.State.getPlantAt(appState.allUserGardens, tileX, tileY)) {
-    return;
-  }
-
-  // Generate PRNG with stable seed
-  const seed = window.PRNG.generateSeedFromUser(appState.currentUserId, Date.now());
-  const rng = window.PRNG.createPRNG(seed);
-
-  // Plant
-  const ug = appState.allUserGardens[appState.currentUserId];
-  const newUg = window.State.plantAt(ug, tileX, tileY, now, rng);
-
-  // Save
-  appState.allUserGardens[appState.currentUserId] = newUg;
-  saveUserGarden(appState.currentUserId);
-
-  // Clear selection + re-render
+  appState.pendingOps.push({ type: 'plant', x: tileX, y: tileY });
   appState.selectedTile = null;
   appState.selectedPlantId = null;
   render();
@@ -381,61 +454,42 @@ function plantSeed() {
 function waterPlant() {
   if (!appState.selectedPlantId || !appState.currentUserId) return;
 
-  const now = Date.now();
+  const plantInfo = getSelectedPlantInfo();
+  if (!plantInfo) return;
 
-  // Find plant
-  const plant = findPlantById(appState.selectedPlantId);
-  if (!plant) return;
-
-  // Check if owner
+  const plant = plantInfo.plant;
   if (!plant.id.startsWith(appState.currentUserId + '_')) return;
 
-  // Check device-level rate limit
-  cleanupWaterActionsToday();
-  if (appState.waterActionsToday.length >= window.State.MAX_WATERS_PER_DAY) {
-    return; // silently ignore
-  }
-
-  // Check cooldown
-  if (!window.State.canWaterPlant(plant, now)) {
-    return; // silently ignore
-  }
-
-  // Water
-  const ug = appState.allUserGardens[appState.currentUserId];
-  const newUg = window.State.waterPlant(ug, appState.selectedPlantId, now);
-
-  // Update app state
-  appState.allUserGardens[appState.currentUserId] = newUg;
-  appState.waterActionsToday.push(now);
-  saveWaterActionsToday();
-
-  // Save to server
-  saveUserGarden(appState.currentUserId);
-
-  // Re-render
+  appState.pendingOps.push({ type: 'water', plantId: plant.id });
+  appState.selectedPlantId = null;
   render();
 }
 
 /**
- * Save user garden to server
+ * Change selected garden
  */
-async function saveUserGarden(userId) {
-  const data = appState.allUserGardens[userId];
-  if (!data) return;
+async function changeGarden(e) {
+  const gardenId = e.target.value;
+  if (gardenId === appState.currentGardenId) return;
 
-  const etag = appState.etagsByUser[userId] || null;
-  const result = await window.Net.saveUserGardenWithMerge(userId, data, etag);
-
-  if (result.success) {
-    appState.etagsByUser[userId] = result.etag;
-    // Reload to sync
-    const { data: latest, etag: newEtag } = await window.Net.fetchUserGarden(userId);
-    if (latest) {
-      appState.allUserGardens[userId] = latest;
-      appState.etagsByUser[userId] = newEtag;
-    }
+  appState.currentGardenId = gardenId;
+  localStorage.setItem('gardenSelected', gardenId);
+  
+  appState.currentUserId = null;
+  appState.pendingOps = [];
+  appState.selectedTile = null;
+  appState.selectedPlantId = null;
+  
+  try {
+    appState.manifest = await window.Net.fetchManifest(gardenId);
+    const userIds = appState.manifest.plots.map(p => p.userId);
+    const { gardens } = await window.Net.loadAllUserGardens(gardenId, userIds);
+    appState.allUserGardens = gardens;
+    
+    populateUserDropdown();
     render();
+  } catch (err) {
+    console.error('Error changing garden:', err);
   }
 }
 
@@ -444,158 +498,293 @@ async function saveUserGarden(userId) {
  */
 function changeUser(userId) {
   appState.currentUserId = userId;
-  localStorage.setItem('gardenUserId', userId);
+  localStorage.setItem(`gardenUserId_${appState.currentGardenId}`, userId);
+  appState.selectedTile = null;
+  appState.selectedPlantId = null;
+  appState.pendingOps = [];
+  render();
+}
 
-  // Ensure user garden exists
-  if (userId && !appState.allUserGardens[userId]) {
-    appState.allUserGardens[userId] = {
-      version: 1,
-      userId,
-      updatedAt: Date.now(),
-      plants: []
-    };
-  }
-
-  // Apply daily rain
-  if (userId && appState.allUserGardens[userId]) {
-    applyDailyRain();
-  }
-
+/**
+ * Clear pending operations
+ */
+function clearPendingOps() {
+  appState.pendingOps = [];
   appState.selectedTile = null;
   appState.selectedPlantId = null;
   render();
 }
 
 /**
- * Add a new user locally
+ * Show save modal and GitHub Issue Form
  */
-function addUser() {
-  const nameInput = document.getElementById('newUserName');
-  const name = nameInput.value.trim();
-
-  if (!name) return;
-
-  // Generate userId slug
-  const userId = name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
-
-  // Store in localStorage
-  const local = JSON.parse(localStorage.getItem('gardenUsers') || '{}');
-  local[userId] = { name };
-  localStorage.setItem('gardenUsers', JSON.stringify(local));
-
-  // Create empty garden
-  appState.allUserGardens[userId] = {
-    version: 1,
-    userId,
-    updatedAt: Date.now(),
-    plants: []
-  };
-
-  // Switch to this user
-  changeUser(userId);
-
-  // Clear input
-  nameInput.value = '';
+function showSaveModal() {
+  const payload = buildPayload();
+  const issueUrl = buildGitHubIssueUrl(payload, 'save');
+  
+  showModal(
+    '💾 Ready to Save',
+    `<p style="color: #e8c89f;">Your changes are ready to submit to GitHub.</p>
+    <ol style="color: #e8c89f;">
+      <li>Click "Open GitHub & Submit" to open the issue form</li>
+      <li>Review and click "Submit new issue"</li>
+      <li>Wait 1-2 min for  GitHub Action to process</li>
+      <li>Click "Refresh Garden" to see your changes</li>
+    </ol>`,
+    [
+      { text: '✅ Open GitHub & Submit', onClick: () => {
+        window.open(issueUrl, '_blank');
+        clearModal();
+        showSubmittingOverlay();
+      }},
+      { text: 'Cancel', onClick: clearModal, danger: true }
+    ]
+  );
 }
 
 /**
- * Populate user dropdown from manifest + localStorage
+ * Show "Submitting..." overlay
  */
-function populateUserDropdown() {
-  // Ensure all users have gardens
-  appState.manifest.plots.forEach(plot => {
-    if (!appState.allUserGardens[plot.userId]) {
-      appState.allUserGardens[plot.userId] = {
-        version: 1,
-        userId: plot.userId,
-        updatedAt: Date.now(),
-        plants: []
-      };
-    }
-  });
-
-  // Local users
-  const local = JSON.parse(localStorage.getItem('gardenUsers') || '{}');
-  Object.keys(local).forEach(userId => {
-    if (!appState.allUserGardens[userId]) {
-      appState.allUserGardens[userId] = {
-        version: 1,
-        userId,
-        updatedAt: Date.now(),
-        plants: []
-      };
-    }
-  });
+function showSubmittingOverlay() {
+  const overlay = document.createElement('div');
+  overlay.id = 'submitting-overlay';
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  `;
+  
+  overlay.innerHTML = `
+    <div style="background: #2d3a2d; border: 3px solid #8b7355; border-radius: 8px; padding: 40px; text-align: center; color: #e8c89f; max-width: 400px;">
+      <div style="font-size: 2rem; margin-bottom: 20px; animation: spin 2s linear infinite;">🌱</div>
+      <h3 style="color: #ffd700; margin-bottom: 10px;">Submitting...</h3>
+      <p style="margin-bottom: 20px;">Your changes are being processed by GitHub Actions.</p>
+      <p style="font-size: 0.9rem; color: #c9a961; margin-bottom: 20px;">Usually takes 1-2 minutes</p>
+      <button id="refreshOverlayBtn" class="btn btn-warning btn-sm" style="background-color: #ffd700; color: #2d3a2d; border: none; font-weight: bold;">🔄 Refresh Garden</button>
+    </div>
+    <style>
+      @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+  `;
+  
+  document.body.appendChild(overlay);
+  document.getElementById('refreshOverlayBtn').addEventListener('click', refreshGarden);
 }
 
 /**
- * Apply daily "light rain" to one plant
+ * Refresh the garden (reload from server)
+ */
+async function refreshGarden() {
+  const overlay = document.getElementById('submitting-overlay');
+  if (overlay) overlay.remove();
+  
+  appState.pendingOps = [];
+  
+  try {
+    appState.manifest = await window.Net.fetchManifest(appState.currentGardenId);
+    const userIds = appState.manifest.plots.map(p => p.userId);
+    const { gardens } = await window.Net.loadAllUserGardens(appState.currentGardenId, userIds);
+    appState.allUserGardens = gardens;
+    render();
+  } catch (err) {
+    console.error('Error refreshing garden:', err);
+  }
+}
+
+/**
+ * Show add user modal
+ */
+function showAddUserModal() {
+  showModal(
+    '👤 Add New User',
+    `<div class="mb-3">
+      <label for="displayNameInput" class="form-label" style="color: #e8c89f;">Display Name</label>
+      <input type="text" class="form-control form-control-sm" id="displayNameInput" placeholder="e.g., Alice" style="background: #2d3a2d; color: #e8c89f; border-color: #8b7355;">
+    </div>
+    <div class="mb-3">
+      <label for="userIdInput" class="form-label" style="color: #e8c89f;">User ID</label>
+      <input type="text" class="form-control form-control-sm" id="userIdInput" placeholder="alice" style="background: #2d3a2d; color: #e8c89f; border-color: #8b7355;">
+    </div>`,
+    [
+      { text: 'Add to GitHub', onClick: () => {
+        const displayName = document.getElementById('displayNameInput')?.value || '';
+        let userId = document.getElementById('userIdInput')?.value || '';
+        
+        if (!displayName) { alert('Enter a name'); return; }
+        if (!userId) {
+          userId = displayName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+          document.getElementById('userIdInput').value = userId;
+          return;
+        }
+        
+        const payload = `commandType: add_user
+gardenId: ${appState.currentGardenId}
+userId: ${userId}
+displayName: ${displayName}`;
+        
+        const issueUrl = buildGitHubIssueUrl(payload, 'add_user');
+        clearModal();
+        window.open(issueUrl, '_blank');
+        showSubmittingOverlay();
+      }},
+      { text: 'Cancel', onClick: clearModal, danger: true }
+    ]
+  );
+}
+
+/**
+ * Show create garden modal
+ */
+function showCreateGardenModal() {
+  showModal(
+    '🌳 Create New Garden',
+    `<div class="mb-3">
+      <label for="gardenNameInput" class="form-label" style="color: #e8c89f;">Garden Name</label>
+      <input type="text" class="form-control form-control-sm" id="gardenNameInput" placeholder="e.g., Winter Garden" style="background: #2d3a2d; color: #e8c89f; border-color: #8b7355;">
+    </div>
+    <div class="mb-3">
+      <label for="gardenIdInput" class="form-label" style="color: #e8c89f;">Garden ID</label>
+      <input type="text" class="form-control form-control-sm" id="gardenIdInput" placeholder="winter-garden" style="background: #2d3a2d; color: #e8c89f; border-color: #8b7355;">
+    </div>`,
+    [
+      { text: 'Create on GitHub', onClick: () => {
+        const gardenName = document.getElementById('gardenNameInput')?.value || '';
+        let gardenId = document.getElementById('gardenIdInput')?.value || '';
+        
+        if (!gardenName) { alert('Enter a garden name'); return; }
+        if (!gardenId) {
+          gardenId = gardenName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+          document.getElementById('gardenIdInput').value = gardenId;
+          return;
+        }
+        
+        const payload = `commandType: create_garden
+gardenId: ${gardenId}
+displayName: ${gardenName}`;
+        
+        const issueUrl = buildGitHubIssueUrl(payload, 'create_garden');
+        clearModal();
+        window.open(issueUrl, '_blank');
+        showSubmittingOverlay();
+      }},
+      { text: 'Cancel', onClick: clearModal, danger: true }
+    ]
+  );
+}
+
+/**
+ * Build payload for pending operations
+ */
+function buildPayload() {
+  let payload = `commandType: save
+gardenId: ${appState.currentGardenId}
+userId: ${appState.currentUserId}
+ops:`;
+  
+  appState.pendingOps.forEach(op => {
+    if (op.type === 'plant') {
+      payload += `\n- plant x=${op.x} y=${op.y}`;
+    } else if (op.type === 'water') {
+      payload += `\n- water plantId=${op.plantId}`;
+    }
+  });
+  
+  payload += `\nclientTs=${Date.now()}`;
+  return payload;
+}
+
+/**
+ * Build GitHub Issue Form URL
+ */
+function buildGitHubIssueUrl(payload, commandType = 'save') {
+  const repoUrl = 'https://github.com/unclegun/unclegun.github.io';
+  const title = `[garden] ${commandType}`;
+  const body = encodeURIComponent(payload);
+  
+  return `${repoUrl}/issues/new?title=${encodeURIComponent(title)}&body=${body}&template=garden-command.yml`;
+}
+
+/**
+ * Show modal dialog
+ */
+function showModal(title, content, buttons = []) {
+  let modalsContainer = document.getElementById('modals-container');
+  if (!modalsContainer) {
+    modalsContainer = document.createElement('div');
+    modalsContainer.id = 'modals-container';
+    document.body.appendChild(modalsContainer);
+  }
+  
+  const modal = document.createElement('div');
+  modal.className = 'modal fade show';
+  modal.id = 'current-modal';
+  modal.style.display = 'block';
+  modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+  modal.tabIndex = '-1';
+  
+  let buttonsHtml = buttons.map(btn => {
+    const btnClass = btn.danger ? 'btn-outline-secondary' : 'btn-warning';
+    return `<button class="btn btn-sm ${btnClass}" data-btn-action="${buttons.indexOf(btn)}">${btn.text}</button>`;
+  }).join('');
+  
+  modal.innerHTML = `
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background: linear-gradient(135deg, #3a5a40 0%, #2d4a35 100%); border: 2px solid #8b7355;">
+        <div class="modal-header" style="border-color: #8b7355;">
+          <h5 class="modal-title" style="color: #ffd700;">${title}</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="color: #e8c89f;">
+          ${content}
+        </div>
+        <div class="modal-footer" style="border-color: #8b7355; gap: 8px;">
+          ${buttonsHtml}
+        </div>
+      </div>
+    </div>
+  `;
+  
+  modalsContainer.innerHTML = '';
+  modalsContainer.appendChild(modal);
+  
+  buttons.forEach((btn, idx) => {
+    const btnEl = modal.querySelector(`[data-btn-action="${idx}"]`);
+    if (btnEl) {
+      btnEl.addEventListener('click', btn.onClick);
+    }
+  });
+  
+  const closeBtn = modal.querySelector('.btn-close');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', clearModal);
+  }
+}
+
+/**
+ * Clear modal
+ */
+function clearModal() {
+  const modalsContainer = document.getElementById('modals-container');
+  if (modalsContainer) {
+    modalsContainer.innerHTML = '';
+  }
+}
+
+/**
+ * Apply daily rain (bonus watering)
  */
 function applyDailyRain() {
-  const ug = appState.allUserGardens[appState.currentUserId];
-  if (!ug) return;
-
-  const newUg = window.State.applyDailyRain(ug, Date.now());
-  if (newUg !== ug) {
-    appState.allUserGardens[appState.currentUserId] = newUg;
-    saveUserGarden(appState.currentUserId);
-  }
-}
-
-/**
- * Find a plant by ID anywhere in the gardens
- */
-function findPlantById(plantId) {
-  for (const userId in appState.allUserGardens) {
-    const ug = appState.allUserGardens[userId];
-    const plant = ug.plants.find(p => p.id === plantId);
-    if (plant) return plant;
-  }
-  return null;
-}
-
-/**
- * Format age in human-readable form
- */
-function formatAge(plantedAtMs, nowMs) {
-  const ageMs = nowMs - plantedAtMs;
-  const ageDays = ageMs / 86400000;
-
-  if (ageDays < 1) {
-    const hours = Math.floor(ageDays * 24);
-    return hours + 'h';
-  }
-  return Math.floor(ageDays) + 'd';
-}
-
-/**
- * Format time duration
- */
-function formatTime(ms) {
-  const hours = Math.floor(ms / 3600000);
-  const minutes = Math.floor((ms % 3600000) / 60000);
-
-  if (hours > 0) {
-    return hours + 'h ' + minutes + 'm';
-  }
-  return minutes + 'm';
-}
-
-/**
- * Cleanup old water actions (older than 24 hours)
- */
-function cleanupWaterActionsToday() {
   const now = Date.now();
-  const oneDayAgo = now - 86400000;
-  appState.waterActionsToday = appState.waterActionsToday.filter(t => t > oneDayAgo);
-  saveWaterActionsToday();
-}
-
-/**
- * Save water actions to localStorage
- */
-function saveWaterActionsToday() {
-  localStorage.setItem('gardenWaterActions', JSON.stringify(appState.waterActionsToday));
+  const today = Math.floor(now / 86400000);
+  
+  if (appState.lastRainDay === today) return;
+  
+  appState.lastRainDay = today;
+  console.log('🌧️ Gentle rain falls on the garden...');
 }
 
 /**
@@ -606,6 +795,15 @@ function loadWaterActionsToday() {
     localStorage.getItem('gardenWaterActions') || '[]'
   );
   cleanupWaterActionsToday();
+}
+
+/**
+ * Cleanup water actions older than 24h
+ */
+function cleanupWaterActionsToday() {
+  const now = Date.now();
+  const oneDayMs = 86400000;
+  appState.waterActionsToday = appState.waterActionsToday.filter(ts => now - ts < oneDayMs);
 }
 
 // Start on document ready
@@ -619,25 +817,9 @@ if (document.readyState === 'loading') {
   init();
 }
 
-// Event delegation for sidebar buttons & dropdowns
+// Refresh button
 document.addEventListener('click', (e) => {
-  if (e.target.id === 'plantBtn') {
-    plantSeed();
-  } else if (e.target.id === 'waterBtn') {
-    waterPlant();
-  } else if (e.target.id === 'addUserBtn') {
-    addUser();
-  }
-});
-
-document.addEventListener('change', (e) => {
-  if (e.target.id === 'userDropdown') {
-    changeUser(e.target.value);
-  }
-});
-
-document.addEventListener('keypress', (e) => {
-  if (e.target.id === 'newUserName' && e.key === 'Enter') {
-    addUser();
+  if (e.target.id === 'refreshBtn') {
+    refreshGarden();
   }
 });

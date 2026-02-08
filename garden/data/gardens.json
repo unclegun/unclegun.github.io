@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "gardens": [
+    { "id": "main", "name": "Main Garden" }
+  ]
+}

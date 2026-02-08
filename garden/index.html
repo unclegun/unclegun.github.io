@@ -4,24 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Community Garden</title>
+    <link rel="stylesheet" href="/assets/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>🌱 Community Garden</h1>
-        <p>A cozy shared space to grow plants together</p>
-    </header>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-dark bg-dark sticky-top" style="background-color: #2d3a2d !important; border-bottom: 2px solid #8b7355;">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1" style="color: #ffd700; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
+                🌱 Community Garden
+            </span>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-light" id="refreshBtn" title="Refresh">
+                    🔄 Refresh
+                </button>
+            </div>
+        </div>
+    </nav>
 
-    <main>
+    <!-- Main Content -->
+    <main class="container-fluid py-4" style="background: linear-gradient(180deg, #2d3a2d 0%, #1a2a1a 100%); min-height: calc(100vh - 60px);">
         <!-- Loading message -->
-        <div id="loading-msg" style="text-align: center; padding: 40px; color: #e8c89f; font-size: 1.2rem;">
+        <div id="loading-msg" class="text-center py-5" style="color: #e8c89f; font-size: 1.2rem;">
             🌱 Loading garden...
         </div>
+
+        <!-- Garden Container (populated by app.js) -->
+        <div id="garden-app"></div>
     </main>
 
-    <footer>
-        <p>&copy; 2025 Community Garden • Tend with care</p>
+    <!-- Footer -->
+    <footer class="text-center py-3" style="background-color: #2d3a2d; border-top: 2px solid #8b7355; color: #e8c89f; margin-top: auto;">
+        <p class="mb-0">&copy; 2025 Community Garden • Tend with care</p>
     </footer>
+
+    <!-- Bootstrap JS Bundle (includes Popper) -->
+    <script defer src="/assets/bootstrap/bootstrap.bundle.min.js"></script>
 
     <!-- Scripts in order: utilities first, then app -->
     <script src="prng.js"></script>

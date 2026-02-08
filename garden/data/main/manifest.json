@@ -1,5 +1,7 @@
 {
   "version": 1,
+  "gardenId": "main",
+  "grid": { "w": 24, "h": 12, "tile": 24 },
   "plots": [
     {
       "userId": "alice",
@@ -61,5 +63,6 @@
         "h": 6
       }
     }
-  ]
+  ],
+  "updatedAt": 1700000000000
 }

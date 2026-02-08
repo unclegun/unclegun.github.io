@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "gardenId": "main",
   "userId": "eve",
   "updatedAt": 1708977600000,
   "plants": [
