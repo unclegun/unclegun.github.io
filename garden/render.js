@@ -117,6 +117,19 @@ function renderGardenSVG(manifest, allUserGardens, currentUserId, selected, now)
         renderer(g, tileX, tileY, plant, stage, isSelected, now);
       }
 
+      // Add plant info label
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', tileX + TILE_SIZE / 2);
+      label.setAttribute('y', tileY + TILE_SIZE + 10);
+      label.setAttribute('text-anchor', 'middle');
+      label.setAttribute('font-size', '10');
+      label.setAttribute('font-family', 'Georgia, serif');
+      label.setAttribute('fill', '#E8C89F');
+      label.setAttribute('pointer-events', 'none');
+      label.setAttribute('class', 'plant-label');
+      label.textContent = `${archetype} 💧${plant.watered}`;
+      g.appendChild(label);
+
       // Selection highlight
       if (isSelected) {
         const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'circle');

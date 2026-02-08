@@ -256,18 +256,10 @@ function renderSidebar() {
   let html = '<div class="card-body">';
   html += '<h5 class="card-title" style="color: #ffd700;">🌱 Controls</h5>';
 
-  // Garden section
+  // Garden section - main garden only, no creation
   html += '<div class="mb-3">';
-  html += '<label for="gardenDropdown" class="form-label" style="color: #e8c89f;">Garden</label>';
-  html += '<div class="input-group input-group-sm">';
-  html += '<select class="form-select form-select-sm" id="gardenDropdown" style="background: #2d3a2d; color: #e8c89f; border-color: #8b7355;">';
-  appState.gardens.forEach(garden => {
-    const selected = garden.id === appState.currentGardenId ? 'selected' : '';
-    html += `<option value="${garden.id}" ${selected}>${garden.name}</option>`;
-  });
-  html += '</select>';
-  html += '<button class="btn btn-sm btn-outline-light" id="createGardenBtn" title="Create Garden"><strong>+</strong></button>';
-  html += '</div>';
+  html += '<label class="form-label" style="color: #e8c89f;">Garden</label>';
+  html += '<div class="form-control form-control-sm" style="background: #2d3a2d; color: #e8c89f; border-color: #8b7355;">Main Garden</div>';
   html += '</div>';
 
   // User section
@@ -336,12 +328,12 @@ function renderSidebar() {
   sidebarDiv.innerHTML = html;
 
   // Event listeners
-  document.getElementById('gardenDropdown')?.addEventListener('change', changeGarden);
   document.getElementById('userDropdown')?.addEventListener('change', (e) => changeUser(e.target.value));
-  document.getElementById('plantBtn')?.addEventListener('click', plantSeed);
-  document.getElementById('waterBtn')?.addEventListener('click', waterPlant);
   document.getElementById('addUserBtn')?.addEventListener('click', showAddUserModal);
-  document.getElementById('createGardenBtn')?.addEventListener('click', showCreateGardenModal);
+  const plantBtn = document.getElementById('plantBtn');
+  if (plantBtn) plantBtn.addEventListener('click', plantSeed);
+  const waterBtn = document.getElementById('waterBtn');
+  if (waterBtn) waterBtn.addEventListener('click', waterPlant);
   document.getElementById('saveBtn')?.addEventListener('click', showSaveModal);
   document.getElementById('clearBtn')?.addEventListener('click', clearPendingOps);
 }
@@ -404,7 +396,7 @@ function renderTileInfo(tile) {
     if (plotUserId) {
       html += `<p style="color: #c9a961; font-size: 0.85rem;">Belongs to ${getDisplayName(plotUserId)}</p>`;
     } else {
-      html += '<p style="color: #c9a961; font-size: 0.85rem;">Outside all plots</p>`;
+      html += '<p style="color: #c9a961; font-size: 0.85rem;">Outside all plots</p>';
     }
   }
   
@@ -622,7 +614,7 @@ function showAddUserModal() {
         }
         
         const payload = `commandType: add_user
-gardenId: ${appState.currentGardenId}
+gardenId: main
 userId: ${userId}
 displayName: ${displayName}`;
         
@@ -636,45 +628,7 @@ displayName: ${displayName}`;
   );
 }
 
-/**
- * Show create garden modal
- */
-function showCreateGardenModal() {
-  showModal(
-    '🌳 Create New Garden',
-    `<div class="mb-3">
-      <label for="gardenNameInput" class="form-label" style="color: #e8c89f;">Garden Name</label>
-      <input type="text" class="form-control form-control-sm" id="gardenNameInput" placeholder="e.g., Winter Garden" style="background: #2d3a2d; color: #e8c89f; border-color: #8b7355;">
-    </div>
-    <div class="mb-3">
-      <label for="gardenIdInput" class="form-label" style="color: #e8c89f;">Garden ID</label>
-      <input type="text" class="form-control form-control-sm" id="gardenIdInput" placeholder="winter-garden" style="background: #2d3a2d; color: #e8c89f; border-color: #8b7355;">
-    </div>`,
-    [
-      { text: 'Create on GitHub', onClick: () => {
-        const gardenName = document.getElementById('gardenNameInput')?.value || '';
-        let gardenId = document.getElementById('gardenIdInput')?.value || '';
-        
-        if (!gardenName) { alert('Enter a garden name'); return; }
-        if (!gardenId) {
-          gardenId = gardenName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-          document.getElementById('gardenIdInput').value = gardenId;
-          return;
-        }
-        
-        const payload = `commandType: create_garden
-gardenId: ${gardenId}
-displayName: ${gardenName}`;
-        
-        const issueUrl = buildGitHubIssueUrl(payload, 'create_garden');
-        clearModal();
-        window.open(issueUrl, '_blank');
-        showSubmittingOverlay();
-      }},
-      { text: 'Cancel', onClick: clearModal, danger: true }
-    ]
-  );
-}
+
 
 /**
  * Build payload for pending operations
