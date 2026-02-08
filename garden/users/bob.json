@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "userId": "bob",
+  "updatedAt": 1708977600000,
+  "plants": [
+    {
+      "id": "bob_0",
+      "x": 7,
+      "y": 2,
+      "plantedAt": 1708891200000,
+      "watered": 5,
+      "lastWateredAt": 1708960800000,
+      "genes": {
+        "archetype": 2,
+        "palette": 3,
+        "pattern": 0,
+        "accent": 3,
+        "rarity": 2
+      },
+      "updatedAt": 1708960800000
+    },
+    {
+      "id": "bob_1",
+      "x": 9,
+      "y": 3,
+      "plantedAt": 1708910400000,
+      "watered": 2,
+      "lastWateredAt": 1708945200000,
+      "genes": {
+        "archetype": 6,
+        "palette": 0,
+        "pattern": 3,
+        "accent": 1,
+        "rarity": 0
+      },
+      "updatedAt": 1708945200000
+    }
+  ]
+}

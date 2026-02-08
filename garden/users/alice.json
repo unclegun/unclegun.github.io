@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "userId": "alice",
+  "updatedAt": 1708977600000,
+  "plants": [
+    {
+      "id": "alice_0",
+      "x": 1,
+      "y": 1,
+      "plantedAt": 1708891200000,
+      "watered": 3,
+      "lastWateredAt": 1708956000000,
+      "genes": {
+        "archetype": 0,
+        "palette": 1,
+        "pattern": 2,
+        "accent": 1,
+        "rarity": 1
+      },
+      "updatedAt": 1708956000000
+    },
+    {
+      "id": "alice_1",
+      "x": 2,
+      "y": 2,
+      "plantedAt": 1708905600000,
+      "watered": 1,
+      "lastWateredAt": 1708939200000,
+      "genes": {
+        "archetype": 1,
+        "palette": 4,
+        "pattern": 3,
+        "accent": 2,
+        "rarity": 0
+      },
+      "updatedAt": 1708939200000
+    },
+    {
+      "id": "alice_2",
+      "x": 3,
+      "y": 4,
+      "plantedAt": 1708920000000,
+      "watered": 0,
+      "lastWateredAt": 0,
+      "genes": {
+        "archetype": 5,
+        "palette": 2,
+        "pattern": 1,
+        "accent": 0,
+        "rarity": 0
+      },
+      "updatedAt": 1708920000000
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "userId": "charlie",
+  "updatedAt": 1708977600000,
+  "plants": [
+    {
+      "id": "charlie_0",
+      "x": 13,
+      "y": 1,
+      "plantedAt": 1708878000000,
+      "watered": 7,
+      "lastWateredAt": 1708963200000,
+      "genes": {
+        "archetype": 7,
+        "palette": 5,
+        "pattern": 2,
+        "accent": 2,
+        "rarity": 1
+      },
+      "updatedAt": 1708963200000
+    },
+    {
+      "id": "charlie_1",
+      "x": 15,
+      "y": 4,
+      "plantedAt": 1708915200000,
+      "watered": 1,
+      "lastWateredAt": 1708948800000,
+      "genes": {
+        "archetype": 3,
+        "palette": 1,
+        "pattern": 0,
+        "accent": 0,
+        "rarity": 0
+      },
+      "updatedAt": 1708948800000
+    },
+    {
+      "id": "charlie_2",
+      "x": 14,
+      "y": 2,
+      "plantedAt": 1708920000000,
+      "watered": 0,
+      "lastWateredAt": 0,
+      "genes": {
+        "archetype": 4,
+        "palette": 4,
+        "pattern": 1,
+        "accent": 1,
+        "rarity": 0
+      },
+      "updatedAt": 1708920000000
+    }
+  ]
+}

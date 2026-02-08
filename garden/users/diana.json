@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "userId": "diana",
+  "updatedAt": 1708977600000,
+  "plants": [
+    {
+      "id": "diana_0",
+      "x": 19,
+      "y": 1,
+      "plantedAt": 1708884000000,
+      "watered": 4,
+      "lastWateredAt": 1708955400000,
+      "genes": {
+        "archetype": 0,
+        "palette": 2,
+        "pattern": 3,
+        "accent": 1,
+        "rarity": 0
+      },
+      "updatedAt": 1708955400000
+    }
+  ]
+}

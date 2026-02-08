@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "plots": [
+    {
+      "userId": "alice",
+      "name": "Alice",
+      "plot": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 6
+      }
+    },
+    {
+      "userId": "bob",
+      "name": "Bob",
+      "plot": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 6
+      }
+    },
+    {
+      "userId": "charlie",
+      "name": "Charlie",
+      "plot": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 6
+      }
+    },
+    {
+      "userId": "diana",
+      "name": "Diana",
+      "plot": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 6
+      }
+    },
+    {
+      "userId": "eve",
+      "name": "Eve",
+      "plot": {
+        "x": 0,
+        "y": 6,
+        "w": 6,
+        "h": 6
+      }
+    },
+    {
+      "userId": "frank",
+      "name": "Frank",
+      "plot": {
+        "x": 6,
+        "y": 6,
+        "w": 6,
+        "h": 6
+      }
+    }
+  ]
+}

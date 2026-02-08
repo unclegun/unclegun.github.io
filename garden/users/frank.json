@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "userId": "frank",
+  "updatedAt": 1708977600000,
+  "plants": [
+    {
+      "id": "frank_0",
+      "x": 8,
+      "y": 8,
+      "plantedAt": 1708896000000,
+      "watered": 3,
+      "lastWateredAt": 1708951200000,
+      "genes": {
+        "archetype": 5,
+        "palette": 4,
+        "pattern": 2,
+        "accent": 1,
+        "rarity": 2
+      },
+      "updatedAt": 1708951200000
+    },
+    {
+      "id": "frank_1",
+      "x": 10,
+      "y": 10,
+      "plantedAt": 1708910400000,
+      "watered": 0,
+      "lastWateredAt": 0,
+      "genes": {
+        "archetype": 6,
+        "palette": 1,
+        "pattern": 3,
+        "accent": 0,
+        "rarity": 0
+      },
+      "updatedAt": 1708910400000
+    }
+  ]
+}

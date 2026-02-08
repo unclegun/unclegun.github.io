@@ -1,0 +1,477 @@
+/* Community Garden - Stardew Valley-inspired styling */
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-bg: #2d3a2d;
+  --secondary-bg: #3a5a40;
+  --accent-light: #e8c89f;
+  --accent-dark: #8b7355;
+  --wood: #6b5344;
+  --green: #5a7a60;
+  --highlight: #ffd700;
+}
+
+body {
+  font-family: 'Georgia', 'Palatino', serif;
+  background: linear-gradient(180deg, #2d3a2d 0%, #1a2a1a 100%);
+  color: #e8c89f;
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+/* Header */
+header {
+  text-align: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #8b7355;
+  padding-bottom: 15px;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  color: #ffd700;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+header p {
+  margin: 10px 0 0;
+  color: #c9a961;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+/* Main container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+}
+
+/* Garden SVG */
+.garden-container {
+  background: linear-gradient(135deg, #3a5a40 0%, #2d4a35 100%);
+  border: 3px solid #8b7355;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 0, 0, 0.7);
+  overflow: auto;
+  max-height: 550px;
+}
+
+.garden-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.garden-bg {
+  /* Subtle texture would go here */
+}
+
+.garden-tile {
+  transition: fill 0.2s ease;
+  cursor: pointer;
+}
+
+.garden-tile:hover {
+  fill: #6a8a70 !important;
+  filter: brightness(1.1);
+}
+
+.plot-border {
+  pointer-events: none;
+}
+
+.plot-label {
+  pointer-events: none;
+  font-weight: bold;
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.7));
+}
+
+/* Plants */
+.plant-group {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.plant-group:hover .plant-part {
+  filter: brightness(1.15);
+}
+
+.plant-part {
+  transition: fill 0.3s ease;
+}
+
+.plant-selection {
+  pointer-events: none;
+  animation: pulse-selection 1.5s ease-in-out infinite;
+}
+
+.plant-glow {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.plant-group.planted {
+  animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-selection {
+  0%, 100% {
+    stroke-width: 2px;
+    opacity: 0.6;
+  }
+  50% {
+    stroke-width: 2px;
+    opacity: 1;
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Sway animation for plants */
+.sway {
+  transform-origin: center;
+  animation: gentle-sway 4s ease-in-out infinite;
+}
+
+.plant-group:nth-child(odd) .sway {
+  animation-duration: 5s;
+}
+
+.plant-group:nth-child(3n) .sway {
+  animation-duration: 6s;
+}
+
+@keyframes gentle-sway {
+  0%, 100% {
+    transform: none;
+  }
+  25% {
+    transform: translateX(0.5px) translateY(-0.3px);
+  }
+  75% {
+    transform: translateX(-0.5px) translateY(0.3px);
+  }
+}
+
+.plant-watering {
+  animation: water-sparkle 2s ease-out forwards;
+}
+
+@keyframes water-sparkle {
+  0% {
+    opacity: 1;
+    r: 0;
+  }
+  100% {
+    opacity: 0;
+    r: 6px;
+  }
+}
+
+/* Sidebar */
+.sidebar {
+  background: linear-gradient(135deg, #3a5a40 0%, #2d4a35 100%);
+  border: 2px solid #8b7355;
+  border-radius: 8px;
+  padding: 20px;
+  max-height: 550px;
+  overflow-y: auto;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  color: #ffd700;
+  font-size: 1.3rem;
+  border-bottom: 1px solid #8b7355;
+  padding-bottom: 10px;
+}
+
+.sidebar h3 {
+  color: #e8c89f;
+  font-size: 1rem;
+  margin: 15px 0 10px;
+}
+
+/* User selection */
+.user-section {
+  margin-bottom: 20px;
+}
+
+.user-dropdown {
+  width: 100%;
+  padding: 8px;
+  background: #2d3a2d;
+  color: #e8c89f;
+  border: 1px solid #8b7355;
+  border-radius: 4px;
+  font-family: 'Georgia', serif;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.user-dropdown:focus {
+  outline: none;
+  border-color: #ffd700;
+  box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+}
+
+.user-add-section {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.user-input {
+  flex: 1;
+  padding: 6px;
+  background: #2d3a2d;
+  color: #e8c89f;
+  border: 1px solid #8b7355;
+  border-radius: 4px;
+  font-family: 'Georgia', serif;
+  font-size: 0.9rem;
+}
+
+.user-input::placeholder {
+  color: #7a8a7a;
+}
+
+.user-add-btn {
+  padding: 6px 10px;
+  background: #8b7355;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.user-add-btn:hover {
+  background: #a08a6a;
+}
+
+.user-info {
+  background: #2d3a2d;
+  padding: 10px;
+  border-left: 3px solid #ffd700;
+  border-radius: 2px;
+  font-size: 0.9rem;
+  color: #c9a961;
+}
+
+/* Selected tile info */
+.tile-info {
+  background: #2d3a2d;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  color: #c9a961;
+}
+
+.tile-info.empty {
+  opacity: 0.6;
+}
+
+/* Plant info */
+.plant-info {
+  background: #2d3a2d;
+  border-left: 3px solid #8b7355;
+  padding: 10px;
+  border-radius: 2px;
+  font-size: 0.85rem;
+  margin-bottom: 15px;
+  color: #c9a961;
+}
+
+.plant-info strong {
+  color: #e8c89f;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.plant-stat {
+  display: flex;
+  justify-content: space-between;
+  margin: 3px 0;
+}
+
+.plant-stat .label {
+  text-align: left;
+}
+
+.plant-stat .value {
+  text-align: right;
+  color: #ffd700;
+  font-weight: bold;
+}
+
+/* Buttons */
+button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #8b7355 0%, #6b5344 100%);
+  color: #fff;
+  border: 1px solid #5a4333;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Georgia', serif;
+  font-size: 0.95rem;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+button:hover {
+  background: linear-gradient(135deg, #a08a6a 0%, #8a7555 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+button.secondary {
+  background: #5a7a60;
+  border-color: #4a6a50;
+}
+
+button.secondary:hover {
+  background: #6a8a70;
+}
+
+/* Hints & messages */
+.hint {
+  color: #a9a974;
+  font-size: 0.8rem;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+.message {
+  padding: 8px;
+  border-radius: 3px;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.message.info {
+  background: #3a5a40;
+  color: #c9a961;
+  border: 1px solid #8b7355;
+}
+
+.message.warning {
+  background: #5a4a2a;
+  color: #ffb347;
+  border: 1px solid #d2691e;
+}
+
+/* Cooldown indicator */
+.cooldown-timer {
+  color: #ffb347;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+/* Scrollbars */
+.garden-container::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.garden-container::-webkit-scrollbar-track,
+.sidebar::-webkit-scrollbar-track {
+  background: #2d3a2d;
+  border-radius: 4px;
+}
+
+.garden-container::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb {
+  background: #8b7355;
+  border-radius: 4px;
+}
+
+.garden-container::-webkit-scrollbar-thumb:hover,
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #a08a6a;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    max-height: none;
+  }
+
+  .garden-container {
+    max-height: 600px;
+  }
+}
+
+@media (max-width: 600px) {
+  header h1 {
+    font-size: 1.8rem;
+  }
+
+  .sidebar {
+    padding: 15px;
+  }
+
+  .user-section {
+    margin-bottom: 15px;
+  }
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  margin-top: 30px;
+  color: #8b8a7a;
+  font-size: 0.9rem;
+  border-top: 1px solid #8b7355;
+  padding-top: 15px;
+}
