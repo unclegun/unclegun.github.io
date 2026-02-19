@@ -3,35 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>home</title>
-    <link rel="stylesheet" href="style.css">
+    <title>StrataStack Solutions LLC - Custom Software Development</title>
+    <meta name="description" content="StrataStack Solutions LLC provides custom computer programming services, systems design, and reliable software solutions for federal and commercial clients.">
+    <link rel="stylesheet" href="/stratastack/style.css">
 </head>
 <body>
     <header>
-        <h3>unclegun.github.io</h3>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="projects.html">Projects</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><a href="garden/">Community Garden</a></li>
-                <li><a href="chartjs-demo.html">Chart.js Demo</a></li>
-            </ul>
-        </nav>
+        <div class="container">
+            <div class="nav">
+                <a href="/" class="brand">
+                    <img src="/stratastack/stratastack_logo.png" alt="StrataStack Solutions LLC">
+                    <div>
+                        <div class="title">StrataStack Solutions</div>
+                        <small>Custom Software Development</small>
+                    </div>
+                </a>
+                <nav class="nav-links">
+                    <a href="#top">Home</a>
+                    <a href="#why">Why</a>
+                    <a href="#capabilities">Capabilities</a>
+                    <a href="#work">Work</a>
+                    <a href="#stack">Stack</a>
+                    <a href="#naics">NAICS</a>
+                    <a href="#contact">Contact</a>
+                </nav>
+            </div>
+        </div>
     </header>
 
-    <main>
-        <section>
-            <h2 class="p-intro">Oh hai :D</h2>
-            <img class="img-home" src="img/old_man.png" alt="old">
-            <p class="p-img">me exclaiming about the internet peaking at the hampster dance.</p>
-            <p class="p-body">This site will either be filled with unhinged rantings or a desolate wasteland filled with nothing but empty promises.</p>
-            <p class="p-body">Let's get real weird with it (͠◉_◉᷅ )</p>
+    <main id="top">
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="container">
+                <div class="hero-grid">
+                    <div class="reveal">
+                        <h1 id="hero-title">Reliable Software Solutions</h1>
+                        <p class="lead">We build secure, scalable software systems for federal and commercial clients with a focus on clean architecture and long-term maintainability.</p>
+                        <p class="credibility">Full-stack engineer with 8+ years delivering secure systems in federal and research environments.</p>
+                        <div class="credentials" aria-label="Credentials">
+                            <span class="chip">CompTIA Security+ (Active)</span>
+                            <span class="chip">Federal & research SDLC experience: UAT, release management, CM</span>
+                        </div>
+                        <div class="tags">
+                            <span class="tag">Federal Contracting</span>
+                            <span class="tag">Custom Development</span>
+                            <span class="tag">Systems Design</span>
+                        </div>
+                        <div class="cta">
+                            <a class="btn primary" href="#contact">Get Started</a>
+                            <a class="btn secondary" href="#capabilities">Our Capabilities</a>
+                            <button type="button" class="btn ghost" data-open-capability>View Capability Statement</button>
+                        </div>
+                    </div>
+                    <div class="card pad reveal">
+                        <img src="/stratastack/stratastack_logo.png" alt="StrataStack Solutions" class="hero-logo">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="why" aria-labelledby="why-title">
+            <div class="container">
+                <h2 id="why-title">Why Stratastack</h2>
+                <ul class="approach-list item reveal">
+                    <li>Federal-ready delivery practices with disciplined handoffs and sustainment planning.</li>
+                    <li>Security-first implementation grounded in least-privilege design and operational guardrails.</li>
+                    <li>Sustainment-friendly architecture that keeps systems maintainable under changing mission needs.</li>
+                    <li>Performance budgets and data-heavy engineering experience for high-throughput workloads.</li>
+                    <li>Documentation and validation culture across SDLC, UAT, release management, and CM.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="approach" aria-labelledby="approach-title">
+            <div class="container">
+                <h2 id="approach-title">Our Approach</h2>
+                <div class="grid">
+                    <div class="item reveal">
+                        <h3>Reliability First</h3>
+                        <p class="muted">Clean code, thoughtful architecture, and tests. We build systems that are easy to operate, extend, and audit.</p>
+                    </div>
+                    <div class="item reveal">
+                        <h3>End‑to‑End Ownership</h3>
+                        <p class="muted">From requirements to sustainment—we stand behind what we build and keep it running.</p>
+                    </div>
+                    <div class="item reveal">
+                        <h3>Security Focused</h3>
+                        <p class="muted">Built with security best practices from day one, suitable for sensitive federal and commercial environments.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="capabilities" aria-labelledby="capabilities-title">
+            <div class="container">
+                <h2 id="capabilities-title">Capabilities</h2>
+                <div class="capability-grid">
+                    <details class="capability-card reveal">
+                        <summary>Application Architecture & SDLC</summary>
+                        <ul class="muted list">
+                            <li>Designs target-state architecture with clear boundaries and ownership.</li>
+                            <li>Establishes release workflows aligned to UAT and change-control requirements.</li>
+                            <li>Improves quality gates to reduce regression and deployment risk.</li>
+                        </ul>
+                        <p class="subhead">Typical deliverables</p>
+                        <ul class="muted list">
+                            <li>Architecture decision records (ADRs)</li>
+                            <li>System diagrams and integration maps</li>
+                            <li>Test plans, release checklists, and runbooks</li>
+                        </ul>
+                    </details>
+
+                    <details class="capability-card reveal">
+                        <summary>Web Apps & APIs</summary>
+                        <ul class="muted list">
+                            <li>Builds secure frontends and APIs for internal and external users.</li>
+                            <li>Implements robust authn/authz and auditable service patterns.</li>
+                            <li>Modernizes legacy workflows without disrupting critical operations.</li>
+                        </ul>
+                        <p class="subhead">Typical deliverables</p>
+                        <ul class="muted list">
+                            <li>API contracts and endpoint documentation</li>
+                            <li>Reusable UI components and service modules</li>
+                            <li>Integration and acceptance test suites</li>
+                        </ul>
+                    </details>
+
+                    <details class="capability-card reveal">
+                        <summary>Data Platforms & Performance</summary>
+                        <ul class="muted list">
+                            <li>Tunes data models and query paths for predictable performance.</li>
+                            <li>Builds data-intensive features with observability and resilience in mind.</li>
+                            <li>Supports migration and interoperability across mixed data environments.</li>
+                        </ul>
+                        <p class="subhead">Typical deliverables</p>
+                        <ul class="muted list">
+                            <li>Schema migration plans and query benchmarks</li>
+                            <li>Data validation utilities and monitoring views</li>
+                            <li>Performance baselines and optimization reports</li>
+                        </ul>
+                    </details>
+
+                    <details class="capability-card reveal">
+                        <summary>DevOps & Delivery Automation</summary>
+                        <ul class="muted list">
+                            <li>Automates build-test-release pipelines with environment parity controls.</li>
+                            <li>Hardens CI/CD and container workflows for reliable deployments.</li>
+                            <li>Establishes operational playbooks for incident response and sustainment.</li>
+                        </ul>
+                        <p class="subhead">Typical deliverables</p>
+                        <ul class="muted list">
+                            <li>CI/CD workflows and infrastructure templates</li>
+                            <li>Containerization standards and release artifacts</li>
+                            <li>Operational dashboards and on-call runbooks</li>
+                        </ul>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <section id="work" aria-labelledby="work-title">
+            <div class="container">
+                <h2 id="work-title">Selected Work</h2>
+                <div class="grid work-grid">
+                    <article class="item reveal">
+                        <h3>Mission Data Intake Modernization</h3>
+                        <p><strong>Problem:</strong> Legacy intake pipeline caused brittle handoffs and delayed analyst access.</p>
+                        <p><strong>Approach:</strong> Re-architected API and validation layers with staged release controls.</p>
+                        <p><strong>Impact:</strong> Stabilized releases and reduced deployment risk for recurring updates.</p>
+                    </article>
+                    <article class="item reveal">
+                        <h3>Research Workflow Platform Hardening</h3>
+                        <p><strong>Problem:</strong> Mixed toolchain led to inconsistent results and hard-to-trace defects.</p>
+                        <p><strong>Approach:</strong> Introduced test automation, release gates, and environment baselines.</p>
+                        <p><strong>Impact:</strong> Improved response time for issue triage and increased confidence in delivery.</p>
+                    </article>
+                    <article class="item reveal">
+                        <h3>Operational Dashboard Performance Recovery</h3>
+                        <p><strong>Problem:</strong> High-latency queries and heavy payloads affected mission visibility.</p>
+                        <p><strong>Approach:</strong> Tuned data access paths, caching strategy, and endpoint contracts.</p>
+                        <p><strong>Impact:</strong> Improved perceived application speed and sustained stable operations.</p>
+                    </article>
+                </div>
+                <p class="muted disclosure">Details generalized for confidentiality.</p>
+            </div>
+        </section>
+
+        <section id="stack" aria-labelledby="stack-title">
+            <div class="container">
+                <h2 id="stack-title">Stack & Principles</h2>
+                <div class="two-col">
+                    <div class="item reveal">
+                        <h3>Core Stack</h3>
+                        <div class="chip-list" aria-label="Core technology stack">
+                            <span class="chip">React</span>
+                            <span class="chip">ASP.NET Core</span>
+                            <span class="chip">FastAPI</span>
+                            <span class="chip">SQL Server</span>
+                            <span class="chip">PostgreSQL</span>
+                            <span class="chip">SQLite</span>
+                            <span class="chip">Docker</span>
+                            <span class="chip">GitHub Actions</span>
+                            <span class="chip">Kubernetes</span>
+                        </div>
+                    </div>
+                    <div class="item reveal">
+                        <h3>Principles</h3>
+                        <ul class="muted list">
+                            <li>Maintainable by default</li>
+                            <li>Security-first</li>
+                            <li>Performance budgets</li>
+                            <li>Docs-as-code</li>
+                            <li>Minimal lock-in</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="naics" aria-labelledby="naics-title">
+            <div class="container">
+                <h2 id="naics-title">NAICS & Identifiers</h2>
+                <div class="two-col">
+                    <div class="item reveal">
+                        <h3>Primary NAICS</h3>
+                        <ul class="muted list">
+                            <li>541511 — Custom Computer Programming Services</li>
+                            <li>541512 — Computer Systems Design Services</li>
+                            <li>541519 — Other Computer Related Services</li>
+                        </ul>
+                    </div>
+                    <div class="item reveal">
+                        <h3>Entity</h3>
+                        <p class="muted">
+                            UEI: <strong id="ueiValue">PNW3E2MCDP18</strong><br>
+                            EIN: <strong id="einValue">41-4227223</strong><br>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" aria-labelledby="contact-title">
+            <div class="container">
+                <h2 id="contact-title">Contact</h2>
+                <div class="two-col">
+                    <div class="item reveal">
+                        <h3>Work with us</h3>
+                        <p class="muted">
+                            Email: <a id="contactEmailLink" href="mailto:contact@stratastacksolutions.com">contact@stratastacksolutions.com</a><br>
+                            Phone: <a href="tel:+1">(301) 830‑2277</a><br>
+                            Location: Maryland, USA
+                        </p>
+                        <p class="muted response-time">Typical response time: 1–2 business days.</p>
+                        <div class="cta">
+                            <a class="btn primary" href="mailto:contact@stratastacksolutions.com?subject=Inquiry%20from%20website">Start a conversation</a>
+                            <button type="button" class="btn secondary" id="copyEmailBtn" data-copy-target="#contactEmailLink">Copy email</button>
+                            <button type="button" class="btn ghost" data-open-capability>View Capability Statement</button>
+                        </div>
+                    </div>
+                    <div class="item reveal">
+                        <h3>Send an inquiry</h3>
+                        <form class="contact-form" action="https://formspree.io/f/XXXXXXXX" method="POST">
+                            <label for="name">Name</label>
+                            <input id="name" name="name" type="text" autocomplete="name" required>
+
+                            <label for="email">Email</label>
+                            <input id="email" name="email" type="email" autocomplete="email" required>
+
+                            <label for="organization">Organization <span class="muted">(optional)</span></label>
+                            <input id="organization" name="organization" type="text" autocomplete="organization">
+
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+
+                            <label class="hp" for="website">Website</label>
+                            <input class="hp" id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+
+                            <button class="btn primary" type="submit">Send message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
     <footer>
-        <p>&copy; 2025 unclegun</p>
+        <div class="container">
+            © <span id="y"></span> StrataStack Solutions LLC · Maryland, USA · <a href="#">Privacy</a>
+        </div>
     </footer>
+
+    <dialog id="capabilityDialog" aria-labelledby="capabilityDialogTitle">
+        <article class="modal-content">
+            <div class="modal-head">
+                <h2 id="capabilityDialogTitle">Capability Statement</h2>
+                <button type="button" class="btn secondary modal-close" data-close-capability>Close</button>
+            </div>
+            <p class="muted">StrataStack Solutions LLC delivers secure, maintainable software solutions for federal and research environments.</p>
+            <h3>Core Capabilities</h3>
+            <ul class="muted list">
+                <li>Application architecture, SDLC planning, release management, and sustainment</li>
+                <li>Web application and API development for regulated environments</li>
+                <li>Data platform optimization and performance engineering</li>
+                <li>DevOps automation, CI/CD hardening, and operational runbooks</li>
+            </ul>
+            <h3>Differentiators</h3>
+            <ul class="muted list">
+                <li>8+ years of delivery in federal and research-adjacent settings</li>
+                <li>Security-first execution with least-privilege defaults</li>
+                <li>Strong documentation and validation culture across UAT and CM</li>
+            </ul>
+            <h3>NAICS</h3>
+            <p class="muted">541511, 541512, 541519</p>
+            <h3>Contact</h3>
+            <p class="muted">contact@stratastacksolutions.com · Maryland, USA</p>
+            <p><a href="#" class="btn secondary" aria-disabled="true">Download PDF (coming soon)</a></p>
+        </article>
+    </dialog>
+
+    <div class="modal-fallback" id="capabilityFallback" hidden>
+        <div class="modal-backdrop" data-close-capability></div>
+        <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="capabilityFallbackTitle" tabindex="-1">
+            <article class="modal-content">
+                <div class="modal-head">
+                    <h2 id="capabilityFallbackTitle">Capability Statement</h2>
+                    <button type="button" class="btn secondary modal-close" data-close-capability>Close</button>
+                </div>
+                <p class="muted">StrataStack Solutions LLC delivers secure, maintainable software solutions for federal and research environments.</p>
+                <h3>Core Capabilities</h3>
+                <ul class="muted list">
+                    <li>Application architecture, SDLC planning, release management, and sustainment</li>
+                    <li>Web application and API development for regulated environments</li>
+                    <li>Data platform optimization and performance engineering</li>
+                    <li>DevOps automation, CI/CD hardening, and operational runbooks</li>
+                </ul>
+                <h3>Differentiators</h3>
+                <ul class="muted list">
+                    <li>8+ years of delivery in federal and research-adjacent settings</li>
+                    <li>Security-first execution with least-privilege defaults</li>
+                    <li>Strong documentation and validation culture across UAT and CM</li>
+                </ul>
+                <h3>NAICS</h3>
+                <p class="muted">541511, 541512, 541519</p>
+                <h3>Contact</h3>
+                <p class="muted">contact@stratastacksolutions.com · Maryland, USA</p>
+                <p><a href="#" class="btn secondary" aria-disabled="true">Download PDF (coming soon)</a></p>
+            </article>
+        </div>
+    </div>
+
+    <button id="backToTop" class="btn secondary back-to-top" type="button" aria-label="Back to top">Top</button>
+
+    <script src="/stratastack/main.js" defer></script>
 </body>
 </html>

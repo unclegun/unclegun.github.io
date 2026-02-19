@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klax 3D - Tile Catcher Game</title>
+    <meta name="description" content="A 3D Klax-inspired tile-catcher puzzle game. Match colors to score points!">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Canvas for Three.js -->
+        <canvas id="game-canvas"></canvas>
+        
+        <!-- HUD Overlay -->
+        <div id="hud">
+            <div id="stats">
+                <div class="stat">
+                    <span class="label">Score</span>
+                    <span id="score" class="value">0</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Level</span>
+                    <span id="level" class="value">1</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Lives</span>
+                    <span id="lives" class="value">❤️❤️❤️</span>
+                </div>
+            </div>
+            
+            <div id="rack-preview">
+                <div class="label">Rack</div>
+                <div id="rack-tiles"></div>
+            </div>
+            
+            <div id="high-score" class="hidden">
+                High Score: <span id="high-score-value">0</span>
+            </div>
+        </div>
+        
+        <!-- Touch Controls -->
+        <div id="touch-controls" class="hidden">
+            <button id="btn-left" class="control-btn">◀</button>
+            <button id="btn-drop" class="control-btn">▼</button>
+            <button id="btn-right" class="control-btn">▶</button>
+        </div>
+        
+        <!-- Pause Indicator -->
+        <div id="pause-indicator" class="hidden overlay-message">
+            <h2>PAUSED</h2>
+            <p>Press P to resume</p>
+        </div>
+        
+        <!-- Game Over Screen -->
+        <div id="game-over" class="hidden overlay-panel">
+            <h2>Game Over</h2>
+            <p>Final Score: <span id="final-score">0</span></p>
+            <p id="new-high-score" class="hidden">🎉 New High Score! 🎉</p>
+            <button id="btn-restart" class="btn-primary">Play Again</button>
+            <button id="btn-menu" class="btn-secondary">Main Menu</button>
+        </div>
+        
+        <!-- Start Menu -->
+        <div id="start-menu" class="overlay-panel">
+            <h1>Klax 3D</h1>
+            <p class="subtitle">Catch. Match. Score.</p>
+            <button id="btn-start" class="btn-primary">Start Game</button>
+            <button id="btn-how-to-play" class="btn-secondary">How to Play</button>
+            <button id="btn-settings" class="btn-secondary">Settings</button>
+            <button id="btn-about" class="btn-secondary">About</button>
+        </div>
+        
+        <!-- How to Play Panel -->
+        <div id="how-to-play" class="hidden overlay-panel">
+            <h2>How to Play</h2>
+            <div class="instructions">
+                <p><strong>Objective:</strong> Catch falling tiles and create matches in the well!</p>
+                
+                <h3>Controls</h3>
+                <p><strong>Keyboard:</strong></p>
+                <ul>
+                    <li>← → or A D: Move catcher left/right</li>
+                    <li>Space or Enter: Drop tile from rack</li>
+                    <li>P: Pause game</li>
+                    <li>R: Restart</li>
+                </ul>
+                <p><strong>Touch:</strong> Use on-screen buttons</p>
+                
+                <h3>Gameplay</h3>
+                <ul>
+                    <li>Tiles slide down the conveyor toward you</li>
+                    <li>Position the catcher to catch tiles (max 5 in rack)</li>
+                    <li>Drop tiles from rack into the 5×5 well</li>
+                    <li>Match 3+ same colors in a row (horizontal, vertical, diagonal)</li>
+                    <li>Matches can also occur in the rack itself!</li>
+                    <li>Lose a life when: rack overflows or well column fills up</li>
+                </ul>
+                
+                <h3>Scoring</h3>
+                <ul>
+                    <li>3-match: 100 points</li>
+                    <li>4-match: 300 points</li>
+                    <li>5-match: 600 points</li>
+                    <li>Level up every 1000 points (speed increases!)</li>
+                </ul>
+            </div>
+            <button id="btn-back-from-help" class="btn-primary">Back</button>
+        </div>
+        
+        <!-- Settings Panel -->
+        <div id="settings" class="hidden overlay-panel">
+            <h2>Settings</h2>
+            <div class="setting-item">
+                <label>
+                    <input type="checkbox" id="setting-sound" checked>
+                    Sound Effects
+                </label>
+            </div>
+            <div class="setting-item">
+                <label>
+                    <input type="checkbox" id="setting-reduced-motion">
+                    Reduce Motion (override system)
+                </label>
+            </div>
+            <button id="btn-back-from-settings" class="btn-primary">Back</button>
+        </div>
+        
+        <!-- About Panel -->
+        <div id="about" class="hidden overlay-panel">
+            <h2>About Klax 3D</h2>
+            <p>A tribute to the classic arcade game Klax, reimagined in 3D using Three.js.</p>
+            <p><strong>Note:</strong> This is an original implementation. No copyrighted assets from the original Klax game were used.</p>
+            <p>Built with:</p>
+            <ul>
+                <li>Three.js for 3D rendering</li>
+                <li>WebAudio API for sound</li>
+                <li>localStorage for save data</li>
+            </ul>
+            <p class="credit">Created for unclegun.github.io</p>
+            <button id="btn-back-from-about" class="btn-primary">Back</button>
+        </div>
+        
+        <!-- Toast Notifications -->
+        <div id="toast-container"></div>
+    </div>
+    
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
