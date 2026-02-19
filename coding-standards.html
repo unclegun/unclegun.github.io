@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Coding Standards &amp; Processes</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --ink: #0f172a;
+            --muted: #64748b;
+            --surface: #ffffff;
+            --shell: #f8fafc;
+            --accent: #2563eb;
+            --accent-soft: #e0f2fe;
+            --accent-2: #14b8a6;
+            --accent-3: #f97316;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            background: radial-gradient(circle at top, #e0f2fe 0%, var(--shell) 45%, #f1f5f9 100%);
+            color: var(--ink);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(120deg, #0f172a 0%, #1d4ed8 60%, #0f172a 100%) !important;
+        }
+
+        .app-shell {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 24px;
+            align-items: start;
+            padding-right: 16px;
+        }
+
+        .playbook-nav {
+            position: sticky;
+            top: 90px;
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 4px solid var(--accent);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+        }
+
+        .playbook-nav .nav-link {
+            color: var(--muted);
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: block;
+        }
+
+        .playbook-nav .nav-link:hover {
+            color: var(--ink);
+            background: #f1f5f9;
+        }
+
+        .playbook-nav .nav-link.active {
+            color: var(--ink);
+            background: var(--accent-soft);
+        }
+
+        .standard-card {
+            background: var(--surface);
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid var(--accent);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .standard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .standard-card h2 {
+            font-size: 1.75rem;
+            margin-bottom: 16px;
+            color: var(--accent);
+        }
+
+        .standard-card h3 {
+            font-size: 1.35rem;
+            margin-bottom: 12px;
+            color: var(--ink);
+            margin-top: 20px;
+        }
+
+        .standard-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 8px;
+            margin-top: 12px;
+        }
+
+        .standard-card h5 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        .standard-card ul, .standard-card ol {
+            margin-bottom: 12px;
+            padding-left: 20px;
+        }
+
+        .standard-card li {
+            margin-bottom: 6px;
+            line-height: 1.6;
+        }
+
+        details {
+            margin: 12px 0;
+            padding: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        details summary {
+            font-weight: 600;
+            color: var(--ink);
+            outline: none;
+            padding: 0;
+        }
+
+        details summary:hover {
+            color: var(--accent);
+        }
+
+        details > *:not(summary) {
+            margin-top: 12px;
+        }
+
+        details ul, details ol {
+            margin: 8px 0 0 0;
+        }
+
+        .form-check {
+            margin: 8px 0;
+        }
+
+        .form-check-label {
+            margin-left: 6px;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .page-header .meta {
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin: 4px 0;
+        }
+
+        .page-header .status-line {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 12px;
+            font-style: italic;
+        }
+
+        .content-wrapper {
+            max-width: 900px;
+        }
+
+        .btn,
+        .form-control,
+        .form-select,
+        .playbook-nav .nav-link,
+        .standard-card {
+            transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.16);
+        }
+
+        .alert {
+            margin-bottom: 16px;
+        }
+
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: "Courier New", monospace;
+            font-size: 0.9em;
+            color: #e74c3c;
+        }
+
+        @media (max-width: 1200px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .playbook-nav {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-shell {
+                padding-right: 8px;
+            }
+
+            .playbook-nav {
+                padding: 12px;
+            }
+
+            .standard-card {
+                padding: 16px;
+            }
+
+            .standard-card h2 {
+                font-size: 1.5rem;
+            }
+
+            .page-header {
+                padding: 30px 16px 16px;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-header {
+                padding: 24px 16px 12px;
+            }
+
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .standard-card {
+                padding: 12px;
+                margin-bottom: 16px;
+            }
+
+            .standard-card h3 {
+                font-size: 1.15rem;
+            }
+
+            details {
+                padding: 8px;
+                margin: 8px 0;
+            }
+        }
+
+        .page-footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .notes-toggle {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 3;
+        }
+
+        .notes-drawer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 320px;
+            background: #ffffff;
+            border-left: 1px solid #e2e8f0;
+            box-shadow: -12px 0 24px rgba(15, 23, 42, 0.12);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transform: translateX(100%);
+            transition: transform 0.25s ease;
+            z-index: 2;
+            overflow-y: auto;
+        }
+
+        .standard-card.notes-open {
+            overflow: visible;
+        }
+
+        .standard-card.notes-open .notes-drawer {
+            transform: translateX(0);
+        }
+
+        .standard-card.notes-open .notes-toggle {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .notes-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .notes-header strong {
+            color: var(--ink);
+        }
+
+        .notes-input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .notes-textarea {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px;
+            font-family: "Courier New", monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .notes-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.16);
+        }
+
+        .notes-button-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        .notes-button-group button {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--ink);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .notes-button-group button:hover {
+            background: #f1f5f9;
+            border-color: var(--accent);
+        }
+
+        .notes-button-group button.save {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .notes-button-group button.save:hover {
+            background: #1d4ed8;
+        }
+
+        .export-section {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#playbookSidebar" data-bs-offset="120" tabindex="0">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <span class="navbar-brand fw-semibold">Web Coding Standards &amp; Processes</span>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <button type="button" class="btn btn-outline-light btn-sm" id="exportButton" title="Export page with notes to Word">
+                    Export TXT
+                </button>
+                <a href="index.html" class="text-white-50 text-decoration-none small me-2">Home</a>
+                <span class="text-white-50 small">Draft</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid my-4">
+        <div class="app-shell">
+            <!-- Sticky Table of Contents Sidebar -->
+            <aside class="playbook-nav" id="playbookSidebar">
+                <h6 class="text-uppercase text-muted">On this page</h6>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="#overarching-goals">Overarching Goals</a>
+                    <a class="nav-link" href="#front-end">Front-End</a>
+                    <a class="nav-link" href="#data-tier">Data Tier</a>
+                    <a class="nav-link" href="#data-modeling">Data Modeling</a>
+                    <a class="nav-link" href="#web-code">Web Code</a>
+                    <a class="nav-link" href="#template-solution">Template &amp; Solution</a>
+                    <a class="nav-link" href="#misc">Misc</a>
+                    <a class="nav-link" href="#next-steps">Next Steps &amp; Notes</a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="content-wrapper">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1>Web Coding Standards and Processes</h1>
+                </div>
+
+                <div class="alert alert-warning" role="alert">
+                    <strong>Overview:</strong> This document captures proposed standards and processes to improve development efficiency, sustainability, and team alignment. It is organized as a brainstorming foundation and requires team review and feedback.
+                </div>
+
+                <!-- SECTION 1: Overarching Goals -->
+                <section class="standard-card" id="overarching-goals">
+                    <h2>Overarching Goals</h2>
+                    <p>Foundational principles that guide all subsequent decisions:</p>
+                    <ul>
+                        <li><strong>Efficient development:</strong> Reduce cycle time, minimize re-work, and enable rapid iteration.</li>
+                        <li><strong>Sustainability:</strong> Avoid "foreign land" minefields (hidden technical debt); prevent bolt-on change requests.</li>
+                        <li><strong>Smart customizability:</strong> Total stakeholder consideration; flexible without chaos.</li>
+                        <li><strong>Smart stovepipes:</strong> Clear boundaries between modules; minimize coupling.</li>
+                        <li><strong>AI-generatable:</strong> Codify patterns so tools and teams can generate conformant code.</li>
+                        <li><strong>Increased quantifiability:</strong> Measurable estimates; eased effort planning.</li>
+                        <li><strong>"Juice worth the squeeze":</strong> Value delivered must justify the effort invested.</li>
+                    </ul>
+                    <div class="alert alert-info mt-3" role="alert">
+                        <strong>Intent:</strong> These goals frame every downstream standard. If a standard doesn't serve at least one goal, question it.
+                    </div>
+                </section>
+
+                <!-- SECTION 2: Front-End -->
+                <section class="standard-card" id="front-end">
+                    <h2>Front-End</h2>
+
+                    <h3>site.css Conventions (Component-Level Organization)</h3>
+                    <p>CSS should be organized by component, not by property. Group related elements together:</p>
+                    <ul>
+                        <li><strong>Form elements:</strong> inputs, selects, textareas, labels, validation states.</li>
+                        <li><strong>Cards:</strong> container, header, body, footer, shadow, border states.</li>
+                        <li><strong>Messages:</strong> alerts, toasts, banners; success, info, warning, error variants.</li>
+                        <li><strong>Buttons:</strong> primary, secondary, outlined, disabled, loading states.</li>
+                        <li><strong>Headers:</strong> page title, breadcrumbs, record identity, status chips.</li>
+                        <li><strong>Navigation:</strong> sidebar, tabs, breadcrumbs, pagination.</li>
+                    </ul>
+
+                    <h3>Forms &amp; UX Patterns</h3>
+                    <ul>
+                        <li><strong>Field layout:</strong> Label above input; consistent spacing and alignment.</li>
+                        <li><strong>Validation:</strong> Client-side hints; server validation on submit; clear error messages.</li>
+                        <li><strong>Edit mode options:</strong>
+                            <details>
+                                <summary>Choose wisely (expand to view)</summary>
+                                <ul>
+                                    <li><strong>Modal:</strong> For small, focused edits; interrupts flow; good for confirmations.</li>
+                                    <li><strong>Inline partial:</strong> For quick changes within context; minimal page reload.</li>
+                                    <li><strong>Separate page:</strong> For complex, multi-step edits; auditable journey.</li>
+                                </ul>
+                            </details>
+                        </li>
+                    </ul>
+
+                    <h5>Open Questions</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="feq1">
+                        <label class="form-check-label" for="feq1">Form edit mode strategy decided and documented?</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="feq2">
+                        <label class="form-check-label" for="feq2">Client-side vs server-side validation boundary defined?</label>
+                    </div>
+
+                    <h3>Success/Info/Error Messages</h3>
+                    <p>Consistent messaging improves UX and reduces support burden.</p>
+                    <ul>
+                        <li><strong>Success:</strong> Brief, celebratory; action successful.</li>
+                        <li><strong>Info:</strong> Educational; helps user understand context.</li>
+                        <li><strong>Error:</strong> Specific, actionable; tell user how to fix.</li>
+                        <li><strong>Warning:</strong> Caution or alert; user should read before proceeding.</li>
+                    </ul>
+
+                    <h3>DataTables.js &amp; Site Navigation</h3>
+                    <ul>
+                        <li>Column headers are clickable for sort; indicate current sort direction.</li>
+                        <li>Search is full-text; filters are additive and isolated.</li>
+                        <li>Row selection for bulk actions (export, update, delete).</li>
+                        <li>Pagination keeps performance snappy; default to 10–20 rows per page.</li>
+                    </ul>
+                </section>
+
+                <!-- SECTION 3: Data Tier -->
+                <section class="standard-card" id="data-tier">
+                    <h2>Data Tier</h2>
+
+                    <h3>Data Access Layer (DAL) Rules</h3>
+                    <div class="alert alert-info" role="alert">
+                        <strong>Standard Intent:</strong> <em>All SQL happens in the DAL.</em> This centralizes database logic, eases testing, and simplifies auditing.
+                    </div>
+
+                    <details open>
+                        <summary><strong>Model options</strong></summary>
+                        <ul>
+                            <li><strong>Models for every entity?</strong> Ensures consistency; adds boilerplate. More maintainable long-term.</li>
+                            <li><strong>Models for major entities only?</strong> Faster to ship initially; risk of drift and inconsistency.</li>
+                            <li><strong>MVC-style models for views?</strong> <em>Recommended:</em> Core entities always have models; view-specific models as needed for presentation.</li>
+                        </ul>
+                    </details>
+
+                    <details open>
+                        <summary><strong>Where does SQL live?</strong></summary>
+                        <ul>
+                            <li><strong>All SQL centralized in DAL?</strong> Yes. Easier to audit, test, version, and refactor.</li>
+                            <li><strong>Ad-hoc calls in PageModel acceptable?</strong> No. Hidden dependencies; harder to test; complicates auditing.</li>
+                        </ul>
+                    </details>
+
+                    <details open>
+                        <summary><strong>Full-entity vs partial updates?</strong></summary>
+                        <ul>
+                            <li><strong>Full-entity updates:</strong> Simpler logic; higher versioning (RowVersion) overhead.</li>
+                            <li><strong>Partial/ad-hoc:</strong> More control; risk of orphaned fields.</li>
+                            <li><strong>Recommendation:</strong> DAL provides full-entity methods by default. Partial updates when justified (e.g., high-frequency field changes).</li>
+                        </ul>
+                    </details>
+
+                    <h5>Open Questions</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="dtq1">
+                        <label class="form-check-label" for="dtq1">DAL entity model strategy decided?</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="dtq2">
+                        <label class="form-check-label" for="dtq2">Business logic vs DAL boundaries defined?</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="dtq3">
+                        <label class="form-check-label" for="dtq3">SQL Views vs inline SQL strategy documented?</label>
+                    </div>
+
+                    <h3>Business Logic Placement</h3>
+                    <details open>
+                        <summary><strong>Where does business logic live?</strong></summary>
+                        <ul>
+                            <li><strong>DAL strictly for DB calls?</strong> Clean separation; but business rules end up scattered across PageModel and services.</li>
+                            <li><strong>DAL houses business logic for entity?</strong> <em>Recommended:</em> Entity-specific validation, calculations, and state transitions belong in DAL or a domain service (shared, testable).</li>
+                        </ul>
+                    </details>
+
+                    <h3>Database Helpers &amp; Advanced SQL Server Features</h3>
+                    <ul>
+                        <li><strong>DB call efficiency:</strong> Minimize round-trips; use batch operations for bulk work.</li>
+                        <li><strong>EF guidance:</strong> Use EF for CRUD; stored procs for complex aggregations.</li>
+                        <li><strong>SQL Views:</strong> Denormalize read-heavy queries; keep views indexed and tested.</li>
+                        <li><strong>Stored procs:</strong> For complex multi-step operations, data migrations, or bulk updates. Document purpose and usage.</li>
+                        <li><strong>Functions &amp; Triggers:</strong> Use judiciously; document intent, side effects, and test thoroughly.</li>
+                    </ul>
+                </section>
+
+                <!-- SECTION 4: Data Modeling -->
+                <section class="standard-card" id="data-modeling">
+                    <h2>Data Modeling</h2>
+
+                    <h3>Normalization</h3>
+                    <p>Organize schema to minimize redundancy and enforce consistency:</p>
+                    <ul>
+                        <li><strong>First Normal Form (1NF):</strong> No repeating groups.</li>
+                        <li><strong>Second Normal Form (2NF):</strong> No partial dependencies.</li>
+                        <li><strong>Third Normal Form (3NF):</strong> No transitive dependencies.</li>
+                        <li><strong>Document exceptions:</strong> Justified denormalization with clear rationale (e.g., performance).</li>
+                    </ul>
+
+                    <h3>Audit Logging</h3>
+                    <div class="alert alert-info" role="alert">
+                        <strong>Standard Intent:</strong> <em>Track who changed what, when, and why.</em> This is critical for compliance, debugging, and accountability.
+                    </div>
+                    <ul>
+                        <li><strong>Schema:</strong> Audit table per major entity or centralized audit log.</li>
+                        <li><strong>Implementation:</strong> Use triggers or DAL logic; document chosen approach.</li>
+                    </ul>
+
+                    <h3>Lookup / Enum / Constants / Bits</h3>
+                    <p>Manage reference data consistently:</p>
+                    <ul>
+                        <li><strong>Lookup tables:</strong> For mutable, user-managed values (e.g., department, location, team).</li>
+                        <li><strong>Enums / bits:</strong> For immutable, small sets (e.g., status, permission flags, role).</li>
+                        <li><strong>Code constants:</strong> Map enum values to user-friendly display names in a single, centralized place.</li>
+                        <li><strong>Documentation:</strong> Maintain a data dictionary; explain business meaning of each value.</li>
+                    </ul>
+                </section>
+
+                <!-- SECTION 5: Web Code -->
+                <section class="standard-card" id="web-code">
+                    <h2>Web Code</h2>
+
+                    <h3>Global(-ish) Variables</h3>
+                    <p>Centralize configuration and reduce hidden dependencies:</p>
+                    <ul>
+                        <li><strong>appsettings:</strong> Connection strings, feature flags; environment-specific.</li>
+                        <li><strong>tblGlobalVariables:</strong> Runtime-configurable settings; no code deploy needed for operational changes.</li>
+                        <li><strong>Object-level:</strong> Singleton or DI-injected services; immutable after initialization.</li>
+                    </ul>
+
+                    <h3>Code Comments — Enforceable Standards</h3>
+                    <div class="alert alert-info" role="alert">
+                        <strong>Standard Intent:</strong> <em>Comments should explain intent, not restate code.</em>
+                    </div>
+                    <ul>
+                        <li><strong>Function definitions:</strong> Summarize purpose, key inputs, outputs, exceptions, and any non-obvious behavior.</li>
+                        <li><strong>Versioning notes:</strong> Mark rework, breaking changes, deprecations with date and owner.</li>
+                        <li><strong>CR tracking:</strong> Reference change request ID or ticket; link to decision.</li>
+                        <li><strong>Why over what:</strong> Code shows what; comments explain why (business logic, workarounds, gotchas).</li>
+                    </ul>
+
+                    <h3>Enforceable Guidelines for Code Repetition</h3>
+                    <div class="alert alert-info" role="alert">
+                        <strong>Standard Intent:</strong> <em>DRY (Don't Repeat Yourself) is valuable, but copy-paste to avoid tight coupling is sometimes justified.</em>
+                    </div>
+                    <ul>
+                        <li>If two modules copy-paste the same snippet, that's probably a shared utility candidate.</li>
+                        <li>If one module copy-pastes code from another <strong>and documents which version it copied from</strong>, that relationship is explicit and maintainable.</li>
+                        <li><strong>Never</strong> hide shared code behind complex inheritance or dynamic dispatch that obscures intent.</li>
+                        <li>Document the exception in code comments: why is this duplicated? When should it be consolidated?</li>
+                    </ul>
+                </section>
+
+                <!-- SECTION 6: Template & Solution -->
+                <section class="standard-card" id="template-solution">
+                    <h2>Template &amp; Solution</h2>
+
+                    <h3>Utilities (Expansion &amp; Usage)</h3>
+                    <p>Share common patterns across teams via utility libraries:</p>
+                    <ul>
+                        <li>String formatting, date/time helpers, crypto utilities.</li>
+                        <li>Data validation, masking, normalization functions.</li>
+                        <li>Logging, error handling, retry logic.</li>
+                        <li><strong>Versioning:</strong> Semantic versioning; document breaking changes; notify teams of updates.</li>
+                    </ul>
+
+                    <h3>Third-Party Tools</h3>
+                    <details open>
+                        <summary><strong>In-template tools</strong></summary>
+                        <ul>
+                            <li><strong>DataTables.js:</strong> Table search, sort, filter, paginate.</li>
+                            <li><strong>Bootstrap:</strong> Grid, components, utilities.</li>
+                            <li><strong>HTMX:</strong> Partial page updates without React/Vue; keep it simple.</li>
+                            <li><strong>Chart.js:</strong> Client-side visualization; data from server JSON.</li>
+                        </ul>
+                    </details>
+
+                    <details open>
+                        <summary><strong>Outside-template on APL</strong></summary>
+                        <ul>
+                            <li><strong>Swagger/OpenAPI:</strong> API documentation and client generation.</li>
+                            <li><strong>Entity Framework:</strong> ORM for C# data access.</li>
+                            <li><strong>NUnit / xUnit:</strong> Unit testing framework.</li>
+                            <li><strong>Azure DevOps:</strong> CI/CD, Agile boards, version control.</li>
+                        </ul>
+                    </details>
+
+                    <h3>Site Structure &amp; Asset Placement</h3>
+                    <p>Recommended folder structure for maintainability:</p>
+                    <pre>/Pages
+  /Shared
+    _Layout.cshtml
+    /Partials
+      _SectionCard.cshtml
+      _ValidationSummary.cshtml
+  /Records
+    Index.cshtml
+    Index.cshtml.cs
+    Details.cshtml
+    Details.cshtml.cs
+/ViewComponents
+  RecordHeaderViewComponent.cs
+  StatusBadgeViewComponent.cs
+/TagHelpers
+  StatusChipTagHelper.cs
+/Services
+  IDataAccessLayer.cs
+  RecordService.cs
+/Models
+  Record.cs
+  RecordViewModel.cs
+/wwwroot
+  /js
+    site.js
+  /css
+    site.css</pre>
+                </section>
+
+                <!-- SECTION 7: Misc -->
+                <section class="standard-card" id="misc">
+                    <h2>Misc</h2>
+
+                    <h3>Mock-ups vs Early Drafts</h3>
+                    <p>Clarify expectations before coding begins:</p>
+                    <ul>
+                        <li><strong>Wireframes:</strong> Low-fi, structure and flow; quick iteration; rapid feedback.</li>
+                        <li><strong>Mock-ups:</strong> High-fi visuals; more detail; slower to produce; good for stakeholder alignment.</li>
+                        <li><strong>Early drafts:</strong> Minimal requirements to check-in; document gaps and assumptions explicitly.</li>
+                    </ul>
+
+                    <h3>Data Migration &amp; Revisit Coding Standards</h3>
+                    <ul>
+                        <li>Migrations should be repeatable and safe to run multiple times.</li>
+                        <li>build staging plan on dev; finalize implementation by UAT</li>
+                    </ul>
+
+                    <h3>Lean Development &amp; Customer Expectation Management</h3>
+                    <ul>
+                        <li>Deliver in small, testable increments; gather feedback early and often.</li>
+                        <li>Define MVP upfront; communicate what is <strong>not</strong> included in each release.</li>
+                        <li>Use roadmaps to show future work and manage expectations.</li>
+                        <li><strong>"Done"</strong> means tested, documented, and deployable—not just coded.</li>
+                    </ul>
+
+                    <h3>Team Requirements &amp; Mindset</h3>
+                    <ul>
+                        <li><strong>Champion:</strong> Executive sponsor who unblocks decisions and communicates importance.</li>
+                        <li><strong>Subteams:</strong> Functional groups (Back-End, Front-End, QA, Security) with clear responsibilities.</li>
+                        <li><strong>Review counsel:</strong> Senior engineers and architects; private governance channel for contentious decisions.</li>
+                        <li><strong>Cultural note:</strong> <em>"Standards are great… as long as they are mine."</em> Involve teams in standard-setting to earn buy-in and ownership.</li>
+                    </ul>
+                </section>
+
+                <!-- SECTION 8: Next Steps & Notes -->
+                <section class="standard-card" id="next-steps">
+                    <h2>Next Steps &amp; Notes</h2>
+
+                    <h3>Path Forward</h3>
+                    <ol>
+                        <li><strong>Simmer:</strong> Allow teams to digest this brainstorm and ask questions.</li>
+                        <li><strong>Collect feedback:</strong> Use review counsel and subteam channels to surface concerns.</li>
+                        <li><strong>Define phases + deliverables:</strong>
+                            <ul>
+                                <li><strong>Phase 1:</strong> Design baseline (.NET architecture and folder structure)</li>
+                                <li><strong>Phase 2:</strong> DEV processes and code review culture</li>
+                                <li><strong>Phase 3:</strong> Beta testing strategy (DEV vs UAT)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Assign champions and subteams:</strong> Clear ownership; avoid scattered accountability.</li>
+                        <li><strong>Establish review counsel:</strong> Private channel for vetting proposals and decisions.</li>
+                    </ol>
+                    <h3>Alternative Frameworks</h3>
+                    <p>These standards assume a hybrid Agile/waterfall approach. Consider:</p>
+                    <ul>
+                        <li><strong>Kanban:</strong> Continuous flow; good for ops and maintenance.</li>
+                        <li><strong>Scrum + SAFe:</strong> Scaled agile; suitable for large programs with dependencies.</li>
+                        <li><strong>Lean + CI/CD:</strong> Fast feedback loops; requires high engineering maturity and strong automation.</li>
+                    </ul>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Initialize notes system
+        const initializeNotesSystem = () => {
+            const storageKey = (sectionId) => `section-notes:${sectionId}`;
+
+            const loadNotes = (sectionId) => {
+                try {
+                    const raw = localStorage.getItem(storageKey(sectionId));
+                    return raw ? raw : '';
+                } catch (e) {
+                    return '';
+                }
+            };
+
+            const saveNotes = (sectionId, content) => {
+                try {
+                    localStorage.setItem(storageKey(sectionId), content);
+                } catch (e) {
+                    // Ignore storage errors
+                }
+            };
+
+            // Add notes UI to each section
+            const sections = document.querySelectorAll('.standard-card');
+            sections.forEach((section, index) => {
+                const sectionId = section.id || `section-${index + 1}`;
+                section.id = sectionId;
+
+                // Create notes toggle button
+                const toggle = document.createElement('button');
+                toggle.type = 'button';
+                toggle.className = 'btn btn-sm btn-outline-secondary notes-toggle';
+                toggle.textContent = 'Add Notes';
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.setAttribute('aria-controls', `notes-drawer-${sectionId}`);
+
+                // Create notes drawer
+                const drawer = document.createElement('div');
+                drawer.className = 'notes-drawer';
+                drawer.id = `notes-drawer-${sectionId}`;
+                drawer.setAttribute('role', 'dialog');
+                drawer.setAttribute('aria-label', `Notes for ${sectionId}`);
+
+                const notesHeader = document.createElement('div');
+                notesHeader.className = 'notes-header';
+                const title = document.createElement('strong');
+                title.textContent = 'Section Notes';
+                const closeBtn = document.createElement('button');
+                closeBtn.type = 'button';
+                closeBtn.className = 'btn btn-sm btn-outline-secondary p-0';
+                closeBtn.style.width = '24px';
+                closeBtn.style.height = '24px';
+                closeBtn.textContent = '✕';
+                closeBtn.setAttribute('aria-label', 'Close notes');
+                notesHeader.append(title, closeBtn);
+
+                const inputArea = document.createElement('div');
+                inputArea.className = 'notes-input-area';
+
+                const textarea = document.createElement('textarea');
+                textarea.className = 'notes-textarea';
+                textarea.placeholder = 'Add notes for this section...';
+                textarea.setAttribute('aria-label', `Notes for ${sectionId}`);
+                textarea.value = loadNotes(sectionId);
+
+                const buttonGroup = document.createElement('div');
+                buttonGroup.className = 'notes-button-group';
+
+                const saveBtn = document.createElement('button');
+                saveBtn.type = 'button';
+                saveBtn.className = 'save';
+                saveBtn.textContent = 'Save';
+
+                const clearBtn = document.createElement('button');
+                clearBtn.type = 'button';
+                clearBtn.textContent = 'Clear';
+
+                buttonGroup.append(saveBtn, clearBtn);
+                inputArea.append(textarea, buttonGroup);
+                drawer.append(notesHeader, inputArea);
+                section.append(toggle, drawer);
+
+                // Event listeners
+                toggle.addEventListener('click', () => {
+                    section.classList.toggle('notes-open');
+                    toggle.setAttribute('aria-expanded', section.classList.contains('notes-open') ? 'true' : 'false');
+                    textarea.focus();
+                });
+
+                closeBtn.addEventListener('click', () => {
+                    section.classList.remove('notes-open');
+                    toggle.setAttribute('aria-expanded', 'false');
+                });
+
+                saveBtn.addEventListener('click', () => {
+                    saveNotes(sectionId, textarea.value);
+                    section.classList.remove('notes-open');
+                    toggle.setAttribute('aria-expanded', 'false');
+                });
+
+                clearBtn.addEventListener('click', () => {
+                    if (confirm('Clear all notes for this section?')) {
+                        textarea.value = '';
+                        saveNotes(sectionId, '');
+                    }
+                });
+
+                drawer.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        section.classList.remove('notes-open');
+                        toggle.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            });
+
+            // Export to text file functionality
+            const exportButton = document.getElementById('exportButton');
+            if (exportButton) {
+                exportButton.addEventListener('click', () => exportToText(sections, loadNotes));
+            }
+        };
+
+        // Export function - text format
+        const exportToText = (sections, loadNotes) => {
+            const pageTitle = document.querySelector('.page-header h1')?.textContent || 'Web Coding Standards';
+            const statusLine = document.querySelector('.page-header .status-line')?.textContent || '';
+
+            let textContent = '';
+
+            // Title
+            textContent += pageTitle + '\n';
+            textContent += '='.repeat(pageTitle.length) + '\n\n';
+
+            if (statusLine) {
+                textContent += statusLine + '\n\n';
+            }
+
+            textContent += 'Generated: ' + new Date().toLocaleString() + '\n\n';
+            textContent += '─'.repeat(80) + '\n\n';
+
+            // Sections with notes
+            sections.forEach((section, index) => {
+                const sectionId = section.id;
+                const heading = section.querySelector('h2');
+                const headingText = heading ? heading.textContent : `Section ${index + 1}`;
+
+                textContent += '\n' + headingText + '\n';
+                textContent += '─'.repeat(heading ? heading.textContent.length : 20) + '\n\n';
+
+                // Get section content
+                const contentParts = [];
+                const elements = section.querySelectorAll('h3, h4, h5, p, li, li');
+                elements.forEach(el => {
+                    if (el.textContent.trim()) {
+                        contentParts.push(el.textContent.trim());
+                    }
+                });
+
+                // Limit content to first 1000 chars
+                const contentPreview = contentParts.join('\n').substring(0, 1000);
+                if (contentPreview) {
+                    textContent += contentPreview + '\n\n';
+                }
+
+                // Notes for this section
+                const notes = loadNotes(sectionId);
+                textContent += 'NOTES:\n';
+                textContent += '─'.repeat(5) + '\n';
+                if (notes.trim()) {
+                    textContent += notes + '\n\n';
+                } else {
+                    textContent += '(No notes)\n\n';
+                }
+
+                textContent += '\n';
+            });
+
+            textContent += '─'.repeat(80) + '\n';
+            textContent += 'End of document\n';
+
+            // Create blob and download
+            const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Coding-Standards-${new Date().toISOString().split('T')[0]}.txt`;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        };
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', initializeNotesSystem);
+    </script>
+</body>
+</html>
