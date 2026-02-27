@@ -106,6 +106,49 @@
         update();
     }
 
+    function initMobileNav() {
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+        if (!navToggle || !navMenu) return;
+
+        const toggleMenu = () => {
+            const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
+            navToggle.setAttribute('aria-expanded', !isOpen);
+            navMenu.setAttribute('data-open', !isOpen);
+        };
+
+        const closeMenu = () => {
+            navToggle.setAttribute('aria-expanded', 'false');
+            navMenu.removeAttribute('data-open');
+        };
+
+        navToggle.addEventListener('click', toggleMenu);
+
+        // Close menu when a link is clicked
+        navMenu.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', closeMenu);
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (event) => {
+            const isMenuOpen = navToggle.getAttribute('aria-expanded') === 'true';
+            if (isMenuOpen && !event.target.closest('.nav')) {
+                closeMenu();
+            }
+        });
+
+        // Close menu when window is resized above mobile breakpoint
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (window.innerWidth > 880) {
+                    closeMenu();
+                }
+            }, 100);
+        });
+    }
+
     function initSectionReveal() {
         const revealEls = document.querySelectorAll('.reveal');
         if (!revealEls.length) return;
@@ -312,6 +355,7 @@
     function init() {
         initYear();
         initContactConfiguration();
+        initMobileNav();
         initStickyNav();
         initSectionReveal();
         initCopyToClipboard();
