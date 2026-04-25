@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Penny Stock Ranker – Daily Data-Driven Candidates</title>
+  <meta name="description" content="A daily data-driven penny-stock purchase candidate ranking dashboard. Research and educational use only.">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="penny-stock-ranker.css">
+</head>
+<body>
+
+  <!-- ── Navbar ─────────────────────────────────────────────────────────── -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container-fluid px-3 px-lg-4">
+      <a class="navbar-brand fw-bold" href="/">StrataStack</a>
+      <button class="navbar-toggler" type="button"
+              data-bs-toggle="collapse" data-bs-target="#mainNav"
+              aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto gap-1">
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="projects.html">Projects</a></li>
+          <li class="nav-item"><a class="nav-link" href="chartjs-demo.html">Chart.js Demo</a></li>
+          <li class="nav-item"><a class="nav-link active" href="penny-stock-ranker.html">Penny Stock Ranker</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main ───────────────────────────────────────────────────────────── -->
+  <main class="container py-3">
+
+    <!-- Header -->
+    <div class="psr-header">
+      <h1>📈 Penny Stock Ranker</h1>
+      <p class="subtitle">Daily data-driven penny stock purchase candidates</p>
+      <p class="generated-at" id="generatedAt">Loading…</p>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="label">Top Candidate</div>
+        <div class="value" id="summaryTop">—</div>
+        <div class="sub">Highest ranked today</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Candidates Ranked</div>
+        <div class="value" id="summaryCount">—</div>
+        <div class="sub">Passed all filters</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Average Score</div>
+        <div class="value" id="summaryAvgScore">—</div>
+        <div class="sub">Out of 100</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Highest Rel. Volume</div>
+        <div class="value" id="summaryRvol">—</div>
+        <div class="sub">vs. 20-day average</div>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div>
+        <label for="filterTicker">Ticker</label>
+        <input type="text" id="filterTicker" placeholder="e.g. BBAI" maxlength="10">
+      </div>
+      <div>
+        <label for="filterMinScore">Min Score</label>
+        <input type="number" id="filterMinScore" placeholder="0" min="0" max="100" step="5">
+      </div>
+      <div>
+        <label for="filterConfidence">Confidence</label>
+        <select id="filterConfidence">
+          <option value="">All</option>
+          <option value="Strong Candidate">Strong Candidate</option>
+          <option value="Moderate Candidate">Moderate Candidate</option>
+          <option value="Watch Only">Watch Only</option>
+        </select>
+      </div>
+      <div>
+        <label for="sortBy">Sort By</label>
+        <select id="sortBy">
+          <option value="score">Score</option>
+          <option value="relativeVolume">Relative Volume</option>
+          <option value="percentChange">% Change</option>
+          <option value="rsi">RSI</option>
+          <option value="volume">Volume</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Rankings table -->
+    <div id="tableSection">
+      <div class="table-wrapper">
+        <table class="rankings-table" aria-label="Penny stock rankings">
+          <thead>
+            <tr>
+              <th data-sort="rank" title="Click to sort">Rank <span class="sort-icon">⇅</span></th>
+              <th>Ticker</th>
+              <th data-sort="score" class="sorted" title="Click to sort">Score <span class="sort-icon">↓</span></th>
+              <th>Confidence</th>
+              <th>Price</th>
+              <th data-sort="percentChange" title="Click to sort">% Chg <span class="sort-icon">⇅</span></th>
+              <th data-sort="relativeVolume" title="Click to sort">Rel. Vol <span class="sort-icon">⇅</span></th>
+              <th data-sort="rsi" title="Click to sort">RSI <span class="sort-icon">⇅</span></th>
+              <th>Entry Zone</th>
+              <th>Stop</th>
+              <th>Target</th>
+            </tr>
+          </thead>
+          <tbody id="rankingsBody">
+            <!-- Populated by penny-stock-ranker.js -->
+          </tbody>
+        </table>
+      </div>
+      <p class="text-muted" style="font-size:0.75rem; margin-top:-0.5rem; padding: 0 0.25rem">
+        Click any row to expand metrics, score breakdown, and justification.
+      </p>
+    </div>
+
+    <!-- Empty / error state -->
+    <div id="emptyState" style="display:none">
+      <div class="state-card">
+        <div class="state-icon">📭</div>
+        <p>No candidates match the current filters.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────── -->
+  <footer class="psr-footer">
+    <p>For research and educational use only. Not financial advice. Verify all data before trading.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="penny-stock-ranker.js"></script>
+</body>
+</html>

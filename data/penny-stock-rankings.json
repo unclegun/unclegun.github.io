@@ -1,0 +1,221 @@
+{
+  "generatedAt": "2026-04-25T00:00:00Z",
+  "sourceNote": "Generated from free delayed/public market data via Stooq / Yahoo Finance. Data may be delayed 15–60 minutes. For research and educational use only.",
+  "qualifiedCount": 5,
+  "skippedCount": 0,
+  "rankings": [
+    {
+      "rank": 1,
+      "ticker": "BBAI",
+      "companyName": "BigBear.ai Holdings",
+      "score": 82.3,
+      "confidence": "Strong Candidate",
+      "latestPrice": 1.87,
+      "previousClose": 1.71,
+      "percentChange": 9.36,
+      "fiveDayChange": 16.2,
+      "twentyDayChange": 28.4,
+      "volume": 18400000,
+      "averageVolume": 4100000,
+      "relativeVolume": 4.49,
+      "rsi": 63.1,
+      "sma5": 1.75,
+      "sma20": 1.58,
+      "volatility": 0.094,
+      "entryZone": { "low": 1.83, "high": 1.91 },
+      "stopLoss": 1.78,
+      "target": 1.96,
+      "scores": {
+        "volume": 30.0,
+        "momentum": 22.0,
+        "trend": 20.0,
+        "liquidity": 11.0,
+        "rsi": 10.0,
+        "riskAdjustment": -10.7,
+        "total": 82.3
+      },
+      "justification": [
+        "Relative volume is 4.49x average, indicating very strong market interest.",
+        "Strong 5-day momentum of +16.2%.",
+        "Sustained 20-day uptrend of +28.4%.",
+        "Short-term and 20-day momentum are both positive.",
+        "Price is trading above both the 5-day and 20-day moving averages.",
+        "5-day MA is above 20-day MA (bullish alignment).",
+        "Average daily volume is 4,100,000 shares, indicating adequate liquidity.",
+        "RSI of 63.1 is in a healthy momentum zone (50–70)."
+      ],
+      "warnings": [
+        "Above-average volatility (9.40%); position-size carefully.",
+        "Free data may be delayed by 15–60 minutes."
+      ]
+    },
+    {
+      "rank": 2,
+      "ticker": "KULR",
+      "companyName": "KULR Technology Group",
+      "score": 74.8,
+      "confidence": "Strong Candidate",
+      "latestPrice": 2.14,
+      "previousClose": 2.02,
+      "percentChange": 5.94,
+      "fiveDayChange": 11.4,
+      "twentyDayChange": 19.7,
+      "volume": 9600000,
+      "averageVolume": 3200000,
+      "relativeVolume": 3.0,
+      "rsi": 58.7,
+      "sma5": 2.05,
+      "sma20": 1.91,
+      "volatility": 0.081,
+      "entryZone": { "low": 2.10, "high": 2.18 },
+      "stopLoss": 2.04,
+      "target": 2.24,
+      "scores": {
+        "volume": 22.0,
+        "momentum": 17.0,
+        "trend": 20.0,
+        "liquidity": 11.0,
+        "rsi": 10.0,
+        "riskAdjustment": -5.2,
+        "total": 74.8
+      },
+      "justification": [
+        "Relative volume is 3.00x average, indicating above-average market activity.",
+        "Strong single-day price gain of +5.94%.",
+        "Positive 5-day price trend of +11.4%.",
+        "Positive 20-day trend of +19.7%.",
+        "Short-term and 20-day momentum are both positive.",
+        "Price is trading above both the 5-day and 20-day moving averages.",
+        "5-day MA is above 20-day MA (bullish alignment).",
+        "Average daily volume is 3,200,000 shares, indicating adequate liquidity.",
+        "RSI of 58.7 is in a healthy momentum zone (50–70)."
+      ],
+      "warnings": [
+        "Free data may be delayed by 15–60 minutes."
+      ]
+    },
+    {
+      "rank": 3,
+      "ticker": "MVIS",
+      "companyName": "MicroVision Inc.",
+      "score": 61.5,
+      "confidence": "Moderate Candidate",
+      "latestPrice": 1.33,
+      "previousClose": 1.29,
+      "percentChange": 3.1,
+      "fiveDayChange": 6.4,
+      "twentyDayChange": 10.2,
+      "volume": 5100000,
+      "averageVolume": 2800000,
+      "relativeVolume": 1.82,
+      "rsi": 54.3,
+      "sma5": 1.29,
+      "sma20": 1.23,
+      "volatility": 0.072,
+      "entryZone": { "low": 1.30, "high": 1.36 },
+      "stopLoss": 1.27,
+      "target": 1.39,
+      "scores": {
+        "volume": 14.0,
+        "momentum": 12.0,
+        "trend": 20.0,
+        "liquidity": 11.0,
+        "rsi": 10.0,
+        "riskAdjustment": -5.5,
+        "total": 61.5
+      },
+      "justification": [
+        "Relative volume is 1.82x average; moderate elevated interest.",
+        "Positive 5-day price trend of +6.4%.",
+        "Positive 20-day trend of +10.2%.",
+        "Short-term and 20-day momentum are both positive.",
+        "Price is trading above both the 5-day and 20-day moving averages.",
+        "5-day MA is above 20-day MA (bullish alignment).",
+        "Average daily volume is 2,800,000 shares, indicating adequate liquidity.",
+        "RSI of 54.3 is in a healthy momentum zone (50–70)."
+      ],
+      "warnings": [
+        "Free data may be delayed by 15–60 minutes."
+      ]
+    },
+    {
+      "rank": 4,
+      "ticker": "CLOV",
+      "companyName": "Clover Health Investments",
+      "score": 51.2,
+      "confidence": "Moderate Candidate",
+      "latestPrice": 0.97,
+      "previousClose": 0.94,
+      "percentChange": 3.19,
+      "fiveDayChange": 4.3,
+      "twentyDayChange": 6.5,
+      "volume": 3200000,
+      "averageVolume": 2100000,
+      "relativeVolume": 1.52,
+      "rsi": 49.8,
+      "sma5": 0.93,
+      "sma20": 0.91,
+      "volatility": 0.068,
+      "entryZone": { "low": 0.95, "high": 0.99 },
+      "stopLoss": 0.93,
+      "target": 1.01,
+      "scores": {
+        "volume": 14.0,
+        "momentum": 8.0,
+        "trend": 20.0,
+        "liquidity": 7.0,
+        "rsi": 6.0,
+        "riskAdjustment": -3.8,
+        "total": 51.2
+      },
+      "justification": [
+        "Relative volume is 1.52x average; moderate elevated interest.",
+        "Price is trading above both the 5-day and 20-day moving averages.",
+        "5-day MA is above 20-day MA (bullish alignment).",
+        "Average daily volume is 2,100,000 shares, indicating adequate liquidity."
+      ],
+      "warnings": [
+        "Free data may be delayed by 15–60 minutes."
+      ]
+    },
+    {
+      "rank": 5,
+      "ticker": "ZOM",
+      "companyName": "Zomedica Corp.",
+      "score": 38.1,
+      "confidence": "Watch Only",
+      "latestPrice": 0.64,
+      "previousClose": 0.66,
+      "percentChange": -3.03,
+      "fiveDayChange": -1.5,
+      "twentyDayChange": 2.1,
+      "volume": 1800000,
+      "averageVolume": 1600000,
+      "relativeVolume": 1.13,
+      "rsi": 42.1,
+      "sma5": 0.67,
+      "sma20": 0.63,
+      "volatility": 0.059,
+      "entryZone": { "low": 0.62, "high": 0.65 },
+      "stopLoss": 0.61,
+      "target": 0.67,
+      "scores": {
+        "volume": 7.0,
+        "momentum": -2.0,
+        "trend": 8.0,
+        "liquidity": 7.0,
+        "rsi": 6.0,
+        "riskAdjustment": 12.1,
+        "total": 38.1
+      },
+      "justification": [
+        "Price is above the 20-day moving average.",
+        "Average daily volume is 1,600,000 shares, indicating adequate liquidity."
+      ],
+      "warnings": [
+        "Volume (1.13x avg) is near average; no unusual interest detected.",
+        "Free data may be delayed by 15–60 minutes."
+      ]
+    }
+  ]
+}
