@@ -9,3 +9,8 @@ blog-posts/.obsidian/plugins/templater-obsidian/data.json
 blog-posts/.obsidian/plugins/templater-obsidian/main.js
 blog-posts/.obsidian/plugins/templater-obsidian/manifest.json
 blog-posts/.obsidian/plugins/templater-obsidian/styles.css
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
