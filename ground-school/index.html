@@ -7,6 +7,10 @@
     <meta name="description" content="A self-paced Private Pilot Ground School course guide with a 52-week plan, progress tracking, daily study guidance, and original practice questions.">
     <link rel="stylesheet" href="ground-school.css">
     <style>
+        :root {
+            --nav-offset: 96px;
+        }
+
         body {
             background:
                 radial-gradient(circle at top, rgba(117, 165, 203, 0.22), transparent 34%),
@@ -14,8 +18,16 @@
         }
 
         header {
+            position: sticky;
+            top: 0;
+            z-index: 120;
             background: rgba(238, 244, 248, 0.82);
             border-bottom-color: rgba(22, 62, 87, 0.12);
+        }
+
+        section,
+        main {
+            scroll-margin-top: var(--nav-offset);
         }
 
         .brand {
@@ -335,7 +347,6 @@
         .calendar-legend,
         .toolbar,
         .quiz-toolbar,
-        .data-tools,
         .status-inline {
             display: flex;
             flex-wrap: wrap;
@@ -353,45 +364,174 @@
 
         .calendar-grid {
             display: grid;
+            gap: 14px;
+        }
+
+        .calendar-month {
+            border: 1px solid #dde6ef;
+            border-radius: 14px;
+            padding: 14px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(242, 247, 251, 0.9));
+        }
+
+        .calendar-month-head {
+            display: flex;
+            justify-content: space-between;
             gap: 10px;
-        }
-
-        .calendar-week {
-            display: grid;
-            grid-template-columns: 92px repeat(7, minmax(0, 1fr)) 90px;
-            gap: 8px;
             align-items: center;
+            margin-bottom: 10px;
         }
 
-        .calendar-week small {
+        .calendar-month h3,
+        .phase-summary h3 {
+            margin: 0;
+        }
+
+        .calendar-month-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-size: 12px;
             color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
         }
 
-        .day-cell {
+        .calendar-cell {
             border: 1px solid transparent;
             border-radius: 12px;
-            min-height: 48px;
-            padding: 8px;
+            min-height: 52px;
+            padding: 6px;
             font: inherit;
             font-weight: 700;
             color: var(--ink);
             background: #edf2f6;
             cursor: pointer;
+            display: grid;
+            place-items: center;
+            gap: 2px;
         }
 
-        .day-cell[data-status="completed"] {
+        .calendar-cell .cell-day {
+            font-size: 11px;
+            opacity: 0.75;
+        }
+
+        .calendar-cell .cell-icon {
+            font-size: 17px;
+            line-height: 1;
+        }
+
+        .calendar-cell[data-status="completed"] {
             background: #dcefe3;
             color: #174c2b;
         }
 
-        .day-cell[data-status="missed"] {
+        .calendar-cell[data-status="missed"] {
             background: #f8e1de;
             color: #7a3027;
         }
 
-        .day-cell[data-status="review"] {
+        .calendar-cell[data-status="review"] {
             background: #e3edf8;
             color: #163e57;
+        }
+
+        .calendar-cell[data-status="not-started"] {
+            color: #5c7186;
+        }
+
+        .phase-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .phase-panel {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid #dde6ef;
+            overflow: hidden;
+        }
+
+        .phase-summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .phase-summary::-webkit-details-marker,
+        .week-summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .phase-summary:hover {
+            background: rgba(233, 238, 246, 0.45);
+        }
+
+        .phase-content {
+            padding: 0 16px 16px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .phase-week-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .week-mini {
+            border: 1px solid #dde6ef;
+            border-radius: 12px;
+            background: #f8fbfd;
+            overflow: hidden;
+        }
+
+        .week-mini summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 12px;
+            display: grid;
+            gap: 6px;
+        }
+
+        .week-mini summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .week-mini-content {
+            padding: 0 12px 12px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .study-checklist {
+            display: grid;
+            gap: 10px;
+        }
+
+        .study-checklist label {
+            display: flex;
+            gap: 10px;
+            align-items: start;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .mnemonic-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
         }
 
         .day-cell:focus-visible,
@@ -477,7 +617,6 @@
             margin-bottom: 10px;
         }
 
-        .data-tools .btn,
         .quiz-toolbar .btn,
         .toolbar .btn {
             margin-top: 0;
@@ -515,8 +654,20 @@
                 grid-template-columns: 1fr;
             }
 
-            .calendar-week {
+            .phase-week-grid,
+            .mnemonic-grid,
+            .calendar-month-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .calendar-weekday {
+                display: none;
+            }
+
+            .calendar-cell {
+                grid-template-columns: 20px auto;
+                place-items: center start;
+                padding-inline: 10px;
             }
 
             .review-questions {
@@ -528,11 +679,11 @@
             header,
             .cta,
             .quiz-toolbar,
-            .data-tools,
             #quiz,
             #calendar,
             #today-plan,
-            #readiness {
+            #readiness,
+            #study-toolkit {
                 display: none !important;
             }
 
@@ -580,7 +731,9 @@
                     <a href="#dashboard">Overview</a>
                     <a href="#today-plan">Tonight</a>
                     <a href="#schedule">Schedule</a>
+                    <a href="#calendar">Calendar</a>
                     <a href="#quiz">Quiz</a>
+                    <a href="#study-toolkit">Toolkit</a>
                     <a href="#readiness">Readiness</a>
                 </nav>
             </div>
@@ -686,15 +839,15 @@
             <div class="container">
                 <div class="section-head">
                     <div>
-                        <h2>52-Week Course Schedule</h2>
-                        <p class="muted">Each week includes book-topic guidance, daily study breakdowns, and editable notes.</p>
+                        <h2>Phase-Based Course Schedule</h2>
+                        <p class="muted">The 52-week plan is grouped by training phase. Open only the phase you are actively flying through.</p>
                     </div>
                     <div class="toolbar">
-                        <button class="btn secondary" id="jumpCurrentWeek" type="button">Jump to Current Week</button>
+                        <button class="btn secondary" id="jumpCurrentWeek" type="button">Open Current Week</button>
                         <span class="muted" id="scheduleSummary"></span>
                     </div>
                 </div>
-                <div class="stack" id="scheduleList"></div>
+                <div class="phase-list" id="scheduleList"></div>
             </div>
         </section>
 
@@ -702,17 +855,17 @@
             <div class="container">
                 <div class="section-head">
                     <div>
-                        <h2>Calendar Completion View</h2>
-                        <p class="muted">Click each study day to cycle through status states and keep the momentum visible.</p>
+                        <h2>Condensed Study Calendar</h2>
+                        <p class="muted">A compact 13-block calendar (4 weeks each). Click a cell to cycle status and keep momentum visible.</p>
                     </div>
                 </div>
                 <div class="calendar-shell">
                     <div class="panel reveal">
                         <div class="calendar-legend" aria-label="Calendar status legend">
-                            <span class="badge">Not started</span>
-                            <span class="badge" style="background:#dcefe3;color:#174c2b;">Completed</span>
-                            <span class="badge" style="background:#f8e1de;color:#7a3027;">Missed</span>
-                            <span class="badge" style="background:#e3edf8;color:#163e57;">Review day</span>
+                            <span class="badge">&#9711; Not started</span>
+                            <span class="badge" style="background:#dcefe3;color:#174c2b;">&#10003; Completed</span>
+                            <span class="badge" style="background:#f8e1de;color:#7a3027;">&#10005; Missed</span>
+                            <span class="badge" style="background:#e3edf8;color:#163e57;">&#8635; Review day</span>
                         </div>
                         <div class="calendar-grid" id="calendarGrid" style="margin-top: 18px;"></div>
                     </div>
@@ -723,6 +876,52 @@
                                 <p class="muted">Weekly completion, current streak, and longest streak update automatically.</p>
                             </div>
                             <div id="calendarStats" class="calendar-stats"></div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <section id="study-toolkit">
+            <div class="container">
+                <div class="section-head">
+                    <div>
+                        <h2>Study Toolkit</h2>
+                        <p class="muted">Practical tools to turn weak areas into repeatable daily actions.</p>
+                    </div>
+                </div>
+                <div class="review-layout">
+                    <article class="panel reveal">
+                        <div class="stack">
+                            <div class="helper-card">
+                                <div class="mini-label">Weekly Focus Checklist</div>
+                                <div id="studyChecklist" class="study-checklist"></div>
+                            </div>
+                            <div class="helper-card">
+                                <div class="mini-label">15-Minute Weak-Area Drill</div>
+                                <p class="muted fine-print" id="weakAreaDrill">Generate a drill plan based on your current subject and weak quiz areas.</p>
+                                <button class="btn secondary" id="generateDrillPlan" type="button">Generate Drill Plan</button>
+                            </div>
+                            <div class="helper-card">
+                                <div class="mini-label">Flashcard Prompt Pack</div>
+                                <div id="flashcardPrompts" class="stack-sm"></div>
+                            </div>
+                        </div>
+                    </article>
+                    <aside class="status-panel reveal">
+                        <div class="stack">
+                            <div>
+                                <h3>Core Mnemonics</h3>
+                                <p class="muted">Quick memory anchors for planning, risk, and emergency scanning.</p>
+                            </div>
+                            <div class="mnemonic-grid">
+                                <div class="helper-card"><strong>IMSAFE</strong><p class="muted fine-print">Illness, Medication, Stress, Alcohol, Fatigue, Eating/Emotion</p></div>
+                                <div class="helper-card"><strong>PAVE</strong><p class="muted fine-print">Pilot, Aircraft, enVironment, External pressures</p></div>
+                                <div class="helper-card"><strong>ARROW</strong><p class="muted fine-print">Airworthiness, Registration, Radio, Operating limits, Weight and balance</p></div>
+                                <div class="helper-card"><strong>AVEF</strong><p class="muted fine-print">Lost comm route: Assigned, Vectored, Expected, Filed</p></div>
+                                <div class="helper-card"><strong>MEA</strong><p class="muted fine-print">Lost comm altitude: Maximum, Expected, Assigned</p></div>
+                                <div class="helper-card"><strong>CIGAR</strong><p class="muted fine-print">Pre-start flow: Controls, Instruments, Gas, Attitude, Run-up</p></div>
+                            </div>
                         </div>
                     </aside>
                 </div>
@@ -870,26 +1069,6 @@
             </div>
         </section>
 
-        <section id="data-tools">
-            <div class="container">
-                <div class="section-head">
-                    <div>
-                        <h2>Data Tools</h2>
-                        <p class="muted">Export, import, reset, or print the course plan without leaving the page.</p>
-                    </div>
-                </div>
-                <div class="panel reveal">
-                    <div class="data-tools">
-                        <button class="btn secondary" id="exportProgress" type="button">Export Progress JSON</button>
-                        <button class="btn secondary" id="importProgress" type="button">Import Progress JSON</button>
-                        <button class="btn secondary" id="printPlan" type="button">Print Course Plan</button>
-                        <button class="btn primary" id="resetProgress" type="button">Reset Progress</button>
-                    </div>
-                    <input id="importFile" class="sr-only" type="file" accept="application/json">
-                    <p class="muted fine-print" id="dataToolStatus" style="margin-top: 14px;">All progress is stored in localStorage with the prefix <strong>privatePilotGroundSchool.</strong></p>
-                </div>
-            </div>
-        </section>
     </main>
 
     <footer>

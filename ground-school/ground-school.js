@@ -2,6 +2,15 @@ const STORAGE_PREFIX = 'privatePilotGroundSchool.';
 const TOTAL_WEEKS = 52;
 const STUDY_DAYS_PER_WEEK = 6;
 const DAY_LABELS = ['Study Day 1', 'Study Day 2', 'Study Day 3', 'Study Day 4', 'Study Day 5', 'Study Day 6', 'Review Day'];
+const CALENDAR_BLOCK_WEEKS = 4;
+const TOOLKIT_CHECKLIST = [
+    'Complete at least 4 focused study sessions this week.',
+    'Run one 10+ question quiz in your weakest subject.',
+    'Write two flashcards from missed questions.',
+    'Explain one topic out loud without notes.',
+    'Review one weather product (METAR/TAF) daily.',
+    'Do one risk-management scenario using PAVE + IMSAFE.'
+];
 
 const subjectKeywordMap = [
     ['certification', 'Pilot Certification'],
@@ -864,6 +873,9 @@ const GroundSchoolStore = {
                 missedQuestionIds: [],
                 practiceExamScore: null
             },
+            toolkit: {
+                checklist: {}
+            },
             ui: {
                 selectedReviewWeek: 1,
                 selectedSubject: 'All Subjects'
@@ -905,6 +917,11 @@ const GroundSchoolStore = {
                 subjectStats: partial.quiz?.subjectStats || {},
                 missedQuestionIds: Array.isArray(partial.quiz?.missedQuestionIds) ? partial.quiz.missedQuestionIds : [],
                 practiceExamScore: typeof partial.quiz?.practiceExamScore === 'number' ? partial.quiz.practiceExamScore : null
+            },
+            toolkit: {
+                ...defaults.toolkit,
+                ...(partial.toolkit || {}),
+                checklist: partial.toolkit?.checklist || {}
             },
             ui: {
                 ...defaults.ui,
@@ -1302,6 +1319,7 @@ const RenderService = {
         this.renderCalendar(state);
         this.renderQuiz(state);
         this.renderWeeklyReview(state);
+        this.renderStudyToolkit(state);
         this.renderReadiness(state);
         this.renderFooterYear();
     },
@@ -1391,73 +1409,71 @@ const RenderService = {
         const currentWeek = ProgressService.getCurrentWeek(state);
         document.getElementById('scheduleSummary').textContent = `Current week: ${currentWeek} of ${TOTAL_WEEKS}`;
 
-        document.getElementById('scheduleList').innerHTML = schedule.map((week) => {
-            const completion = ScheduleService.getWeekProgress(state, week.weekNumber);
-            const note = state.weeks[week.weekNumber]?.notes || '';
-            const checked = ProgressService.isWeekComplete(state, week.weekNumber) ? 'checked' : '';
-            const open = week.weekNumber === currentWeek ? 'open' : '';
+        const phaseGroups = [];
+        schedule.forEach((week) => {
+            const currentPhase = phaseGroups[phaseGroups.length - 1];
+            if (!currentPhase || currentPhase.name !== week.phaseName) {
+                phaseGroups.push({ name: week.phaseName, weeks: [week] });
+            } else {
+                currentPhase.weeks.push(week);
+            }
+        });
+
+        document.getElementById('scheduleList').innerHTML = phaseGroups.map((phase, phaseIndex) => {
+            const firstWeek = phase.weeks[0].weekNumber;
+            const lastWeek = phase.weeks[phase.weeks.length - 1].weekNumber;
+            const isCurrentPhase = currentWeek >= firstWeek && currentWeek <= lastWeek;
+            const completedInPhase = phase.weeks.filter((week) => ProgressService.isWeekComplete(state, week.weekNumber)).length;
+            const phaseProgress = Math.round((completedInPhase / phase.weeks.length) * 100);
 
             return `
-                <details class="week-panel reveal is-visible" id="week-${week.weekNumber}" ${open}>
-                    <summary class="week-summary">
+                <details class="phase-panel reveal is-visible" id="phase-${phaseIndex + 1}" ${isCurrentPhase ? 'open' : ''}>
+                    <summary class="phase-summary">
                         <div>
-                            <h3>Week ${week.weekNumber}: ${week.mainSubject}</h3>
-                            <p class="muted">${week.phaseName}</p>
+                            <h3>${phase.name}</h3>
+                            <p class="muted fine-print">Weeks ${firstWeek}-${lastWeek} · ${completedInPhase}/${phase.weeks.length} weeks complete</p>
                         </div>
                         <div class="week-status">
-                            <span class="badge">${completion}% complete</span>
-                            <span class="badge">${week.estimatedHours} hrs</span>
+                            <span class="badge">${phaseProgress}%</span>
+                            <span class="badge">${phase.weeks.length} weeks</span>
                         </div>
                     </summary>
-                    <div class="week-content">
-                        <div class="week-topline">
-                            <div class="helper-card">
-                                <div class="mini-label">Main subject</div>
-                                <strong>${week.mainSubject}</strong>
-                            </div>
-                            <div class="helper-card">
-                                <div class="mini-label">PHAK topic</div>
-                                <strong>${week.phakTopic}</strong>
-                            </div>
-                            <div class="helper-card">
-                                <div class="mini-label">Jeppesen topic</div>
-                                <strong>${week.jeppTopic}</strong>
-                            </div>
-                        </div>
-                        <div class="field-grid">
-                            <div class="helper-card">
-                                <div class="mini-label">Weekly objective</div>
-                                <p class="muted fine-print">${week.objective}</p>
-                            </div>
-                            <div class="helper-card">
-                                <div class="mini-label">Key terms</div>
-                                <p class="muted fine-print">${week.keyTerms.join(', ')}</p>
-                            </div>
-                        </div>
-                        <div>
-                            <h4>Daily study breakdown</h4>
-                            <div class="day-list">
-                                ${week.dailyBreakdown.map((day) => `
-                                    <div class="day-row">
-                                        <strong>${day.label}: ${day.topic}</strong>
-                                        <div class="muted fine-print">Reading: ${day.readingTask}</div>
-                                        <div class="muted fine-print">Review: ${day.reviewTask}</div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        <div class="field-grid">
-                            <label>
-                                <span>Week ${week.weekNumber} notes</span>
-                                <textarea data-week-notes="${week.weekNumber}" placeholder="Add notes, mnemonics, weak spots, or edition-specific page references.">${note}</textarea>
-                            </label>
-                            <label class="helper-card" style="align-content:start;">
-                                <span>Completion</span>
-                                <span class="status-inline">
-                                    <input type="checkbox" data-week-complete="${week.weekNumber}" ${checked}>
-                                    <span class="muted fine-print">Mark this week complete when the readings and review are closed out.</span>
-                                </span>
-                            </label>
+                    <div class="phase-content">
+                        <div class="phase-week-grid">
+                            ${phase.weeks.map((week) => {
+                                const completion = ScheduleService.getWeekProgress(state, week.weekNumber);
+                                const note = state.weeks[week.weekNumber]?.notes || '';
+                                const checked = ProgressService.isWeekComplete(state, week.weekNumber) ? 'checked' : '';
+                                const open = week.weekNumber === currentWeek ? 'open' : '';
+
+                                return `
+                                    <details class="week-mini" id="week-${week.weekNumber}" ${open}>
+                                        <summary>
+                                            <strong>Week ${week.weekNumber}: ${week.mainSubject}</strong>
+                                            <span class="muted fine-print">${completion}% complete · ${week.estimatedHours} hrs</span>
+                                        </summary>
+                                        <div class="week-mini-content">
+                                            <div class="helper-card">
+                                                <div class="mini-label">Objective</div>
+                                                <p class="muted fine-print">${week.objective}</p>
+                                            </div>
+                                            <div class="helper-card">
+                                                <div class="mini-label">Reading focus</div>
+                                                <p class="muted fine-print">PHAK: ${week.phakTopic}</p>
+                                                <p class="muted fine-print">Jeppesen: ${week.jeppTopic}</p>
+                                            </div>
+                                            <label>
+                                                <span>Week ${week.weekNumber} notes</span>
+                                                <textarea data-week-notes="${week.weekNumber}" placeholder="Key takeaways and weak spots.">${note}</textarea>
+                                            </label>
+                                            <label class="status-inline">
+                                                <input type="checkbox" data-week-complete="${week.weekNumber}" ${checked}>
+                                                <span class="muted fine-print">Mark week complete.</span>
+                                            </label>
+                                        </div>
+                                    </details>
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                 </details>
@@ -1467,30 +1483,60 @@ const RenderService = {
 
     renderCalendar(state) {
         const streaks = CalendarService.getStreaks(state);
-        document.getElementById('calendarGrid').innerHTML = Array.from({ length: TOTAL_WEEKS }, (_, offset) => {
-            const weekNumber = offset + 1;
+        const statusIcon = {
+            'not-started': '&#9711;',
+            completed: '&#10003;',
+            missed: '&#10005;',
+            review: '&#8635;'
+        };
+
+        const blockCount = Math.ceil(TOTAL_WEEKS / CALENDAR_BLOCK_WEEKS);
+        document.getElementById('calendarGrid').innerHTML = Array.from({ length: blockCount }, (_, blockOffset) => {
+            const startWeek = (blockOffset * CALENDAR_BLOCK_WEEKS) + 1;
+            const endWeek = Math.min(TOTAL_WEEKS, startWeek + CALENDAR_BLOCK_WEEKS - 1);
+            const blockDays = [];
+
+            for (let week = startWeek; week <= endWeek; week += 1) {
+                for (let day = 1; day <= 7; day += 1) {
+                    blockDays.push({
+                        week,
+                        day,
+                        status: ScheduleService.getDayStatus(state, week, day),
+                        label: DAY_LABELS[day - 1]
+                    });
+                }
+            }
+
+            const blockCompleted = blockDays.filter((entry) => entry.status === 'completed').length;
+            const blockProgress = Math.round((blockCompleted / blockDays.length) * 100);
+
             return `
-                <div class="calendar-week">
-                    <div>
-                        <strong>Week ${weekNumber}</strong>
-                        <small>${ScheduleService.getWeek(weekNumber).mainSubject}</small>
+                <article class="calendar-month">
+                    <div class="calendar-month-head">
+                        <div>
+                            <h3>Study Block ${blockOffset + 1}</h3>
+                            <p class="muted fine-print">Weeks ${startWeek}-${endWeek}</p>
+                        </div>
+                        <span class="badge">${blockProgress}% complete</span>
                     </div>
-                    ${Array.from({ length: 7 }, (_, dayOffset) => {
-                        const day = dayOffset + 1;
-                        const status = ScheduleService.getDayStatus(state, weekNumber, day);
-                        return `
+                    <div class="calendar-month-grid" role="grid" aria-label="Weeks ${startWeek} to ${endWeek}">
+                        ${DAY_LABELS.map((label) => `<div class="calendar-weekday">${label.replace('Study ', 'S')}</div>`).join('')}
+                        ${blockDays.map((entry) => `
                             <button
                                 type="button"
-                                class="day-cell"
-                                data-week="${weekNumber}"
-                                data-day="${day}"
-                                data-status="${status}"
-                                aria-label="Week ${weekNumber}, ${DAY_LABELS[dayOffset]}, status ${this.labelize(status)}"
-                            >${day}</button>
-                        `;
-                    }).join('')}
-                    <div class="muted fine-print">${ScheduleService.getWeekProgress(state, weekNumber)}%</div>
-                </div>
+                                class="calendar-cell"
+                                data-week="${entry.week}"
+                                data-day="${entry.day}"
+                                data-status="${entry.status}"
+                                aria-label="Week ${entry.week}, ${entry.label}, status ${this.labelize(entry.status)}"
+                                title="Week ${entry.week}, ${entry.label}: ${this.labelize(entry.status)}"
+                            >
+                                <span class="cell-icon">${statusIcon[entry.status] || statusIcon['not-started']}</span>
+                                <span class="cell-day">W${entry.week}D${entry.day}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </article>
             `;
         }).join('');
 
@@ -1601,6 +1647,29 @@ const RenderService = {
                 `).join('') : '<div class="helper-card"><p class="muted fine-print">Subject accuracy appears after your first quiz.</p></div>'}
             </div>
         `;
+    },
+
+    renderStudyToolkit(state) {
+        const metrics = ProgressService.getMetrics(state);
+        const weakSubjects = ProgressService.getWeakSubjects(state).slice(0, 3).map((entry) => entry.subject);
+        const checklist = state.toolkit?.checklist || {};
+        const currentWeekPlan = ScheduleService.getWeek(metrics.currentWeek);
+
+        document.getElementById('studyChecklist').innerHTML = TOOLKIT_CHECKLIST.map((item, index) => {
+            const key = `item-${index + 1}`;
+            const checked = checklist[key] ? 'checked' : '';
+            return `<label><input type="checkbox" data-toolkit-check="${key}" ${checked}> <span>${item}</span></label>`;
+        }).join('');
+
+        const flashcards = currentWeekPlan.keyTerms.slice(0, 5).map((term) =>
+            `<div class="helper-card"><strong>${term}</strong><p class="muted fine-print">Explain this term from memory, then give one real cockpit example.</p></div>`
+        );
+        document.getElementById('flashcardPrompts').innerHTML = flashcards.join('');
+
+        const weakAreaText = weakSubjects.length
+            ? `Top weak subjects: ${weakSubjects.join(', ')}. Drill these first before starting a new topic.`
+            : `No weak subjects identified yet. Run two quizzes this week to build a better signal.`;
+        document.getElementById('weakAreaDrill').textContent = weakAreaText;
     },
 
     renderWeeklyReview(state) {
@@ -1757,12 +1826,36 @@ const App = {
         });
 
         document.getElementById('calendarGrid').addEventListener('click', (event) => {
-            const button = event.target.closest('.day-cell');
+            const button = event.target.closest('[data-week][data-day]');
             if (!button) {
                 return;
             }
             CalendarService.toggleDayStatus(Number(button.dataset.week), Number(button.dataset.day));
             RenderService.renderAll();
+        });
+
+        document.getElementById('studyChecklist').addEventListener('change', (event) => {
+            const key = event.target.getAttribute('data-toolkit-check');
+            if (!key) {
+                return;
+            }
+
+            GroundSchoolStore.update((state) => {
+                state.toolkit = state.toolkit || { checklist: {} };
+                state.toolkit.checklist = state.toolkit.checklist || {};
+                state.toolkit.checklist[key] = event.target.checked;
+            });
+        });
+
+        document.getElementById('generateDrillPlan').addEventListener('click', () => {
+            const state = GroundSchoolStore.getState();
+            const metrics = ProgressService.getMetrics(state);
+            const weakSubjects = ProgressService.getWeakSubjects(state).slice(0, 2).map((entry) => entry.subject);
+            const primaryWeak = weakSubjects[0] || mapWeekSubjectToQuizSubject(metrics.currentSubject);
+            const secondaryWeak = weakSubjects[1] || metrics.currentSubject;
+
+            document.getElementById('weakAreaDrill').textContent =
+                `15-minute drill: 5 min ${primaryWeak} flashcards, 5 min ${secondaryWeak} questions, 5 min write one scenario-based go/no-go decision using PAVE + IMSAFE.`;
         });
 
         document.querySelector('.quiz-toolbar').addEventListener('click', (event) => {
@@ -1866,59 +1959,20 @@ const App = {
             RenderService.renderReadiness(GroundSchoolStore.getState());
         });
 
-        document.getElementById('exportProgress').addEventListener('click', () => {
-            const blob = new Blob([GroundSchoolStore.exportData()], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const anchor = document.createElement('a');
-            anchor.href = url;
-            anchor.download = 'private-pilot-ground-school-progress.json';
-            anchor.click();
-            URL.revokeObjectURL(url);
-            document.getElementById('dataToolStatus').textContent = 'Progress exported as JSON.';
-        });
-
-        document.getElementById('importProgress').addEventListener('click', () => {
-            document.getElementById('importFile').click();
-        });
-
-        document.getElementById('importFile').addEventListener('change', async (event) => {
-            const file = event.target.files?.[0];
-            if (!file) {
-                return;
-            }
-
-            const text = await file.text();
-            try {
-                GroundSchoolStore.importData(text);
-                document.getElementById('dataToolStatus').textContent = 'Progress imported successfully.';
-                RenderService.renderAll();
-            } catch (error) {
-                console.error(error);
-                document.getElementById('dataToolStatus').textContent = 'Import failed. Verify the JSON file and try again.';
-            }
-            event.target.value = '';
-        });
-
-        document.getElementById('resetProgress').addEventListener('click', () => {
-            if (!window.confirm('Reset all course progress, quiz history, notes, and readiness data?')) {
-                return;
-            }
-            GroundSchoolStore.reset();
-            QuizService.session = null;
-            document.getElementById('dataToolStatus').textContent = 'Progress reset.';
-            RenderService.renderAll();
-        });
-
-        document.getElementById('printPlan').addEventListener('click', () => {
-            window.print();
-        });
     },
 
     openCurrentWeek() {
         const currentWeek = ProgressService.getCurrentWeek(GroundSchoolStore.getState());
-        document.querySelectorAll('#scheduleList details').forEach((detail) => {
-            detail.open = detail.id === `week-${currentWeek}`;
+        const currentWeekPanel = document.getElementById(`week-${currentWeek}`);
+        if (!currentWeekPanel) {
+            return;
+        }
+
+        document.querySelectorAll('#scheduleList .phase-panel').forEach((phasePanel) => {
+            phasePanel.open = phasePanel.contains(currentWeekPanel);
         });
+
+        currentWeekPanel.open = true;
     },
 
     applyMotionAndHeader() {
