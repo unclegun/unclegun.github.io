@@ -570,40 +570,23 @@ dialog::backdrop {
     border-radius: var(--radius);
 }
 
-.stratastack-animated-logo .stratastack-wordmark text {
-    fill: #082744;
-    font-family: "Segoe UI", Roboto, Inter, Arial, sans-serif;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-}
-
-.stratastack-animated-logo .stratastack-word {
-    font-size: 108px;
-}
-
-.stratastack-animated-logo .stratastack-solutions {
-    font-size: 34px;
-    font-weight: 700;
-    letter-spacing: 0.28em;
-}
-
-.stratastack-animated-logo .stratastack-frame,
-.stratastack-animated-logo .stratastack-chart-line,
-.stratastack-animated-logo .stratastack-chart-node,
-.stratastack-animated-logo .stratastack-layer,
-.stratastack-animated-logo .stratastack-word,
-.stratastack-animated-logo .stratastack-solutions {
+.stratastack-animated-logo .logo-frame,
+.stratastack-animated-logo .chart-line,
+.stratastack-animated-logo .chart-node,
+.stratastack-animated-logo .stack-layer,
+.stratastack-animated-logo .word,
+.stratastack-animated-logo .solutions {
     transform-box: fill-box;
     transform-origin: center;
 }
 
-.stratastack-animated-logo .stratastack-frame {
+.stratastack-animated-logo .logo-frame {
     stroke-dasharray: 1900;
     stroke-dashoffset: 1900;
     animation: stratastack-draw-frame 900ms ease 80ms forwards;
 }
 
-.stratastack-animated-logo .stratastack-layer {
+.stratastack-animated-logo .stack-layer {
     opacity: 0;
     transform: translateY(-42px);
     animation:
@@ -613,19 +596,19 @@ dialog::backdrop {
         forwards;
 }
 
-.stratastack-animated-logo .stratastack-layer-top {
+.stratastack-animated-logo .stack-top {
     animation-delay: 480ms;
 }
 
-.stratastack-animated-logo .stratastack-layer-middle {
+.stratastack-animated-logo .stack-middle {
     animation-delay: 680ms;
 }
 
-.stratastack-animated-logo .stratastack-layer-bottom {
+.stratastack-animated-logo .stack-bottom {
     animation-delay: 880ms;
 }
 
-.stratastack-animated-logo .stratastack-chart-line {
+.stratastack-animated-logo .chart-line {
     opacity: 0;
     stroke-dasharray: 760;
     stroke-dashoffset: 760;
@@ -637,7 +620,7 @@ dialog::backdrop {
         forwards;
 }
 
-.stratastack-animated-logo .stratastack-chart-node {
+.stratastack-animated-logo .chart-node {
     opacity: 0;
     transform: scale(0);
     animation:
@@ -647,27 +630,27 @@ dialog::backdrop {
         forwards;
 }
 
-.stratastack-animated-logo .stratastack-node-1 {
+.stratastack-animated-logo .node-1 {
     animation-delay: 1280ms;
 }
 
-.stratastack-animated-logo .stratastack-node-2 {
+.stratastack-animated-logo .node-2 {
     animation-delay: 1430ms;
 }
 
-.stratastack-animated-logo .stratastack-node-3 {
+.stratastack-animated-logo .node-3 {
     animation-delay: 1580ms;
 }
 
-.stratastack-animated-logo .stratastack-node-4 {
+.stratastack-animated-logo .node-4 {
     animation-delay: 1730ms;
 }
 
-.stratastack-animated-logo .stratastack-word {
+.stratastack-animated-logo .word {
     opacity: 0;
 }
 
-.stratastack-animated-logo .stratastack-word-strata {
+.stratastack-animated-logo .word-strata {
     transform: translateY(46px);
     animation:
         stratastack-strata-up
@@ -677,7 +660,7 @@ dialog::backdrop {
         forwards;
 }
 
-.stratastack-animated-logo .stratastack-word-stack {
+.stratastack-animated-logo .word-stack {
     transform: translateY(-58px);
     animation:
         stratastack-word-stack-down
@@ -687,7 +670,7 @@ dialog::backdrop {
         forwards;
 }
 
-.stratastack-animated-logo .stratastack-solutions {
+.stratastack-animated-logo .solutions {
     opacity: 0;
     animation:
         stratastack-fade-solutions
@@ -784,12 +767,12 @@ dialog::backdrop {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .stratastack-animated-logo .stratastack-frame,
-    .stratastack-animated-logo .stratastack-chart-line,
-    .stratastack-animated-logo .stratastack-chart-node,
-    .stratastack-animated-logo .stratastack-layer,
-    .stratastack-animated-logo .stratastack-word,
-    .stratastack-animated-logo .stratastack-solutions {
+    .stratastack-animated-logo .logo-frame,
+    .stratastack-animated-logo .chart-line,
+    .stratastack-animated-logo .chart-node,
+    .stratastack-animated-logo .stack-layer,
+    .stratastack-animated-logo .word,
+    .stratastack-animated-logo .solutions {
         animation: none !important;
         opacity: 1 !important;
         transform: none !important;
@@ -836,11 +819,11 @@ footer a {
     .hero-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .grid {
         grid-template-columns: 1fr;
     }
-    
+
     .two-col {
         grid-template-columns: 1fr;
     }
@@ -848,7 +831,7 @@ footer a {
     .capability-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .nav-toggle {
         display: block;
     }
