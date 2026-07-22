@@ -1,11 +1,5 @@
 [
   {
-    "slug": "First Post",
-    "title": "Oh Hello There",
-    "date": "2025-02-01",
-    "excerpt": "<p></p><p>This is a test of me making a blog post. Hope this works (crosses fingers).</p>"
-  },
-  {
     "slug": "We have arrived",
     "title": "we have arrived",
     "date": "2025-02-11",
@@ -16,5 +10,11 @@
     "title": "lets go crazy",
     "date": "2025-02-12",
     "excerpt": "<p></p><p>you have no idea how high I can fly</p><p></p><p>goal: complete some certs so I can get a big boi job and I can pay for childcare</p><p></p><p>Gonna start the IBM full stack cert. Lets see if I can cram six months of classes into two weeks.</p><p></p>"
+  },
+  {
+    "slug": "First Post",
+    "title": "Oh Hello There",
+    "date": "2025-02-01",
+    "excerpt": "<p></p><p>This is a test of me making a blog post. Hope this works (crosses fingers).</p>"
   }
 ]
