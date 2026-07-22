@@ -88,12 +88,16 @@ header.scrolled {
     transform: translateY(-1px);
 }
 
-.brand img {
-    height: 54px;
-    width: auto;
+.brand .stratastack-animated-logo {
+    width: min(156px, 30vw);
+    flex-shrink: 0;
+}
+
+.brand .stratastack-logo-svg {
     display: block;
+    width: 100%;
+    height: auto;
     border-radius: 12px;
-    background: transparent;
 }
 
 .brand .title {
@@ -544,12 +548,253 @@ dialog::backdrop {
     transform: none;
 }
 
-.hero-logo {
+.stratastack-animated-logo {
+    width: 100%;
+    max-width: 1200px;
+    background: #f3ede3;
+    overflow: hidden;
+}
+
+.stratastack-logo-svg {
+    display: block;
     width: 100%;
     height: auto;
-    display: block;
+    overflow: visible;
+}
+
+.hero-logo {
     border-radius: var(--radius);
-    background: transparent;
+}
+
+.hero-logo .stratastack-logo-svg {
+    border-radius: var(--radius);
+}
+
+.stratastack-animated-logo .stratastack-wordmark text {
+    fill: #082744;
+    font-family: "Segoe UI", Roboto, Inter, Arial, sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.stratastack-animated-logo .stratastack-word {
+    font-size: 108px;
+}
+
+.stratastack-animated-logo .stratastack-solutions {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+}
+
+.stratastack-animated-logo .stratastack-frame,
+.stratastack-animated-logo .stratastack-chart-line,
+.stratastack-animated-logo .stratastack-chart-node,
+.stratastack-animated-logo .stratastack-layer,
+.stratastack-animated-logo .stratastack-word,
+.stratastack-animated-logo .stratastack-solutions {
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.stratastack-animated-logo .stratastack-frame {
+    stroke-dasharray: 1900;
+    stroke-dashoffset: 1900;
+    animation: stratastack-draw-frame 900ms ease 80ms forwards;
+}
+
+.stratastack-animated-logo .stratastack-layer {
+    opacity: 0;
+    transform: translateY(-42px);
+    animation:
+        stratastack-stack-down
+        540ms
+        cubic-bezier(.2, .9, .3, 1.15)
+        forwards;
+}
+
+.stratastack-animated-logo .stratastack-layer-top {
+    animation-delay: 480ms;
+}
+
+.stratastack-animated-logo .stratastack-layer-middle {
+    animation-delay: 680ms;
+}
+
+.stratastack-animated-logo .stratastack-layer-bottom {
+    animation-delay: 880ms;
+}
+
+.stratastack-animated-logo .stratastack-chart-line {
+    opacity: 0;
+    stroke-dasharray: 760;
+    stroke-dashoffset: 760;
+    animation:
+        stratastack-draw-chart
+        820ms
+        ease-out
+        1120ms
+        forwards;
+}
+
+.stratastack-animated-logo .stratastack-chart-node {
+    opacity: 0;
+    transform: scale(0);
+    animation:
+        stratastack-node-pop
+        340ms
+        cubic-bezier(.2, .9, .3, 1.35)
+        forwards;
+}
+
+.stratastack-animated-logo .stratastack-node-1 {
+    animation-delay: 1280ms;
+}
+
+.stratastack-animated-logo .stratastack-node-2 {
+    animation-delay: 1430ms;
+}
+
+.stratastack-animated-logo .stratastack-node-3 {
+    animation-delay: 1580ms;
+}
+
+.stratastack-animated-logo .stratastack-node-4 {
+    animation-delay: 1730ms;
+}
+
+.stratastack-animated-logo .stratastack-word {
+    opacity: 0;
+}
+
+.stratastack-animated-logo .stratastack-word-strata {
+    transform: translateY(46px);
+    animation:
+        stratastack-strata-up
+        620ms
+        cubic-bezier(.2, .9, .3, 1.1)
+        300ms
+        forwards;
+}
+
+.stratastack-animated-logo .stratastack-word-stack {
+    transform: translateY(-58px);
+    animation:
+        stratastack-word-stack-down
+        620ms
+        cubic-bezier(.2, .9, .3, 1.08)
+        900ms
+        forwards;
+}
+
+.stratastack-animated-logo .stratastack-solutions {
+    opacity: 0;
+    animation:
+        stratastack-fade-solutions
+        700ms
+        ease
+        1550ms
+        forwards;
+}
+
+@keyframes stratastack-draw-frame {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes stratastack-stack-down {
+    0% {
+        opacity: 0;
+        transform: translateY(-42px);
+    }
+
+    72% {
+        opacity: 1;
+        transform: translateY(4px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes stratastack-draw-chart {
+    from {
+        opacity: 1;
+        stroke-dashoffset: 760;
+    }
+
+    to {
+        opacity: 1;
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes stratastack-node-pop {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    72% {
+        opacity: 1;
+        transform: scale(1.16);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes stratastack-strata-up {
+    from {
+        opacity: 0;
+        transform: translateY(46px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes stratastack-word-stack-down {
+    from {
+        opacity: 0;
+        transform: translateY(-58px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes stratastack-fade-solutions {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stratastack-animated-logo .stratastack-frame,
+    .stratastack-animated-logo .stratastack-chart-line,
+    .stratastack-animated-logo .stratastack-chart-node,
+    .stratastack-animated-logo .stratastack-layer,
+    .stratastack-animated-logo .stratastack-word,
+    .stratastack-animated-logo .stratastack-solutions {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+        stroke-dashoffset: 0 !important;
+    }
 }
 
 /* Lists */
