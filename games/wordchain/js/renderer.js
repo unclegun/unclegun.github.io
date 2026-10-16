@@ -14,21 +14,26 @@ export class Renderer {
     this.el = els;
     this.view = { x: 0, y: 0, zoom: 1 };
     this.cellEls = new Map();
+    this.ghostEls = [];
+    this.gridSize = null;
     this.#buildGuessGrid();
     this.#buildKeyboard();
     this.#bindPanZoom();
   }
 
-  #buildGuessGrid() {
+  /** (Re)builds the guess grid; the grid adapts to the answer length and the attempts available. */
+  #buildGuessGrid(len = WORD_LENGTH, attempts = MAX_ATTEMPTS) {
     const g = this.el.guesses;
     g.innerHTML = '';
+    g.style.setProperty('--len', len);
+    this.gridSize = { len, attempts };
     this.rows = [];
-    for (let r = 0; r < MAX_ATTEMPTS; r++) {
+    for (let r = 0; r < attempts; r++) {
       const row = document.createElement('div');
       row.className = 'row';
       row.setAttribute('role', 'row');
       const tiles = [];
-      for (let c = 0; c < WORD_LENGTH; c++) {
+      for (let c = 0; c < len; c++) {
         const t = document.createElement('div');
         t.className = 'tile';
         t.setAttribute('role', 'gridcell');
@@ -63,6 +68,8 @@ export class Renderer {
 
   /** Draw the guess panel from engine state plus the live buffer. */
   renderGuesses(engine, buffer, { holdKeys = false } = {}) {
+    const want = { len: engine.wordLength, attempts: engine.maxAttempts };
+    if (engine.current && (want.len !== this.gridSize.len || want.attempts !== this.gridSize.attempts)) this.#buildGuessGrid(want.len, want.attempts);
     const locked = engine.locked;
     this.rows.forEach(({ row, tiles }, r) => {
       const guess = engine.guesses[r];
@@ -105,11 +112,156 @@ export class Renderer {
   }
 
   renderStats(engine, best) {
-    this.el.wordNum.textContent = engine.status === 'playing' ? engine.wordNumber : engine.solved;
-    this.el.score.textContent = engine.score;
-    this.el.attempts.textContent = engine.status === 'playing' ? Math.max(0, engine.attemptsLeft) : 0;
-    this.el.best.textContent = Math.max(best, engine.score);
+    const e = this.el;
+    const playing = engine.status === 'playing';
+    e.wordNum.textContent = playing ? Math.max(engine.wordNumber, engine.phase === 'choosing' ? engine.solved + 1 : 0) : engine.solved;
+    e.score.textContent = engine.score;
+    e.attempts.textContent = playing && engine.current ? Math.max(0, engine.attemptsLeft) : playing ? engine.mode.attempts : 0;
+    e.best.textContent = Math.max(best, engine.score);
+    if (e.mode) e.mode.textContent = `${engine.mode.icon} ${engine.mode.name}`;
+    if (e.tokensBox) {
+      e.tokensBox.hidden = !engine.resources;
+      if (engine.resources) e.tokens.textContent = engine.resources.tokens;
+    }
+    this.#renderObjective(engine);
   }
+
+  #renderObjective(engine) {
+    const box = this.el.objective;
+    if (!box) return;
+    const o = engine.challenges?.current;
+    box.hidden = !engine.challenges;
+    if (!engine.challenges) return;
+    if (!o) { box.querySelector('.obj-text').textContent = 'Objective: none available right now'; box.querySelector('.obj-bar').style.width = '0%'; return; }
+    box.querySelector('.obj-text').textContent = `Objective: ${o.text}`;
+    box.querySelector('.obj-progress').textContent = `${o.progress}/${o.target} · +${o.reward.score}${o.reward.tokens ? ` & ${o.reward.tokens}🪙` : ''}`;
+    box.querySelector('.obj-bar').style.width = Math.round((o.progress / o.target) * 100) + '%';
+  }
+
+  /** Hint / Extra Try buttons (strategic modes). `handlers`: { hint, extraTry }. */
+  renderPowerups(engine) {
+    const box = this.el.powerups;
+    if (!box) return;
+    const r = engine.resources;
+    const active = !!r && engine.phase === 'guessing' && engine.status === 'playing';
+    box.hidden = !r;
+    if (!r) return;
+    for (const [kind, btn] of [['hint', this.el.hintBtn], ['extraTry', this.el.extraBtn]]) {
+      const c = r.check(kind);
+      btn.disabled = !active || !c.ok;
+      btn.title = !c.ok && c.error ? c.error : '';
+      btn.querySelector('.cost').textContent = `${r.cost[kind]}🪙`;
+    }
+  }
+
+  /** Score breakdown after a solved word. Hidden for Classic (original presentation). */
+  renderBreakdown(bd, mode) {
+    const box = this.el.breakdown;
+    if (!box) return;
+    if (!bd || mode.id === 'classic') { box.hidden = true; box.innerHTML = ''; return; }
+    box.hidden = false;
+    box.innerHTML = '';
+    const h = document.createElement('p');
+    h.className = 'bd-title';
+    h.textContent = `Word score +${bd.total}${bd.tokens ? ` · +${bd.tokens} 🪙` : ''}`;
+    const ul = document.createElement('ul');
+    for (const it of bd.items) {
+      const li = document.createElement('li');
+      const a = document.createElement('span');
+      a.textContent = it.label;
+      const b = document.createElement('b');
+      b.textContent = (it.points >= 0 ? '+' : '') + it.points;
+      li.append(a, b);
+      ul.append(li);
+    }
+    box.append(h, ul);
+  }
+
+  /**
+   * Draws placement choices on the board (footprint outlines, intersections, no answers) and the choice cards.
+   * handlers: { choose(id), reroll(id), preview(id) }. Ghost cells live in the pannable/zoomable world.
+   */
+  renderChoice(engine, handlers, { selected = null } = {}) {
+    const opts = engine.publicOptions;
+    this.clearGhosts();
+    const frag = document.createDocumentFragment();
+    const wrap = this.el.options;
+    wrap.innerHTML = '';
+    const names = { expand: 'Expand', connect: 'Connect', junction: 'Junction' };
+    const hints = { expand: 'Grow into open space', connect: 'Links existing words', junction: 'Joins branches for a bonus' };
+    opts.forEach((o, n) => {
+      const tag = 'ABC'[n];
+      const [dx, dy] = o.dir === 'across' ? [1, 0] : [0, 1];
+      const known = new Map(o.intersections.map((i) => [i.index, i.letter]));
+      for (let i = 0; i < o.length; i++) {
+        const d = document.createElement('div');
+        d.className = `ghost cat-${o.category}` + (known.has(i) ? ' intersect' : '') + (selected === o.id ? ' hot' : selected ? ' dim' : '') + (i === 0 ? ' first' : '');
+        d.style.transform = `translate(${(o.x + dx * i) * CELL}px, ${(o.y + dy * i) * CELL}px)`;
+        if (i === 0) d.dataset.tag = tag;
+        frag.append(d);
+        this.ghostEls.push(d);
+      }
+      const card = document.createElement('article');
+      card.className = `opt cat-${o.category}` + (selected === o.id ? ' selected' : '');
+      card.dataset.id = o.id;
+      const pattern = Array.from({ length: o.length }, (_, i) => (known.has(i) ? known.get(i).toUpperCase() : '_')).join(' ');
+      const where = o.intersections.map((i) => `${i.letter.toUpperCase()} (letter ${i.index + 1})`).join(', ');
+      const title = document.createElement('h3');
+      title.textContent = `${tag} · ${names[o.category]}`;
+      const meta = document.createElement('p');
+      meta.className = 'opt-meta';
+      meta.textContent = `${o.dir === 'across' ? 'Across →' : 'Down ↓'} · ${o.length} letters · ${hints[o.category]}`;
+      const pat = document.createElement('p');
+      pat.className = 'opt-pattern';
+      pat.textContent = pattern;
+      pat.setAttribute('aria-label', `Known letters: ${where}`);
+      const info = document.createElement('p');
+      info.className = 'opt-info';
+      info.textContent = `${o.crossings} intersection${o.crossings === 1 ? '' : 's'}: ${where}`;
+      const row = document.createElement('div');
+      row.className = 'opt-actions';
+      const pick = document.createElement('button');
+      pick.type = 'button';
+      pick.className = 'primary';
+      pick.textContent = opts.length === 1 ? 'Continue' : 'Choose';
+      pick.addEventListener('click', () => handlers.choose(o.id));
+      row.append(pick);
+      if (engine.resources) {
+        const rr = document.createElement('button');
+        rr.type = 'button';
+        const c = engine.resources.check('reroll');
+        rr.textContent = `Reroll ${engine.resources.cost.reroll}🪙`;
+        rr.disabled = !c.ok;
+        rr.title = c.ok ? 'Replace this placement with another' : c.error;
+        rr.addEventListener('click', () => handlers.reroll(o.id));
+        row.append(rr);
+      }
+      card.append(title, meta, pat, info, row);
+      for (const ev of ['mouseenter', 'focusin']) card.addEventListener(ev, () => handlers.preview(o.id));
+      card.addEventListener('click', (e) => { if (!e.target.closest('button')) handlers.preview(o.id); });
+      wrap.append(card);
+    });
+    this.el.world.append(frag);
+  }
+
+  clearGhosts() {
+    for (const g of this.ghostEls) g.remove();
+    this.ghostEls = [];
+  }
+
+  /** Frame the whole crossword together with every offered footprint. */
+  focusOptions(engine, { instant = false } = {}) {
+    const cells = [];
+    for (const w of engine.board.words) cells.push(...cellsOf(w.word, w.x, w.y, w.dir));
+    for (const o of engine.publicOptions) {
+      const [dx, dy] = o.dir === 'across' ? [1, 0] : [0, 1];
+      for (let i = 0; i < o.length; i++) cells.push({ x: o.x + dx * i, y: o.y + dy * i });
+    }
+    if (cells.length) this.#frame(cells, { maxZoom: 1.3, minZoom: 0.25, instant });
+  }
+
+  /** Called with a board cell { x, y } when the board is tapped (not dragged). */
+  onBoardTap(fn) { this.tapHandler = fn; }
 
   /** Rebuild the crossword board DOM incrementally; new cells animate in. */
   renderBoard(engine, buffer, { animate = false } = {}) {
@@ -234,7 +386,9 @@ export class Renderer {
     const b = this.el.board;
     const ptrs = new Map();
     let last = 0;
+    let tap = null; // pointer-down position, cleared once the pointer moves (drag/pinch)
     b.addEventListener('pointerdown', (e) => {
+      tap = ptrs.size === 0 ? { x: e.clientX, y: e.clientY } : null;
       b.setPointerCapture(e.pointerId);
       ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
       last = this.#dist(ptrs);
@@ -245,6 +399,7 @@ export class Renderer {
       if (!p) return;
       const dx = e.clientX - p.x, dy = e.clientY - p.y;
       p.x = e.clientX; p.y = e.clientY;
+      if (tap && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 6) tap = null;
       if (ptrs.size === 1) {
         this.view.x += dx; this.view.y += dy;
         this.#applyView();
@@ -257,7 +412,15 @@ export class Renderer {
       }
     });
     const up = (e) => { ptrs.delete(e.pointerId); last = this.#dist(ptrs); };
-    b.addEventListener('pointerup', up);
+    b.addEventListener('pointerup', (e) => {
+      if (tap && this.tapHandler) {
+        const r = b.getBoundingClientRect();
+        const { x, y, zoom } = this.view;
+        this.tapHandler({ x: Math.floor((e.clientX - r.left - x) / (CELL * zoom)), y: Math.floor((e.clientY - r.top - y) / (CELL * zoom)) });
+      }
+      tap = null;
+      up(e);
+    });
     b.addEventListener('pointercancel', up);
     b.addEventListener('wheel', (e) => {
       e.preventDefault();

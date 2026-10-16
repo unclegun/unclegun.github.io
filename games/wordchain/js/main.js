@@ -1,10 +1,12 @@
-import { loadDictionary } from './dictionaryService.js';
+import { loadDictionary, loadLengths } from './dictionaryService.js';
 import { GameEngine } from './gameEngine.js';
 import { Renderer } from './renderer.js';
 import { GuessBuffer, bindInput } from './input.js';
-import { saveGame, loadGame, clearGame, getBest, recordRun } from './storage.js';
+import { saveRun, loadRun, clearRun, getBestFor, recordRunFor, getMeta, setMeta } from './storage.js';
 import { validateSave } from './saveValidator.js';
-import { buildCrosswordSvg, buildShareText, shareResult, downloadSvg } from './share.js';
+import { buildCrosswordSvg, buildShareText, buildShareGrid, shareResult, downloadSvg } from './share.js';
+import { listModes, getMode, isModeId } from './gameModes.js';
+import { createMenu, askConfirm } from './menu.js';
 
 const $ = (id) => document.getElementById(id);
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -13,50 +15,115 @@ const wait = (ms) => new Promise((r) => setTimeout(r, reduceMotion() ? 0 : ms));
 const renderer = new Renderer({
   board: $('board'), world: $('world'), guesses: $('guesses'), keyboard: $('keyboard'), toast: $('toast'),
   wordNum: $('word-num'), score: $('score'), attempts: $('attempts'), best: $('best'),
+  mode: $('mode-name'), tokensBox: $('tokens-box'), tokens: $('tokens'), objective: $('objective'),
+  powerups: $('powerups'), hintBtn: $('hint'), extraBtn: $('extra-try'), breakdown: $('breakdown'), options: $('options'),
 });
 const buffer = new GuessBuffer();
 let dictionary;
-let engine;
+let engine = null;
+let modeId = null; // mode of `engine`
 let busy = false;
-let runToken = 0; // bumped on restart/resume so stale async transitions abort
+let menuOpen = true;
+let selected = null; // previewed option id
+let runToken = 0; // bumped on restart/resume/menu so stale async transitions abort
 let lastResult = null;
 
 const announce = (msg) => { $('status').textContent = msg; };
+const best = () => getBestFor(modeId).score;
 
-const persist = () => saveGame({ ...engine.toJSON(), draft: buffer.letters });
+const persist = () => { if (engine && modeId) saveRun(modeId, { ...engine.toJSON(), draft: buffer.letters }); };
 
 function refresh({ animate = false, holdKeys = false } = {}) {
   renderer.renderGuesses(engine, buffer, { holdKeys });
   renderer.renderBoard(engine, buffer, { animate });
-  renderer.renderStats(engine, getBest().score);
+  renderer.renderStats(engine, best());
+  renderer.renderPowerups(engine);
+  const choosing = engine.phase === 'choosing' && engine.status === 'playing';
+  $('choice').hidden = !choosing;
+  $('play-area').hidden = choosing;
+  $('panel').classList.toggle('choosing', choosing);
 }
 
 function startRound() {
-  buffer.reset(engine.locked);
+  buffer.reset(engine.locked, engine.wordLength);
+  renderer.clearGhosts();
   refresh({ animate: true });
   renderer.focusActive(engine);
   const cur = engine.current;
-  if (cur) announce(`Word ${engine.wordNumber}, ${cur.dir}. ${Object.keys(engine.locked).length} letters are locked.`);
-  setTimeout(() => engine.precompute(), 50); // precompute next placements while the player solves
+  if (cur) announce(`Word ${engine.wordNumber}, ${cur.word.length} letters, ${cur.dir}. ${Object.keys(engine.locked).length} letters are locked.`);
+  setTimeout(() => engine.precompute(), 50); // Classic: precompute next placements while the player solves
 }
 
-function newGame() {
+/** Selection modes: show the offered placements on the board and as cards. */
+function showChoice({ instant = false } = {}) {
+  const opts = engine.publicOptions;
+  refresh();
+  drawChoice();
+  renderer.focusOptions(engine, { instant });
+  announce(opts.length === 1 ? 'One placement is available. Continue to play it.' : `Choose one of ${opts.length} placements. Highlighted footprints show where each word would go.`);
+}
+
+function drawChoice() {
+  renderer.renderChoice(engine, { choose, reroll, preview }, { selected });
+}
+
+function preview(id) {
+  if (selected === id) return;
+  selected = id;
+  drawChoice();
+}
+
+async function choose(id) {
+  if (busy || menuOpen || engine.phase !== 'choosing') return;
+  const res = engine.choose(id);
+  if (!res.ok) {
+    renderer.toast(res.error);
+    if (engine.status === 'complete') { endRun(true); return; }
+    selected = null;
+    showChoice();
+    persist();
+    return;
+  }
+  selected = null;
+  renderer.renderBreakdown(null, engine.mode);
+  startRound();
+  persist();
+}
+
+function reroll(id) {
+  if (busy || menuOpen) return;
+  const res = engine.reroll(id);
+  if (!res.ok) { renderer.toast(res.error); return; }
+  selected = null;
+  renderer.toast('Placement replaced');
+  showChoice();
+  persist();
+}
+
+function newGame(id = modeId) {
   runToken++;
-  clearGame();
-  engine = new GameEngine({ dictionary, seed: (Math.random() * 2 ** 32) >>> 0 });
+  modeId = id;
+  clearRun(id);
+  engine = new GameEngine({ dictionary, seed: (Math.random() * 2 ** 32) >>> 0, mode: id });
   busy = false;
+  selected = null;
   closeModals();
+  renderer.renderBreakdown(null, engine.mode);
   startRound();
   renderer.focusActive(engine, { instant: true });
   persist();
 }
 
-function resume(state) {
+function resume(id, state) {
   runToken++;
+  modeId = id;
   busy = false;
+  selected = null;
   engine = new GameEngine({ dictionary, state });
+  renderer.renderBreakdown(null, engine.mode);
   if (engine.status === 'complete') { endRun(true); return; }
-  buffer.reset(engine.locked);
+  if (engine.phase === 'choosing') { showChoice({ instant: true }); persist(); return; }
+  buffer.reset(engine.locked, engine.wordLength);
   buffer.restoreDraft(state.draft);
   refresh();
   renderer.focusActive(engine, { instant: true });
@@ -68,26 +135,35 @@ function closeModals() {
 }
 
 function endRun(complete) {
-  clearGame();
-  const isBest = recordRun({ score: engine.score, words: engine.solved });
-  const best = getBest();
-  lastResult = { words: engine.solved, score: engine.score, best: best.score, isBest, board: engine.board.words.map((w) => ({ ...w })) };
+  clearRun(modeId);
+  const sum = engine.summary();
+  const isBest = recordRunFor(modeId, { score: engine.score, words: engine.solved });
+  const bestNow = getBestFor(modeId);
+  lastResult = { ...sum, best: bestNow.score, isBest, board: engine.board.words.map((w) => ({ ...w })) };
   $('share-status').textContent = '';
   $('share').disabled = $('download-svg').disabled = !lastResult.board.length;
   $('end-title').textContent = complete ? 'Crossword complete!' : 'Run over';
   $('end-message').textContent = complete
     ? 'No more words fit on your crossword. Amazing run!'
     : `The word was ${engine.current.word.toUpperCase()}.`;
-  $('end-words').textContent = engine.solved;
-  $('end-score').textContent = engine.score;
-  $('end-best').textContent = best.score + (isBest ? ' (new!)' : '');
+  $('end-mode').textContent = `${engine.mode.icon} ${engine.mode.name}`;
+  $('end-words').textContent = sum.words;
+  $('end-score').textContent = sum.score;
+  $('end-best').textContent = bestNow.score + (isBest ? ' (new!)' : '');
+  $('end-avg').textContent = sum.avgGuesses || '–';
+  $('end-cross').textContent = sum.intersections;
+  $('end-junc').textContent = sum.junctions;
+  $('end-obj-box').hidden = sum.objectives === null;
+  $('end-obj').textContent = sum.objectives ?? 0;
+  $('end-board').innerHTML = lastResult.board.length ? buildCrosswordSvg(lastResult.board, { title: `WordChain ${engine.mode.name}` }) : '';
+  renderer.clearGhosts();
+  refresh();
   $('end-modal').showModal();
   $('end-restart').focus();
-  refresh();
 }
 
 async function submit() {
-  if (busy || engine.status !== 'playing' || engine.phase !== 'guessing') return;
+  if (busy || menuOpen || engine.status !== 'playing' || engine.phase !== 'guessing') return;
   const row = engine.guesses.length;
   if (!buffer.complete) { renderer.shakeRow(row); renderer.toast('Not enough letters'); return; }
   const res = engine.submitGuess(buffer.word);
@@ -98,11 +174,13 @@ async function submit() {
   persist(); // never lose the guess, even if the page is closed mid-animation
   renderer.renderGuesses(engine, buffer, { holdKeys: true });
   renderer.flipRow(row);
-  renderer.renderStats(engine, getBest().score);
+  renderer.renderStats(engine, best());
   await wait(900);
   if (!alive()) return;
   if (res.solved) {
     renderer.toast('Solved!');
+    renderer.renderBreakdown(res.breakdown, engine.mode);
+    if (res.breakdown.objective) renderer.toast(`Objective complete: +${res.breakdown.objective.score}`);
     refresh({ animate: true });
     await wait(450);
     if (!alive()) return;
@@ -113,12 +191,13 @@ async function submit() {
     if (!alive()) return;
     engine.advance();
     if (engine.status === 'complete') { endRun(true); busy = false; return; }
+    if (engine.phase === 'choosing') { selected = null; showChoice(); persist(); busy = false; return; }
     startRound();
     persist();
   } else if (res.lost) {
     endRun(false);
   } else {
-    buffer.reset(engine.locked);
+    buffer.reset(engine.locked, engine.wordLength);
     persist();
     refresh();
     announce(`${engine.attemptsLeft} attempts left`);
@@ -126,20 +205,104 @@ async function submit() {
   busy = false;
 }
 
+function useHint() {
+  if (busy || menuOpen) return;
+  const res = engine.hint();
+  if (!res.ok) { renderer.toast(res.error); return; }
+  buffer.lock(res.index, res.letter);
+  refresh();
+  persist();
+  renderer.toast(`Letter ${res.index + 1} is ${res.letter.toUpperCase()}`);
+  announce(`Hint: letter ${res.index + 1} is ${res.letter}. It is locked.`);
+}
+
+function useExtraTry() {
+  if (busy || menuOpen) return;
+  const res = engine.extraTry();
+  if (!res.ok) { renderer.toast(res.error); return; }
+  refresh();
+  persist();
+  announce(`Extra try added. ${res.attemptsLeft} attempts left.`);
+}
+
 bindInput({
   keyboardEl: $('keyboard'),
-  isBlocked: () => busy || engine?.status !== 'playing' || engine?.phase !== 'guessing' || document.querySelector('dialog[open]') !== null,
-  onLetter: (l) => { if (buffer.add(l)) { refresh(); persist(); } },
+  isBlocked: () => busy || menuOpen || engine?.status !== 'playing' || engine?.phase !== 'guessing' || document.querySelector('dialog[open]') !== null,
+  onLetter: (l) => { if (buffer.add(l)) { renderer.renderBreakdown(null, engine.mode); refresh(); persist(); } },
   onBackspace: () => { if (buffer.backspace()) { refresh(); persist(); } },
   onEnter: submit,
 });
 
-$('restart').addEventListener('click', newGame);
-$('end-restart').addEventListener('click', newGame);
+// ---- menu and navigation ----
+const menu = createMenu({
+  root: $('menu'), modes: listModes(), confirmDialog: $('confirm-modal'), currentMode: () => modeId,
+  getInfo: (id) => ({ best: getBestFor(id), saved: savedSummaryUnvalidated(id) }),
+  onPlay: (id, { fresh }) => startMode(id, { fresh }),
+});
+
+// Menu cards only need a light check; the full validation happens when the save is loaded.
+function savedSummaryUnvalidated(id) {
+  const s = loadRun(id);
+  if (!s || s.status !== 'playing' || !Number.isInteger(s.solved) || !Number.isInteger(s.score)) return null;
+  return { words: s.solved, score: s.score };
+}
+
+function showMenu(note = '') {
+  runToken++; // abort in-flight animations; state was persisted at every step
+  busy = false;
+  if (engine && modeId && engine.status === 'playing') persist();
+  menuOpen = true;
+  closeModals();
+  $('menu-note').textContent = note;
+  menu.render();
+  $('menu').hidden = false;
+  $('app').hidden = true;
+  $('menu').scrollTop = 0;
+  $('menu').querySelector('button')?.focus();
+}
+
+function showGame() {
+  menuOpen = false;
+  $('menu').hidden = true;
+  $('app').hidden = false;
+  setMeta({ lastMode: modeId });
+}
+
+async function startMode(id, { fresh }) {
+  const mode = getMode(id);
+  try {
+    $('menu-note').textContent = mode.features.variableLength ? 'Loading word lists…' : '';
+    await loadLengths(dictionary, mode.wordLengths);
+  } catch {
+    $('menu-note').textContent = 'Could not load the word lists for this mode.';
+    return;
+  }
+  const saved = fresh ? null : validateSave(loadRun(id), dictionary, id);
+  let note = '';
+  showGame();
+  if (saved && saved.status === 'playing') {
+    try { resume(id, saved); } catch { newGame(id); note = 'Saved run could not be restored; started a new one.'; }
+  } else {
+    if (!fresh && loadRun(id)) note = 'Saved run was invalid; started a new one.';
+    newGame(id);
+  }
+  $('help-mode').textContent = `${engine.mode.name}: ${engine.mode.description}`;
+  if (note) renderer.toast(note);
+  renderer.focusActive(engine, { instant: true });
+}
+
+$('menu-btn').addEventListener('click', () => showMenu());
+$('restart').addEventListener('click', async () => {
+  if (busy || menuOpen) return;
+  const ok = await askConfirm($('confirm-modal'), `Abandon this ${engine.mode.name} run and start a new one?`, { yes: 'Start new run', no: 'Keep playing' });
+  if (ok) newGame(modeId);
+});
+$('end-restart').addEventListener('click', () => newGame(modeId));
+$('end-menu').addEventListener('click', () => showMenu());
 $('share').addEventListener('click', async () => {
   if (!lastResult) return;
   const svg = buildCrosswordSvg(lastResult.board);
-  const text = buildShareText({ ...lastResult, url: location.href.split('#')[0] });
+  const text = buildShareText({ ...lastResult, mode: lastResult.modeName, grid: buildShareGrid(lastResult.board), url: location.href.split('#')[0] });
   const how = await shareResult({ svg, text });
   $('share-status').textContent = { shared: 'Shared!', copied: 'Result copied to clipboard.', downloaded: 'Crossword image downloaded.', cancelled: '' }[how];
 });
@@ -148,22 +311,38 @@ $('help').addEventListener('click', () => $('help-modal').showModal());
 $('help-close').addEventListener('click', () => $('help-modal').close());
 $('zoom-in').addEventListener('click', () => renderer.zoomBy(1.25));
 $('zoom-out').addEventListener('click', () => renderer.zoomBy(0.8));
-$('recenter').addEventListener('click', () => renderer.focusActive(engine));
-addEventListener('resize', () => renderer.focusActive(engine, { instant: true }));
+$('recenter').addEventListener('click', () => (engine?.phase === 'choosing' ? renderer.focusOptions(engine) : renderer.focusActive(engine)));
+$('hint').addEventListener('click', useHint);
+$('extra-try').addEventListener('click', useExtraTry);
+addEventListener('resize', () => { if (engine && !menuOpen) (engine.phase === 'choosing' ? renderer.focusOptions(engine) : renderer.focusActive(engine, { instant: true })); });
+
+// Tapping a highlighted footprint previews that option (choosing is confirmed with the card button).
+renderer.onBoardTap(({ x, y }) => {
+  if (menuOpen || engine?.phase !== 'choosing') return;
+  const hit = engine.publicOptions.find((o) => {
+    const [dx, dy] = o.dir === 'across' ? [1, 0] : [0, 1];
+    return Array.from({ length: o.length }, (_, i) => [o.x + dx * i, o.y + dy * i]).some(([cx, cy]) => cx === x && cy === y);
+  });
+  if (hit) {
+    preview(hit.id);
+    $('options').querySelector(`[data-id="${CSS.escape(hit.id)}"]`)?.scrollIntoView({ block: 'nearest' });
+  }
+});
 
 (async function init() {
   try {
     dictionary = await loadDictionary();
   } catch (e) {
     $('status').textContent = 'Could not load the word list. Serve this folder over HTTP and reload.';
+    $('menu-note').textContent = 'Failed to load word list. Serve this folder over HTTP and reload.';
     $('loading').textContent = 'Failed to load word list.';
     return;
   }
   $('loading').hidden = true;
-  const saved = validateSave(loadGame(), dictionary);
-  if (saved && saved.status === 'playing') {
-    try { resume(saved); } catch { clearGame(); newGame(); }
-  } else newGame();
+  const last = getMeta().lastMode;
+  if (isModeId(last)) modeId = last; // highlighted in the menu
+  menu.render();
+  $('menu').querySelector('button')?.focus();
   if (!localStorage.getItem('wordchain.seenHelp')) {
     try { localStorage.setItem('wordchain.seenHelp', '1'); } catch { /* ignore */ }
     $('help-modal').showModal();
