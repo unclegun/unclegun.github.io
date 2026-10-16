@@ -50,3 +50,24 @@ Loading overlay gone on desktop/mobile, animation feel, touch pan/pinch, safe-ar
 ## Extending
 Swap the dictionary by passing any object with the same methods to `GameEngine`; replace `data/*.txt` to change the word lists.
 Limitations: answer list is auto-curated plus a hand-written exclusion list, not fully hand-reviewed; no Web Worker (generation is fast enough in testing).
+
+## Game modes
+The menu opens on start (`menu.js`); each mode has its own saved run and best score, and "Menu" is available in-game.
+| Mode | Summary |
+| --- | --- |
+| Classic | The original: 5 letters, 6 tries, automatic placements, original scoring. No tokens/objectives. |
+| Builder | After each word choose 2–3 placements (Expand = 1 crossing, Connect = 2, Junction = 3+ or joining branches). Targets stay hidden; fewer known letters score more. Tokens enabled. |
+| Architect | Builder's selection, scored on structure: crossings, junctions, compactness, with a penalty for linear sprawl. |
+| Challenge | Automatic placements plus one active objective at a time (streaks, junctions, orientations, score targets…) that is only offered if achievable. Rewards are score + tokens. |
+| Wildcard | 4–7 letter words (lengths introduced gradually), dynamic guess grid, crossings between different lengths. Still 6 tries. |
+
+Tokens (Builder/Architect/Challenge/Wildcard only): Hint (reveal and lock one unknown letter), Reroll (swap an unstarted option; only charged on success),
+Extra Try (capped). Costs, caps and earning rules live in `TOKEN_ECONOMY` (`gameModes.js`); rewards are keyed so they cannot be re-claimed.
+
+## Additional modules
+`gameModes.js` (mode config), `modeRules.js` (progression), `scoring.js` (weights + strategies), `challengeManager.js`, `resourceManager.js`, `menu.js`.
+`crosswordGenerator.js` gained `analyzePlacement`/`findOptions`; `gameEngine.js` is shared by all modes.
+Persistence: `wordchain.v2.*` keys per mode; legacy Classic v1 saves/best score are migrated. Wildcard word lists are in `data/` (see `data/README.md`).
+
+## Limitations
+Tests: `node --test` (unit/simulation). UI was only smoke-tested in headless Chromium, not exhaustively on real touch devices. 4/6/7-letter answer lists are auto-curated and may contain a few odd words.

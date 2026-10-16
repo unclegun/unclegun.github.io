@@ -14,3 +14,8 @@ Review `answers.txt` by hand if you want a stricter curation; removing a line is
 `answer-exclusions.txt` records words removed from `answers.txt` after review (proper names, slang/contractions such as
 `gonna`, brands, nationalities, crude or sensitive terms, obscure words). A test asserts none of them are in `answers.txt`.
 `valid-guesses.txt` is left broad, so excluded words remain accepted as guesses. Licensing notes above are unchanged.
+
+## Wildcard lists (4, 6, 7 letters)
+`valid-guesses-{4,6,7}.txt` come from the npm package `an-array-of-english-words` (MIT). `answers-{4,6,7}.txt` are the subset with
+Zipf frequency ≥ 4.0 (Python `wordfreq`, MIT/CC-BY-SA data), excluding plurals/-ed/-ies forms, a blocklist, and names/places;
+`answer-exclusions-extra.txt` lists the extra removals. Static files; no runtime API calls.

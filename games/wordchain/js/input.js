@@ -2,11 +2,11 @@ import { WORD_LENGTH } from './placementValidator.js';
 
 /** Current-row letter buffer. Locked positions are pre-filled and never editable. */
 export class GuessBuffer {
-  constructor(locked = {}) { this.reset(locked); }
+  constructor(locked = {}, length = WORD_LENGTH) { this.reset(locked, length); }
 
-  reset(locked = {}) {
-    this.locked = locked;
-    this.letters = Array.from({ length: WORD_LENGTH }, (_, i) => locked[i] || '');
+  reset(locked = {}, length = this.letters?.length || WORD_LENGTH) {
+    this.locked = { ...locked };
+    this.letters = Array.from({ length }, (_, i) => locked[i] || '');
   }
 
   /** Restores saved partial letters; ignores anything malformed or touching locked slots. */
@@ -18,6 +18,12 @@ export class GuessBuffer {
 
   isLocked(i) { return i in this.locked; }
 
+  /** Locks a hint-revealed letter; the player's other letters are kept. */
+  lock(i, letter) {
+    this.locked[i] = letter;
+    this.letters[i] = letter;
+  }
+
   add(letter) {
     const i = this.letters.findIndex((l, idx) => !l && !this.isLocked(idx));
     if (i === -1) return false;
@@ -26,7 +32,7 @@ export class GuessBuffer {
   }
 
   backspace() {
-    for (let i = WORD_LENGTH - 1; i >= 0; i--) {
+    for (let i = this.letters.length - 1; i >= 0; i--) {
       if (!this.isLocked(i) && this.letters[i]) { this.letters[i] = ''; return true; }
     }
     return false;

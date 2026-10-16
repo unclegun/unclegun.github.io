@@ -8,13 +8,18 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <div id="app">
+  <div id="app" hidden>
     <header>
-      <h1>Word<span>Chain</span></h1>
+      <button id="menu-btn" type="button" class="menu-btn" aria-label="Main menu (pause)">☰</button>
+      <div class="title">
+        <h1>Word<span>Chain</span></h1>
+        <span id="mode-name" class="mode-pill" aria-label="Current mode"></span>
+      </div>
       <div class="stats" aria-label="Game stats">
         <div><span class="lbl">Word</span><b id="word-num">1</b></div>
         <div><span class="lbl">Score</span><b id="score">0</b></div>
-        <div><span class="lbl">Tries left</span><b id="attempts">6</b></div>
+        <div><span class="lbl">Tries</span><b id="attempts">6</b></div>
+        <div id="tokens-box" hidden><span class="lbl">Tokens</span><b>🪙 <span id="tokens">0</span></b></div>
         <div class="hide-sm"><span class="lbl">Best</span><b id="best">0</b></div>
       </div>
       <div class="actions">
@@ -22,6 +27,11 @@
         <button id="restart" type="button" aria-label="Restart game">↻</button>
       </div>
     </header>
+    <div id="objective" class="objective" role="status" hidden>
+      <span class="obj-text"></span>
+      <span class="obj-progress"></span>
+      <div class="obj-track"><div class="obj-bar"></div></div>
+    </div>
 
     <main>
       <section id="board" tabindex="0" role="application" aria-label="Crossword board">
@@ -35,8 +45,20 @@
       </section>
 
       <section id="panel" aria-label="Guess panel">
-        <div id="guesses" role="grid" aria-label="Guesses"></div>
-        <div id="keyboard" aria-label="On-screen keyboard"></div>
+        <div id="breakdown" class="breakdown" aria-live="polite" hidden></div>
+        <div id="choice" class="choice" hidden>
+          <h2>Choose where the crossword grows</h2>
+          <p class="choice-help">Outlined footprints on the board show each option; answers stay hidden. Tap one to preview it.</p>
+          <div id="options" class="options"></div>
+        </div>
+        <div id="play-area">
+          <div id="guesses" role="grid" aria-label="Guesses"></div>
+          <div id="powerups" class="powerups" hidden>
+            <button id="hint" type="button" title="Reveal one unknown letter">💡 Hint <span class="cost"></span></button>
+            <button id="extra-try" type="button" title="Buy one more attempt">➕ Extra try <span class="cost"></span></button>
+          </div>
+          <div id="keyboard" aria-label="On-screen keyboard"></div>
+        </div>
       </section>
     </main>
 
@@ -44,18 +66,31 @@
     <p id="status" class="sr-only" role="status" aria-live="polite"></p>
   </div>
 
+  <section id="menu" class="menu" aria-labelledby="menu-title">
+    <div class="menu-inner">
+      <h1 id="menu-title">Word<span>Chain</span></h1>
+      <p class="tagline">Every word builds something bigger.</p>
+      <div id="mode-cards" class="mode-cards"></div>
+      <p id="menu-note" class="menu-note" role="status"></p>
+    </div>
+  </section>
+
+  <dialog id="confirm-modal" aria-labelledby="confirm-text">
+    <p id="confirm-text" class="confirm-text"></p>
+    <div class="share-row"><button type="button" class="confirm-no">Cancel</button><button type="button" class="confirm-yes primary">OK</button></div>
+  </dialog>
+
   <dialog id="help-modal" aria-labelledby="help-title">
     <h2 id="help-title">How to play</h2>
-    <p>Guess the highlighted word in 6 tries. Each guess must be a valid 5-letter word.</p>
+    <p>Guess the highlighted word in 6 tries. Each guess must be a valid word of the shown length.</p>
     <ul class="legend">
       <li><span class="sample correct">A</span> right letter, right spot</li>
       <li><span class="sample present">B</span> in the word, wrong spot</li>
       <li><span class="sample absent">C</span> not in the word</li>
     </ul>
     <p>Solve a word and it joins the crossword. The next word crosses a solved one, and shared letters are
-      <b>locked</b> and filled in for you.</p>
-    <p>Score: 100 per word, plus a bonus for fewer guesses. Run out of tries and the run ends.
-      Drag to pan the board, scroll or pinch to zoom.</p>
+      <b>locked</b> and filled in for you. Drag to pan the board, scroll or pinch to zoom.</p>
+    <p id="help-mode"></p>
     <button id="help-close" type="button" class="primary">Play</button>
   </dialog>
 
@@ -63,16 +98,25 @@
     <h2 id="end-title">Run over</h2>
     <p id="end-message"></p>
     <dl class="summary">
+      <div><dt>Mode</dt><dd id="end-mode">-</dd></div>
       <div><dt>Words solved</dt><dd id="end-words">0</dd></div>
       <div><dt>Score</dt><dd id="end-score">0</dd></div>
-      <div><dt>Best run</dt><dd id="end-best">0</dd></div>
+      <div><dt>Best</dt><dd id="end-best">0</dd></div>
+      <div><dt>Avg guesses</dt><dd id="end-avg">0</dd></div>
+      <div><dt>Intersections</dt><dd id="end-cross">0</dd></div>
+      <div><dt>Junctions</dt><dd id="end-junc">0</dd></div>
+      <div id="end-obj-box"><dt>Objectives</dt><dd id="end-obj">0</dd></div>
     </dl>
+    <div id="end-board" class="end-board" aria-label="Final crossword"></div>
     <div class="share-row">
-      <button id="share" type="button">Share</button>
+      <button id="share" type="button">Share Result</button>
       <button id="download-svg" type="button">Save image</button>
     </div>
     <p id="share-status" class="share-status" role="status"></p>
-    <button id="end-restart" type="button" class="primary">New run</button>
+    <div class="share-row">
+      <button id="end-menu" type="button">Change Mode</button>
+      <button id="end-restart" type="button" class="primary">Play Again</button>
+    </div>
   </dialog>
 
   <script type="module" src="js/main.js"></script>
