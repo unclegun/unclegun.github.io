@@ -1,5 +1,4 @@
 abbey
-abbot
 abide
 about
 above
@@ -9,7 +8,6 @@ actor
 acute
 adapt
 added
-admin
 admit
 adobe
 adopt
@@ -55,7 +53,6 @@ angle
 angry
 anime
 ankle
-annex
 annoy
 apart
 apple
@@ -64,7 +61,6 @@ arbor
 areas
 arena
 argue
-ariel
 arise
 armed
 armor
@@ -95,7 +91,6 @@ balls
 bands
 barge
 baron
-basal
 based
 basic
 basil
@@ -112,16 +107,13 @@ began
 begin
 begun
 being
-belle
 belly
 below
 bench
-benny
 berry
 berth
 bible
 bills
-billy
 binge
 bingo
 birch
@@ -141,7 +133,6 @@ blind
 blink
 blitz
 block
-bloke
 blond
 blood
 bloom
@@ -153,7 +144,6 @@ blush
 board
 boast
 boats
-bobby
 bonds
 bones
 bonus
@@ -161,12 +151,9 @@ books
 boost
 booth
 boots
-booty
-booze
 bored
 borne
 bound
-bowel
 boxer
 boxes
 brace
@@ -179,7 +166,6 @@ brawl
 bread
 break
 breed
-brent
 bribe
 brick
 bride
@@ -187,7 +173,6 @@ brief
 bring
 brink
 broad
-brock
 broke
 brook
 broom
@@ -200,7 +185,6 @@ built
 bully
 bunch
 bunny
-burke
 burnt
 burst
 buyer
@@ -224,7 +208,6 @@ carve
 cases
 caste
 catch
-cater
 cause
 cease
 cedar
@@ -245,7 +228,6 @@ check
 cheek
 cheer
 chest
-chevy
 chick
 chief
 child
@@ -261,8 +243,6 @@ chuck
 chunk
 cider
 cigar
-circa
-cisco
 cited
 civic
 civil
@@ -300,7 +280,6 @@ comic
 condo
 coral
 corps
-costa
 costs
 couch
 cough
@@ -377,7 +356,6 @@ dizzy
 dodge
 doing
 dolly
-donna
 donor
 doors
 doubt
@@ -400,13 +378,9 @@ drone
 drops
 drove
 drown
-drugs
-drunk
 dryer
 dummy
-dunno
 dusty
-dutch
 dwarf
 dwell
 dying
@@ -435,7 +409,6 @@ envoy
 equal
 equip
 erase
-erect
 error
 essay
 ether
@@ -459,7 +432,6 @@ falls
 false
 famed
 fancy
-fanny
 fatal
 fatty
 fault
@@ -467,10 +439,8 @@ fauna
 favor
 feast
 feels
-fella
 fence
 ferry
-fetal
 fetch
 fever
 fewer
@@ -520,7 +490,6 @@ focus
 folks
 foods
 force
-forex
 forge
 forms
 forty
@@ -533,7 +502,6 @@ freak
 freed
 fresh
 fried
-fritz
 front
 frost
 froze
@@ -556,7 +524,6 @@ genre
 ghost
 giant
 gifts
-gimme
 girls
 given
 gives
@@ -566,12 +533,10 @@ glove
 glued
 goals
 going
-gonna
 goods
 goofy
 goose
 gorge
-gotta
 grace
 grade
 graft
@@ -601,15 +566,11 @@ guide
 guild
 guilt
 guise
-gypsy
 habit
 hairy
 hands
 handy
 happy
-haram
-hardy
-harry
 harsh
 hatch
 hated
@@ -626,12 +587,10 @@ hedge
 hello
 helps
 hence
-henry
 hills
 hired
 hitch
 hobby
-hogan
 holds
 holes
 holly
@@ -647,14 +606,12 @@ hotel
 hound
 hours
 house
-hubby
 human
 humid
 humor
 hurry
 hurts
 hydro
-hyped
 hyper
 icing
 ideal
@@ -668,20 +625,13 @@ indie
 inlet
 inner
 input
-intel
-inter
 intro
 irony
 issue
 items
 ivory
-japan
 jelly
-jenny
-jerry
 jewel
-jihad
-jimmy
 joint
 joker
 jokes
@@ -689,12 +639,9 @@ jolly
 judge
 juice
 juicy
-kappa
 karma
 keeps
-kelly
 kills
-kinda
 kinds
 kings
 kitty
@@ -702,7 +649,6 @@ knife
 knock
 known
 knows
-kylie
 label
 labor
 laden
@@ -725,11 +671,8 @@ ledge
 legal
 legit
 lemon
-leone
 level
 lever
-levin
-lewis
 light
 liked
 likes
@@ -750,13 +693,11 @@ loans
 lobby
 local
 lodge
-logan
 logic
 login
 looks
 loose
 loser
-louis
 loved
 lover
 loves
@@ -776,7 +717,6 @@ major
 maker
 makes
 males
-malik
 manga
 mango
 mania
@@ -784,12 +724,10 @@ manly
 manor
 maple
 march
-maria
 marry
 marsh
 mason
 match
-mater
 matte
 maybe
 mayor
@@ -823,8 +761,6 @@ model
 modem
 moist
 molly
-momma
-mommy
 money
 monte
 month
@@ -832,7 +768,6 @@ moody
 moose
 moral
 moron
-morse
 motel
 motif
 motor
@@ -855,11 +790,8 @@ naive
 naked
 named
 names
-nancy
-nanny
 nasal
 nasty
-natal
 naval
 needs
 needy
@@ -883,7 +815,6 @@ notes
 novel
 nurse
 nylon
-obese
 occur
 ocean
 oddly
@@ -896,7 +827,6 @@ onion
 onset
 opens
 opera
-opium
 opted
 optic
 orbit
@@ -920,8 +850,6 @@ panda
 panel
 panic
 pants
-paolo
-papal
 paper
 parry
 parts
@@ -937,12 +865,9 @@ peace
 peach
 pearl
 pedal
-penal
 pence
 penny
 peril
-perry
-peter
 petty
 phase
 phone
@@ -985,7 +910,6 @@ prime
 print
 prior
 prism
-privy
 prize
 probe
 promo
@@ -1004,7 +928,6 @@ puppy
 purge
 purse
 quake
-quasi
 queen
 query
 quest
@@ -1024,7 +947,6 @@ rainy
 raise
 rally
 ranch
-randy
 range
 ranks
 rapid
@@ -1046,7 +968,6 @@ reign
 relax
 relay
 remix
-renal
 renew
 repay
 reply
@@ -1075,12 +996,9 @@ robot
 rocks
 rocky
 rodeo
-roger
 rogue
 roles
 rolls
-roman
-romeo
 rooms
 roots
 rotor
@@ -1101,7 +1019,6 @@ safer
 saint
 salad
 sales
-sally
 salon
 salsa
 salty
@@ -1179,7 +1096,6 @@ sight
 sigma
 signs
 silly
-silva
 since
 siren
 sites
@@ -1238,7 +1154,6 @@ speed
 spell
 spend
 spent
-sperm
 spice
 spicy
 spike
@@ -1363,9 +1278,6 @@ tenor
 tense
 tenth
 terms
-terra
-terry
-tesla
 tests
 texts
 thank
@@ -1418,7 +1330,6 @@ trade
 trail
 train
 trait
-trans
 trash
 tread
 treat
@@ -1465,7 +1376,6 @@ upper
 upset
 urban
 urged
-urine
 usage
 users
 usher
@@ -1498,7 +1408,6 @@ vocal
 vodka
 vogue
 voice
-vomit
 voted
 voter
 votes
@@ -1507,8 +1416,6 @@ wages
 wagon
 waist
 walks
-wally
-wanna
 wants
 waste
 watch
@@ -1520,7 +1427,6 @@ weave
 wedge
 weigh
 weird
-welsh
 whack
 whale
 wharf
@@ -1535,7 +1441,6 @@ whose
 wider
 widow
 width
-willy
 winds
 windy
 wings
@@ -1565,7 +1470,6 @@ write
 wrong
 wrote
 yacht
-yahoo
 yards
 years
 yeast

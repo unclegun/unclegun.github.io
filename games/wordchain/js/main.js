@@ -3,6 +3,8 @@ import { GameEngine } from './gameEngine.js';
 import { Renderer } from './renderer.js';
 import { GuessBuffer, bindInput } from './input.js';
 import { saveGame, loadGame, clearGame, getBest, recordRun } from './storage.js';
+import { validateSave } from './saveValidator.js';
+import { buildCrosswordSvg, buildShareText, shareResult, downloadSvg } from './share.js';
 
 const $ = (id) => document.getElementById(id);
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -16,11 +18,15 @@ const buffer = new GuessBuffer();
 let dictionary;
 let engine;
 let busy = false;
+let runToken = 0; // bumped on restart/resume so stale async transitions abort
+let lastResult = null;
 
 const announce = (msg) => { $('status').textContent = msg; };
 
-function refresh({ animate = false } = {}) {
-  renderer.renderGuesses(engine, buffer);
+const persist = () => saveGame({ ...engine.toJSON(), draft: buffer.letters });
+
+function refresh({ animate = false, holdKeys = false } = {}) {
+  renderer.renderGuesses(engine, buffer, { holdKeys });
   renderer.renderBoard(engine, buffer, { animate });
   renderer.renderStats(engine, getBest().score);
 }
@@ -35,18 +41,23 @@ function startRound() {
 }
 
 function newGame() {
+  runToken++;
   clearGame();
   engine = new GameEngine({ dictionary, seed: (Math.random() * 2 ** 32) >>> 0 });
   busy = false;
   closeModals();
   startRound();
   renderer.focusActive(engine, { instant: true });
-  saveGame(engine.toJSON());
+  persist();
 }
 
 function resume(state) {
+  runToken++;
+  busy = false;
   engine = new GameEngine({ dictionary, state });
+  if (engine.status === 'complete') { endRun(true); return; }
   buffer.reset(engine.locked);
+  buffer.restoreDraft(state.draft);
   refresh();
   renderer.focusActive(engine, { instant: true });
   setTimeout(() => engine.precompute(), 50);
@@ -60,6 +71,9 @@ function endRun(complete) {
   clearGame();
   const isBest = recordRun({ score: engine.score, words: engine.solved });
   const best = getBest();
+  lastResult = { words: engine.solved, score: engine.score, best: best.score, isBest, board: engine.board.words.map((w) => ({ ...w })) };
+  $('share-status').textContent = '';
+  $('share').disabled = $('download-svg').disabled = !lastResult.board.length;
   $('end-title').textContent = complete ? 'Crossword complete!' : 'Run over';
   $('end-message').textContent = complete
     ? 'No more words fit on your crossword. Amazing run!'
@@ -79,23 +93,33 @@ async function submit() {
   const res = engine.submitGuess(buffer.word);
   if (!res.ok) { renderer.shakeRow(row); renderer.toast(res.error); announce(res.error); return; }
   busy = true;
-  renderer.renderGuesses(engine, buffer);
+  const token = runToken;
+  const alive = () => token === runToken;
+  persist(); // never lose the guess, even if the page is closed mid-animation
+  renderer.renderGuesses(engine, buffer, { holdKeys: true });
   renderer.flipRow(row);
   renderer.renderStats(engine, getBest().score);
   await wait(900);
-  saveGame(engine.toJSON());
+  if (!alive()) return;
   if (res.solved) {
     renderer.toast('Solved!');
-    refresh();
-    await wait(600);
+    refresh({ animate: true });
+    await wait(450);
+    if (!alive()) return;
+    const solvedWord = engine.board.words[engine.board.words.length - 1];
+    renderer.focusAll(engine); // zoom out to show the growing crossword
+    renderer.highlightWord(engine, solvedWord);
+    await wait(650);
+    if (!alive()) return;
     engine.advance();
     if (engine.status === 'complete') { endRun(true); busy = false; return; }
     startRound();
-    saveGame(engine.toJSON());
+    persist();
   } else if (res.lost) {
     endRun(false);
   } else {
     buffer.reset(engine.locked);
+    persist();
     refresh();
     announce(`${engine.attemptsLeft} attempts left`);
   }
@@ -105,13 +129,21 @@ async function submit() {
 bindInput({
   keyboardEl: $('keyboard'),
   isBlocked: () => busy || engine?.status !== 'playing' || engine?.phase !== 'guessing' || document.querySelector('dialog[open]') !== null,
-  onLetter: (l) => { if (buffer.add(l)) { refresh(); } },
-  onBackspace: () => { if (buffer.backspace()) refresh(); },
+  onLetter: (l) => { if (buffer.add(l)) { refresh(); persist(); } },
+  onBackspace: () => { if (buffer.backspace()) { refresh(); persist(); } },
   onEnter: submit,
 });
 
-$('restart').addEventListener('click', () => { if (busy) return; newGame(); });
+$('restart').addEventListener('click', newGame);
 $('end-restart').addEventListener('click', newGame);
+$('share').addEventListener('click', async () => {
+  if (!lastResult) return;
+  const svg = buildCrosswordSvg(lastResult.board);
+  const text = buildShareText({ ...lastResult, url: location.href.split('#')[0] });
+  const how = await shareResult({ svg, text });
+  $('share-status').textContent = { shared: 'Shared!', copied: 'Result copied to clipboard.', downloaded: 'Crossword image downloaded.', cancelled: '' }[how];
+});
+$('download-svg').addEventListener('click', () => { if (lastResult) downloadSvg(buildCrosswordSvg(lastResult.board)); });
 $('help').addEventListener('click', () => $('help-modal').showModal());
 $('help-close').addEventListener('click', () => $('help-modal').close());
 $('zoom-in').addEventListener('click', () => renderer.zoomBy(1.25));
@@ -128,9 +160,10 @@ addEventListener('resize', () => renderer.focusActive(engine, { instant: true })
     return;
   }
   $('loading').hidden = true;
-  const saved = loadGame();
-  if (saved && saved.status === 'playing') resume(saved);
-  else newGame();
+  const saved = validateSave(loadGame(), dictionary);
+  if (saved && saved.status === 'playing') {
+    try { resume(saved); } catch { clearGame(); newGame(); }
+  } else newGame();
   if (!localStorage.getItem('wordchain.seenHelp')) {
     try { localStorage.setItem('wordchain.seenHelp', '1'); } catch { /* ignore */ }
     $('help-modal').showModal();
