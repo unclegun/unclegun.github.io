@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>WordChain - Endless Crossword Wordle</title>
+  <meta name="description" content="WordChain: solve Wordle-style puzzles that grow into an endless crossword.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Word<span>Chain</span></h1>
+      <div class="stats" aria-label="Game stats">
+        <div><span class="lbl">Word</span><b id="word-num">1</b></div>
+        <div><span class="lbl">Score</span><b id="score">0</b></div>
+        <div><span class="lbl">Tries left</span><b id="attempts">6</b></div>
+        <div class="hide-sm"><span class="lbl">Best</span><b id="best">0</b></div>
+      </div>
+      <div class="actions">
+        <button id="help" type="button" aria-label="How to play">?</button>
+        <button id="restart" type="button" aria-label="Restart game">↻</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="board" tabindex="0" role="application" aria-label="Crossword board">
+        <div id="world"></div>
+        <p id="loading">Loading…</p>
+        <div class="board-controls">
+          <button id="zoom-in" type="button" aria-label="Zoom in">+</button>
+          <button id="zoom-out" type="button" aria-label="Zoom out">−</button>
+          <button id="recenter" type="button" aria-label="Focus active word">◎</button>
+        </div>
+      </section>
+
+      <section id="panel" aria-label="Guess panel">
+        <div id="guesses" role="grid" aria-label="Guesses"></div>
+        <div id="keyboard" aria-label="On-screen keyboard"></div>
+      </section>
+    </main>
+
+    <div id="toast" role="status"></div>
+    <p id="status" class="sr-only" role="status" aria-live="polite"></p>
+  </div>
+
+  <dialog id="help-modal" aria-labelledby="help-title">
+    <h2 id="help-title">How to play</h2>
+    <p>Guess the highlighted word in 6 tries. Each guess must be a valid 5-letter word.</p>
+    <ul class="legend">
+      <li><span class="sample correct">A</span> right letter, right spot</li>
+      <li><span class="sample present">B</span> in the word, wrong spot</li>
+      <li><span class="sample absent">C</span> not in the word</li>
+    </ul>
+    <p>Solve a word and it joins the crossword. The next word crosses a solved one, and shared letters are
+      <b>locked</b> and filled in for you.</p>
+    <p>Score: 100 per word, plus a bonus for fewer guesses. Run out of tries and the run ends.
+      Drag to pan the board, scroll or pinch to zoom.</p>
+    <button id="help-close" type="button" class="primary">Play</button>
+  </dialog>
+
+  <dialog id="end-modal" aria-labelledby="end-title">
+    <h2 id="end-title">Run over</h2>
+    <p id="end-message"></p>
+    <dl class="summary">
+      <div><dt>Words solved</dt><dd id="end-words">0</dd></div>
+      <div><dt>Score</dt><dd id="end-score">0</dd></div>
+      <div><dt>Best run</dt><dd id="end-best">0</dd></div>
+    </dl>
+    <button id="end-restart" type="button" class="primary">New run</button>
+  </dialog>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
