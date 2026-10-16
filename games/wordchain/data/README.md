@@ -9,3 +9,8 @@
 
 The lists are generated offline and shipped as static text files; the game makes no runtime API calls.
 Review `answers.txt` by hand if you want a stricter curation; removing a line is all that is needed.
+
+## Answer filtering
+`answer-exclusions.txt` records words removed from `answers.txt` after review (proper names, slang/contractions such as
+`gonna`, brands, nationalities, crude or sensitive terms, obscure words). A test asserts none of them are in `answers.txt`.
+`valid-guesses.txt` is left broad, so excluded words remain accepted as guesses. Licensing notes above are unchanged.

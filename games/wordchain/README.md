@@ -24,7 +24,10 @@ cd games/wordchain && node --test   # Node 18+, no dependencies
 | `wordleEvaluator.js` | Green/yellow/gray scoring with duplicate-letter handling |
 | `dictionaryService.js` | Replaceable provider (`isValidGuess`, `wordsWith(pos, letter)`, `randomAnswer`); position/letter index; static file loader |
 | `placementValidator.js` | Crossword rules on a sparse `(x, y)` board: conflicts, overlap, adjacency, crossings |
-| `crosswordGenerator.js` | `CrosswordBoard` + `CrosswordGenerator`: scans all solved words/letters, scores & randomizes candidates |
+| `crosswordGenerator.js` | `CrosswordBoard` + `CrosswordGenerator`: bounded candidate pool sampled across *all* solved words/intersections (validation budget caps cost), scored with configurable `DEFAULT_WEIGHTS` (placement jitter, crossing preference, diversity, compactness), then a diversity-aware pick across anchors/board regions |
+| `difficulty.js` | Soft crossing preferences by word number (1: none, 2–5: one, 6–15: one–two, 16+: one–three) |
+| `saveValidator.js` | Replays and sanity-checks saves; malformed/outdated saves start a fresh run |
+| `share.js` | End-of-run SVG crossword, share text, Web Share → clipboard → download fallback (independent of the engine) |
 | `gameEngine.js` | Rounds, attempts, scoring, precomputation, serialization (no DOM) |
 | `random.js` | Seedable, restorable PRNG (reproducible tests and saves) |
 | `storage.js` | Save/resume and high score |
@@ -33,6 +36,17 @@ cd games/wordchain && node --test   # Node 18+, no dependencies
 Precomputation: while the player guesses, `engine.precompute()` places the (known) target on a projected board and caches
 candidates; they are revalidated before reveal, with on-demand generation as fallback.
 
+## Refinements
+- **Resume**: saves are validated; a save taken during the solved transition resumes at the next word. The in-progress
+  draft letters are saved too. Restart bumps a run token so stale animations cannot touch a new game.
+- **Growth animation**: Wordle flip → solved word joins board → zoom out to whole crossword with highlight on the new word and
+  intersections → next word revealed and focused. Input is blocked only during this (~1.5 s); `prefers-reduced-motion` makes it immediate.
+- **Answers**: `data/answer-exclusions.txt` lists names, slang and sensitive words removed from `answers.txt` (see `data/README.md`).
+- **Sharing**: the end dialog offers Share (Web Share with the SVG when supported, else copies text, else downloads) and Save image.
+
+## Manual browser verification still needed
+Loading overlay gone on desktop/mobile, animation feel, touch pan/pinch, safe-area insets, Web Share on mobile.
+
 ## Extending
 Swap the dictionary by passing any object with the same methods to `GameEngine`; replace `data/*.txt` to change the word lists.
-Limitations: answer list is auto-curated, not hand-reviewed; no Web Worker (generation is fast enough in testing).
+Limitations: answer list is auto-curated plus a hand-written exclusion list, not fully hand-reviewed; no Web Worker (generation is fast enough in testing).

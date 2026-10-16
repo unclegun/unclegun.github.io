@@ -62,7 +62,7 @@ export class Renderer {
   }
 
   /** Draw the guess panel from engine state plus the live buffer. */
-  renderGuesses(engine, buffer) {
+  renderGuesses(engine, buffer, { holdKeys = false } = {}) {
     const locked = engine.locked;
     this.rows.forEach(({ row, tiles }, r) => {
       const guess = engine.guesses[r];
@@ -83,7 +83,8 @@ export class Renderer {
         }
       });
     });
-    const st = letterStatuses(engine.guesses);
+    // while a row is flipping, keep keyboard colors from spoiling the reveal
+    const st = letterStatuses(holdKeys ? engine.guesses.slice(0, -1) : engine.guesses);
     for (const [k, b] of Object.entries(this.keys)) {
       if (k.length === 1) b.className = 'key' + (st[k] ? ' ' + st[k] : '');
     }
@@ -147,27 +148,66 @@ export class Renderer {
       `Crossword with ${board.words.length} solved words. Arrow keys pan, plus and minus zoom.`);
   }
 
-  /** Center on the active word (or the whole board if it fits). */
+  /** Briefly highlight a solved word and the cells where it crosses others. */
+  highlightWord(engine, w) {
+    if (!w) return;
+    for (const c of cellsOf(w.word, w.x, w.y, w.dir)) {
+      const el = this.cellEls.get(key(c.x, c.y));
+      if (!el) continue;
+      const crossing = engine.board.cells.get(key(c.x, c.y))?.dirs.size > 1;
+      el.classList.remove('flash', 'flash-cross');
+      void el.offsetWidth;
+      el.classList.add(crossing ? 'flash-cross' : 'flash');
+    }
+  }
+
+  /** Smoothly frame the whole crossword (zoom-out reveal). */
+  focusAll(engine) {
+    const cells = [];
+    for (const w of engine.board.words) cells.push(...cellsOf(w.word, w.x, w.y, w.dir));
+    if (!cells.length) return;
+    this.#frame(cells, { maxZoom: 1.2, minZoom: 0.25, instant: false });
+  }
+
+  /** Center on the active word (or the whole board if it fits readably). */
   focusActive(engine, { instant = false } = {}) {
     const pts = [];
     const cur = engine.current;
     if (cur) pts.push(...cellsOf(cur.word, cur.x, cur.y, cur.dir));
     const all = [];
     for (const w of engine.board.words) all.push(...cellsOf(w.word, w.x, w.y, w.dir));
+    const full = all.concat(pts);
+    if (!full.length) return;
     const rect = this.el.board.getBoundingClientRect();
-    const bb = (cells) => ({
+    const fit = this.#fit(full, rect);
+    if (fit < 0.7 && pts.length) {
+      // board too large to read: keep the active word fully in view instead
+      const zoom = Math.min(1.1, Math.max(0.7, rect.width / ((WORD_LENGTH + 1) * CELL)));
+      this.#frame(pts, { maxZoom: zoom, minZoom: zoom, instant });
+    } else this.#frame(full, { maxZoom: 1.4, minZoom: 0.25, instant });
+  }
+
+  #bb(cells) {
+    return {
       x0: Math.min(...cells.map((c) => c.x)), x1: Math.max(...cells.map((c) => c.x)) + 1,
       y0: Math.min(...cells.map((c) => c.y)), y1: Math.max(...cells.map((c) => c.y)) + 1,
-    });
-    const full = bb(all.concat(pts));
+    };
+  }
+
+  #fit(cells, rect) {
+    const bb = this.#bb(cells);
     const pad = 1.5;
-    const fit = Math.min(rect.width / ((full.x1 - full.x0 + pad) * CELL), rect.height / ((full.y1 - full.y0 + pad) * CELL));
-    let target = full, zoom = Math.min(1.4, fit);
-    if (fit < 0.7 && pts.length) { target = bb(pts); zoom = Math.min(1.1, Math.max(0.7, rect.width / ((WORD_LENGTH + 1) * CELL))); }
+    return Math.min(rect.width / ((bb.x1 - bb.x0 + pad) * CELL), rect.height / ((bb.y1 - bb.y0 + pad) * CELL));
+  }
+
+  #frame(cells, { maxZoom, minZoom, instant }) {
+    const rect = this.el.board.getBoundingClientRect();
+    const bb = this.#bb(cells);
+    const zoom = Math.max(minZoom, Math.min(maxZoom, this.#fit(cells, rect)));
     this.el.world.classList.toggle('instant', instant);
     this.view.zoom = zoom;
-    this.view.x = rect.width / 2 - ((target.x0 + target.x1) / 2) * CELL * zoom;
-    this.view.y = rect.height / 2 - ((target.y0 + target.y1) / 2) * CELL * zoom;
+    this.view.x = rect.width / 2 - ((bb.x0 + bb.x1) / 2) * CELL * zoom;
+    this.view.y = rect.height / 2 - ((bb.y0 + bb.y1) / 2) * CELL * zoom;
     this.#applyView();
     if (instant) requestAnimationFrame(() => this.el.world.classList.remove('instant'));
   }

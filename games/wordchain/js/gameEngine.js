@@ -20,8 +20,11 @@ export class GameEngine {
     this.generator = new CrosswordGenerator({ dictionary, rng: this.rng });
     this.board = new CrosswordBoard();
     this.next = null; // precomputed candidates
-    if (state) this.#restore(state);
-    else this.#start(seed);
+    if (state) {
+      this.#restore(state);
+      // A save taken mid-transition (solved, not yet advanced) resumes at the next word.
+      if (this.phase === 'solved' && this.status === 'playing') this.advance();
+    } else this.#start(seed);
   }
 
   #start(seed) {
@@ -102,15 +105,16 @@ export class GameEngine {
     if (!this.current || this.phase !== 'guessing') return;
     const projected = this.board.clone();
     projected.addWord(this.current.word, this.current.x, this.current.y, this.current.dir);
-    this.next = { forWord: this.current.word, candidates: this.generator.findCandidates(projected, 4) };
+    this.next = { forWord: this.current.word, candidates: this.generator.findCandidates(projected, 4, { wordNumber: this.solved + 2 }) };
   }
 
   #takeNext() {
+    const wordNumber = this.solved + 1;
     const cached = this.next && this.next.forWord === this.current.word ? this.next.candidates : [];
     this.next = null;
     const fresh = cached.filter((c) => this.#stillValid(c));
     if (fresh.length) return fresh[this.rng.int(Math.min(fresh.length, 3))];
-    return this.generator.pickNext(this.board); // on-demand fallback
+    return this.generator.pickNext(this.board, wordNumber); // on-demand fallback
   }
 
   #stillValid(c) {

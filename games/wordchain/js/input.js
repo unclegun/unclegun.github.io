@@ -9,6 +9,13 @@ export class GuessBuffer {
     this.letters = Array.from({ length: WORD_LENGTH }, (_, i) => locked[i] || '');
   }
 
+  /** Restores saved partial letters; ignores anything malformed or touching locked slots. */
+  restoreDraft(draft) {
+    if (!Array.isArray(draft) || draft.length !== this.letters.length) return;
+    if (!draft.every((l, i) => (this.isLocked(i) ? l === this.locked[i] : l === '' || /^[a-z]$/.test(l)))) return;
+    this.letters = draft.slice();
+  }
+
   isLocked(i) { return i in this.locked; }
 
   add(letter) {
