@@ -55,7 +55,9 @@ export function getBestFor(mode, s) {
 
 export function getStats(mode, s) {
   const st = readJson(s, k('stats', mode));
-  return { runs: 0, words: 0, totalScore: 0, bestWords: 0, ...(st && typeof st === 'object' ? st : {}) };
+  const o = st && typeof st === 'object' ? st : {};
+  const n = (v) => (Number.isFinite(v) && v >= 0 ? v : 0);
+  return { runs: n(o.runs), words: n(o.words), totalScore: n(o.totalScore), bestWords: n(o.bestWords) };
 }
 
 /** Records a finished run (best score + statistics); returns true if it's a new best score. */

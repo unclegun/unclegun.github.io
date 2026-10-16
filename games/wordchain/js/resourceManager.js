@@ -20,9 +20,9 @@ export class ResourceManager {
 
   static isValidState(s, config) {
     return !!s && Number.isInteger(s.tokens) && s.tokens >= 0 && s.tokens <= config.maxBalance
-      && s.used && ['hint', 'reroll', 'extraTry'].every((k) => Number.isInteger(s.used[k]) && s.used[k] >= 0)
+      && s.used && ['hint', 'reroll', 'extraTry'].every((k) => Number.isInteger(s.used[k]) && s.used[k] >= 0 && s.used[k] <= 1000)
       && Array.isArray(s.awarded) && s.awarded.every((k) => typeof k === 'string')
-      && Number.isInteger(s.earnedThisWord) && Number.isInteger(s.earnedTotal) && Number.isInteger(s.spentTotal);
+      && Number.isInteger(s.earnedThisWord) && s.earnedThisWord >= 0 && Number.isInteger(s.earnedTotal) && s.earnedTotal >= 0 && Number.isInteger(s.spentTotal) && s.spentTotal >= 0;
   }
 
   get cost() { return this.config.costs; }
