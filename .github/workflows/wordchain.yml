@@ -1,0 +1,48 @@
+name: WordChain CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/wordchain.yml'
+      - 'games/wordchain/**'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test and browser smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Chromium
+        uses: browser-actions/setup-chrome@v2.2.0
+        id: chrome
+      - name: Run WordChain tests
+        working-directory: games/wordchain
+        env:
+          CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
+        run: |
+          set -o pipefail
+          set +e
+          npm test 2>&1 | tee /tmp/wordchain-test-output.txt
+          status=$?
+          set -e
+          {
+            echo '## WordChain test summary'
+            echo '```text'
+            tail -n 18 /tmp/wordchain-test-output.txt
+            echo '```'
+            if grep -q '# SKIP no Chromium available' /tmp/wordchain-test-output.txt; then
+              echo 'Browser smoke tests: **skipped** (Chromium was unavailable).'
+            else
+              echo 'Browser smoke tests: **executed** by the existing headless Chromium test.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"

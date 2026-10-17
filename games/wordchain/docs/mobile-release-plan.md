@@ -9,6 +9,8 @@ Status: **web/PWA foundation only.** No native project exists. A PWA does not by
 | PWA | Manifest, icons, service worker, offline cache | Added in 2.1; offline restart still needs real-browser verification |
 | Native-store | Signed binaries, store listings, review passed | Not started |
 
+WordChain 2.2 currently includes a WordChain-scoped Node/Chromium CI smoke suite. It verifies the game HUD/shop browser fixture and Reverse Wordle completion wiring; it is not a substitute for physical-device testing. PWA offline launch and restart remain unverified in a real browser.
+
 ## 2. Approach: Capacitor
 Recommended: wrap the static site with [Capacitor](https://capacitorjs.com). It keeps the vanilla JS/ES-module code unchanged, bundles assets inside the app (true offline, no service-worker dependency) and gives access to status bar, safe area, haptics and lifecycle plugins. Alternatives (Trusted Web Activity for Android only, Cordova, native rewrite) are less suitable: TWA does not cover iOS; a rewrite throws away working code.
 
@@ -35,7 +37,7 @@ Word lists are bundled in `data/`, so offline bundling needs no change; load the
 - Listing text, category (Games › Word), age rating questionnaire.
 
 ## 5. Privacy and data inventory
-The game uses no backend, accounts, analytics or ads. Data stored locally only: run saves, best scores, tutorial flags, audio preferences, local playtest counters (never uploaded). Apple "App Privacy" answer: Data Not Collected; Google Data safety: no data collected or shared. Re-verify before submission and publish a privacy policy URL.
+The game uses no backend, accounts, analytics or ads. Data stored locally only: run saves, best scores, tutorial flags, audio preferences, local playtest counters (never uploaded). Saves and preferences are device/browser-local, are not synchronized across devices, and may be lost when site/application data is cleared. Apple "App Privacy" answer: Data Not Collected; Google Data safety: no data collected or shared. Re-verify before submission and publish a privacy policy URL.
 
 ## 6. Accessibility checks
 VoiceOver/TalkBack walkthrough of guessing, shop and every event; Dynamic Type/large font; contrast across all nine Anarchy palettes; reduced motion; touch targets ≥44pt; no color-only feedback.
@@ -44,6 +46,7 @@ VoiceOver/TalkBack walkthrough of guessing, shop and every event; Dynamic Type/l
 Apple 4.2 (minimum functionality) is the main risk for web wrappers: ship native touches (haptics, offline, proper icons, share sheet) and a polished experience. Google requires target API level compliance and a Data safety form. Do not claim features (offline, accessibility) in listings until verified.
 
 ## 8. Testing, signing, release
+- CI: `.github/workflows/wordchain.yml` runs the Node suite and headless Chromium smoke test for relevant pull requests. The browser fixture currently covers the Anarchy HUD/shop and Reverse Wordle completion hook; the wider mode, mobile, audio, timed-event, progression, and offline PWA scenarios are not covered by that browser fixture. Configure **WordChain CI / Test and browser smoke** as a required check in branch protection/rulesets if required merge gating is desired; enforcement is not enabled or verified by this repository change.
 - Devices: at least one small and one large iPhone, a mid-range Android, a tablet/foldable, offline and low-memory cases.
 - Android: upload keystore, Play App Signing, internal → closed → production tracks, AAB.
 - iOS: Apple Developer account, certificates/profiles, TestFlight, then App Store Connect review.
