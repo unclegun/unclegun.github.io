@@ -8,7 +8,7 @@ import { existsSync } from 'node:fs';
 import { extname, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = fileURLToPath(new URL('..', import.meta.url));
+const root = fileURLToPath(new URL('..', import.meta.url)).replace(/[\/]+$/, '');
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.txt': 'text/plain' };
 const chrome = ['chromium', 'chromium-browser', 'google-chrome', 'google-chrome-stable'].map((b) => spawnSync('which', [b]).stdout?.toString().trim()).find(Boolean) || process.env.CHROME_BIN;
 
