@@ -11,6 +11,7 @@ import * as Chaos from './chaosMeter.js';
 import { themeFor } from './themeDirector.js';
 import { newAnarchyState } from './anarchyState.js';
 import { puzzleFromJSON, MINIGAMES, DETOUR_LIMITS } from './puzzles/index.js';
+import { ConsequenceManager, EFFECT_TYPES } from './consequences.js';
 import { ReverseWordle } from './puzzles/reverseWordle.js';
 import { INFECTION } from './puzzles/infection.js';
 
@@ -44,6 +45,7 @@ export class AnarchyGame {
     this.rng = createRng(1);
     this.rng.setState(this.s.rng);
     this.economy = new ArcadeEconomy(this.s.economy);
+    this.consequences = new ConsequenceManager(this.s.consequences);
     this.puzzle = this.s.puzzle ? puzzleFromJSON(this.s.puzzle) : null;
     this.detourPuzzle = this.s.detour ? puzzleFromJSON(this.s.detour.puzzle) : null;
     if (saved) this.#recover();
@@ -100,13 +102,37 @@ export class AnarchyGame {
     if (limit !== null && limit >= e.mode.attempts) limit = limit > e.mode.attempts ? limit : null;
     e.attemptLimit = limit;
     this.s.attemptLimit = limit;
+    this.consequences.expire(e.solved + 1);
     const rev = this.#activeHooks().find((en) => en.id === 'reverse_wordle');
+    if (!rev) this.#applyRoundStartEffects();
     if (rev && !this.puzzle) {
       this.puzzle = ReverseWordle.create({ dictionary: this.dictionary, answer: e.current.word, rng: this.rng });
       this.s.puzzleEntry = rev.id;
       this.s.phase = 'event';
     }
     return this.s.phase;
+  }
+
+  /** Applies carried-over 'roundStart' consequences exactly once (an effect that cannot apply yet stays queued until it expires). */
+  #applyRoundStartEffects() {
+    const e = this.engine;
+    const used = [];
+    for (const fx of [...this.consequences.active]) {
+      if (fx.trigger !== 'roundStart') continue;
+      let ok = false;
+      if (fx.type === 'startHint') {
+        for (let n = 0; n < fx.magnitude; n++) {
+          const unknown = Object.keys(e.hints).length >= this.cfg.maxHints ? [] : this.#unknownIndex();
+          if (!unknown.length) break;
+          const index = unknown[this.rng.int(unknown.length)];
+          e.hints[index] = e.current.word[index];
+          ok = true;
+        }
+      } else if (fx.type === 'freeGuess' && e.extra < this.cfg.maxExtra) { e.extra++; ok = true; }
+      else if (fx.type === 'shield' && !this.economy.s.shieldArmed) { this.economy.s.shieldArmed = true; ok = true; }
+      if (ok) { this.consequences.take(fx.type); used.push(fx.label); }
+    }
+    if (used.length) this.s.note = `Applied: ${used.join('; ')}`;
   }
 
   /** Attempts the player must not exceed to earn the current goal bonus, or null. */
@@ -179,6 +205,13 @@ export class AnarchyGame {
       else if (it.label !== 'Word solved') res.breakdown.items.push({ label: it.label, points: 0 });
     }
     res.rewards = { coins, score: delta, items: r.items, jackpot: hookResults.some((x) => x?.jackpot), boss: hookResults.some((x) => x?.boss) };
+    const carried = this.consequences.take('solveBonus');
+    if (carried) {
+      const extra = this.economy.award(`${paidKey}:cons`, carried.magnitude);
+      res.breakdown.tokens += extra;
+      res.rewards.coins += extra;
+      res.breakdown.items.push({ label: `${carried.source === 'letter_forge' ? 'Forge bonus' : 'Carried bonus'} (+${extra}🪙)`, points: 0 });
+    }
     this.economy.endWord();
     Chaos.onWordSolved(this.s.chaos, { attempts: info.attempts, crossings, hard: info.attempts >= 5 || hookResults.some((x) => x?.boss) });
     const wasDouble = this.#finishEntries(entries, info);
@@ -384,6 +417,10 @@ export class AnarchyGame {
       this.engine.score += reward.score || 0;
       this.s.stats.bonusScore += reward.score || 0;
       if (reward.reveal) this.economy.grantCredit('freeReveal', reward.reveal);
+      if (reward.consequence) {
+        const fx = this.consequences.add({ id: `${key}:fx`, source: en.id, round: this.engine.solved + 1, ...reward.consequence });
+        if (fx) reward = { ...reward, effect: fx.label };
+      }
       for (const k of reward.claim || []) if (!this.s.claimed.includes(k)) this.s.claimed.push(k);
     }
     advanceStage(en, 'rewarded');
@@ -399,7 +436,7 @@ export class AnarchyGame {
   /** Buys/uses the missing letter in a Letter Collapse puzzle (Wildcard Tile first, otherwise 2 coins). */
   fillMissing() {
     const p = this.puzzle;
-    if (this.s.phase !== 'event' || !p || p.type !== 'collapse' || p.missing === null || p.filled) return { ok: false, error: 'No missing letter to supply' };
+    if (this.s.phase !== 'event' || !p || !['collapse', 'forge'].includes(p.type) || (p.type === 'collapse' && p.missing === null) || (p.type === 'forge' && p.variant !== 'missing') || p.filled) return { ok: false, error: 'No missing letter to supply' };
     const useTile = this.economy.held('wildcardTile') > 0;
     if (!useTile && this.economy.coins < 2) return { ok: false, error: 'Not enough coins' };
     if (!p.fillMissing()) return { ok: false, error: 'No missing letter to supply' };
@@ -589,6 +626,9 @@ export class AnarchyGame {
   }
 
   /** Chips for the HUD. */
+  /** Active carried-over effects for the HUD. */
+  get effects() { return this.consequences.active.map((f) => ({ id: f.id, type: f.type, icon: EFFECT_TYPES[f.type].icon, label: f.label, expiresRound: f.expiresRound })); }
+
   get chips() {
     return this.s.entries.filter((e) => e.stage === 'active' || e.stage === 'announced').map((en) => {
       const d = def(en);
@@ -606,6 +646,7 @@ export class AnarchyGame {
       ...this.s,
       rng: this.rng.getState(),
       economy: this.economy.toJSON(),
+      consequences: this.consequences.toJSON(),
       puzzle: this.puzzle ? this.puzzle.toJSON() : null,
       detour: this.s.detour ? { ...this.s.detour, puzzle: this.detourPuzzle.toJSON() } : null,
     };

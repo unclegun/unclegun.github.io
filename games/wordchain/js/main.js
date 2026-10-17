@@ -371,6 +371,17 @@ async function startMode(id, { fresh }) {
   $('help-mode').textContent = `${engine.mode.name}: ${engine.mode.description}`;
   if (note) renderer.toast(note);
   renderer.focusActive(engine, { instant: true });
+  showFirstTimeHelp(id);
+}
+
+/** Contextual onboarding: the How to Play dialog opens once, at the first game start (never over the mode menu). */
+function showFirstTimeHelp(id) {
+  try {
+    if (localStorage.getItem('wordchain.seenHelp')) return;
+    localStorage.setItem('wordchain.seenHelp', '1');
+  } catch { return; }
+  if (id === 'anarchy') renderer.toast('Anarchy: solve words to fill the Chaos Meter, spend coins in the 🪙 Shop, and watch the rules change.');
+  $('help-modal').showModal();
 }
 
 $('menu-btn').addEventListener('click', () => showMenu());
@@ -425,8 +436,9 @@ renderer.onBoardTap(({ x, y }) => {
   if (isModeId(last)) modeId = last; // highlighted in the menu
   menu.render();
   $('menu').querySelector('button')?.focus();
-  if (!localStorage.getItem('wordchain.seenHelp')) {
-    try { localStorage.setItem('wordchain.seenHelp', '1'); } catch { /* ignore */ }
-    $('help-modal').showModal();
-  }
 })();
+
+// Offline support: the service worker is scoped to this folder only (see sw.js).
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => { /* optional: the game works without it */ }); });
+}

@@ -37,6 +37,17 @@ const roundTrip = (g, extra = {}) => {
 function solvePuzzle(g) {
   const p = g.puzzle;
   switch (p.type) {
+    case 'forge': {
+      if (p.hasBlank) assert.ok(g.fillMissing().ok);
+      const target = p.solutions[0];
+      if (p.variant === 'swap') {
+        const idx = [...p.word].findIndex((c, i) => c !== target[i]);
+        p.exchange(idx, p.spares.indexOf(target[idx]));
+      } else {
+        for (let i = 0; i < target.length; i++) { const j = p.slots.indexOf(target[i], i); if (j !== i) p.swap(i, j); }
+      }
+      break;
+    }
     case 'collapse': {
       if (p.hasBlank) assert.ok(g.fillMissing().ok);
       const target = p.word;
@@ -410,10 +421,10 @@ test('chain reaction awards only unique links', () => {
 });
 
 // ---- full game flows ----
-test('letter collapse event: canonical crossword preserved, reward paid once', () => {
+test('letter forge event: canonical crossword preserved, reward paid once', () => {
   const g = fresh(51);
   playRounds(g, 4);
-  g.force = 'letter_collapse';
+  g.force = 'letter_forge';
   let guard = 0;
   while (g.phase !== 'announce' && guard++ < 5) step(g);
   assert.equal(g.phase, 'announce');
@@ -421,13 +432,13 @@ test('letter collapse event: canonical crossword preserved, reward paid once', (
   const coins = g.coins, score = g.score;
   assert.ok(g.accept().ok);
   assert.equal(g.phase, 'event');
-  assert.equal(g.puzzle.type, 'collapse');
+  assert.equal(g.puzzle.type, 'forge');
   assert.equal(g.completeEvent().ok, false, 'unsolved cannot complete');
   assert.equal(g.coins, coins);
   assert.equal(JSON.stringify(g.engine.board.words), words, 'board unchanged during puzzle');
   const saved = roundTrip(g);
   assert.equal(saved.phase, 'event');
-  assert.equal(saved.puzzle.type, 'collapse');
+  assert.equal(saved.puzzle.type, 'forge');
   solvePuzzle(g);
   const r = g.completeEvent();
   assert.ok(r.ok);

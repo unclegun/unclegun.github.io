@@ -1,6 +1,8 @@
 import { MODIFIERS } from './modifierRegistry.js';
 import { ENCOUNTERS } from './encounterManager.js';
 import { LetterCollapse } from './puzzles/letterCollapse.js';
+import { LetterForge } from './puzzles/forge.js';
+import { createRng } from '../random.js';
 import { TileRepair } from './puzzles/tileRepair.js';
 import { GravityShift } from './puzzles/gravity.js';
 import { LetterStorm } from './puzzles/letterStorm.js';
@@ -19,12 +21,26 @@ import { scaled } from './anarchyScoring.js';
 const reward = (puzzleDone, coins, score, label, round) => (puzzleDone ? { coins: scaled(coins, round), score: scaled(score, round), label } : { coins: 0, score: 0, label: 'No reward' });
 
 export const INTERLUDES = {
-  letter_collapse: {
-    id: 'letter_collapse', name: 'Letter Collapse', icon: '🧱', tier: 'minor', kind: 'interlude', weight: 12, minRound: 2, cooldown: 3,
-    eligible: (ctx) => !!ctx.lastWord && ctx.lastWord.word.length >= 4,
+  letter_forge: {
+    id: 'letter_forge', name: 'Letter Forge', icon: '🔨', tier: 'minor', kind: 'interlude', weight: 12, minRound: 2, cooldown: 3,
+    eligible: (ctx) => !!ctx.lastWord && !!LetterForge.create({ dictionary: ctx.dictionary, word: ctx.lastWord.word, rng: createRng(ctx.round * 7919 + ctx.lastWord.word.length), allowMissing: true, round: ctx.round }),
     setup: () => ({}),
-    describe: () => 'The word you just solved crumbles into a tray. Rearrange the tiles into a valid word. Your crossword is safe: only a temporary copy falls.',
-    createPuzzle: (ctx, rng) => LetterCollapse.create({ dictionary: ctx.dictionary, word: ctx.lastWord.word, rng, missing: ctx.round >= 6 && (ctx.coins >= 2 || ctx.inventory.wildcardTile > 0) && rng.next() < 0.3 }),
+    describe: () => 'Your last word is melting in the forge. Build a DIFFERENT word from its letters (any valid word counts). Your crossword is safe: only a temporary copy is used. Forging earns coins and a benefit for your next word.',
+    createPuzzle: (ctx, rng) => LetterForge.create({ dictionary: ctx.dictionary, word: ctx.lastWord.word, rng, round: ctx.round, allowMissing: ctx.round >= 6 && (ctx.coins >= 2 || ctx.inventory.wildcardTile > 0) }),
+    resolve(p, ctx) {
+      const kind = p.rewardKind(ctx.dictionary);
+      const d = p.difficulty;
+      const magnitude = kind === 'solveBonus' ? 1 + d : kind === 'startHint' && d >= 3 ? 2 : 1;
+      return { ...reward(!!kind, 1 + d, 40 * d, `Forged a new word (${p.variant})`, ctx.round), consequence: kind ? { type: kind, magnitude } : null };
+    },
+  },
+  /** Legacy: kept so saves from before Letter Forge still load. Never offered. */
+  letter_collapse: {
+    id: 'letter_collapse', name: 'Letter Collapse', icon: '🧱', tier: 'minor', kind: 'interlude', weight: 0, minRound: 99, cooldown: 3,
+    eligible: () => false,
+    setup: () => ({}),
+    describe: () => 'The word you just solved crumbles into a tray. Rearrange the tiles into a valid word.',
+    createPuzzle: (ctx, rng) => LetterCollapse.create({ dictionary: ctx.dictionary, word: ctx.lastWord.word, rng }),
     resolve: (p, ctx) => reward(p.isSolved(ctx.dictionary), 2, 50, 'Letters restored', ctx.round),
   },
   wordquake: {

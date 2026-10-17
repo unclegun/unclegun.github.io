@@ -338,3 +338,9 @@ html.an-theme-pop #board { animation: themePop .9s ease-out; }
   html[data-an-theme] body, html[data-an-theme] #app, html[data-an-theme] .an-hud { transition: none; }
   html.an-theme-pop #board, .an-chaos.hot .bar, .inv-item.bump, .shop-item.bought { animation: none; }
 }
+
+/* Letter Forge and carried-over effects */
+.tray-tile.spare { border-style: dashed; margin-left: 6px; }
+.tray-tile.spare:first-of-type, .tray-tile:not(.spare) + .tray-tile.spare { margin-left: 18px; }
+.chip.tier-effect { border-color: var(--accent); }
+.objective-line { font-weight: 600; margin: 0 0 6px; }

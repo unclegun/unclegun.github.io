@@ -25,7 +25,7 @@ export function unmountPuzzleViews() {
 }
 
 /** Tap-to-swap tray: tap/Enter a tile, then another to swap. Arrow keys move focus; mouse users can also drag. */
-function swapTray(host, { tiles, swap, label, fall = false, cls = '' }) {
+function swapTray(host, { tiles, swap, label, fall = false, cls = '', spareFrom = Infinity }) {
   const tray = el('div', `tray ${cls}`, '', { role: 'group', 'aria-label': label });
   let selected = null;
   let dragFrom = null;
@@ -33,7 +33,7 @@ function swapTray(host, { tiles, swap, label, fall = false, cls = '' }) {
     const focus = document.activeElement?.dataset?.i;
     tray.replaceChildren();
     tiles().forEach((l, i) => {
-      const b = el('button', 'tray-tile' + (selected === i ? ' selected' : '') + (l ? '' : ' blank') + (fall && !reduceMotion() ? ' fall' : ''), l ? l.toUpperCase() : '＋', { type: 'button', 'data-i': String(i), draggable: l ? 'true' : 'false', 'aria-label': l ? `Tile ${l}, position ${i + 1}${selected === i ? ', selected' : ''}` : `Empty slot ${i + 1}` });
+      const b = el('button', 'tray-tile' + (selected === i ? ' selected' : '') + (l ? '' : ' blank') + (i >= spareFrom ? ' spare' : '') + (fall && !reduceMotion() ? ' fall' : ''), l ? l.toUpperCase() : '＋', { type: 'button', 'data-i': String(i), draggable: l ? 'true' : 'false', 'aria-label': l ? `${i >= spareFrom ? 'Spare tile' : 'Tile'} ${l}, ${i >= spareFrom ? `spare ${i - spareFrom + 1}` : `position ${i + 1}`}${selected === i ? ', selected' : ''}` : `Empty slot ${i + 1}` });
       b.style.setProperty('--i', i);
       b.addEventListener('click', () => {
         if (!l) return;
@@ -77,6 +77,39 @@ VIEWS.collapse = (p, host, ctx) => {
     if (p.hasBlank) {
       const tile = ctx.game.economy.held('wildcardTile') > 0;
       extra.append(button(tile ? '🔤 Use Wildcard Tile' : '🔤 Buy missing letter (2🪙)', () => {
+        const r = ctx.game.fillMissing();
+        if (!r.ok) ctx.toast(r.error);
+        tray.redraw(); update(); ctx.changed();
+      }, 'secondary'));
+    }
+  }
+  update();
+};
+
+VIEWS.forge = (p, host, ctx) => {
+  const how = { anagram: 'Rearrange the same letters into a different valid word.', swap: 'Swap one tile with a spare tile (the two tiles after the gap) to make a different valid word.', missing: 'A tile is missing. Supply it (Wildcard Tile or 2 coins), then build a different valid word.' };
+  host.append(el('p', 'objective-line', `Goal: ${how[p.variant]}`), el('p', 'hint', `Your word melted into the forge. Any valid word except ${p.word.toUpperCase()} works; there are at least ${p.choices} intended answer${p.choices > 1 ? 's' : ''}. Tap two tiles to swap them (or drag, or use ← → and Enter).`));
+  const status = el('p', 'puzzle-status', '', { role: 'status', 'aria-live': 'polite' });
+  const extra = el('div', 'puzzle-extra');
+  const n = p.length;
+  const tray = swapTray(host, {
+    tiles: () => [...p.slots, ...p.spares], label: 'Forge tray', fall: true, spareFrom: p.spares.length ? n : Infinity,
+    swap: (i, j) => {
+      const [a, b] = i < j ? [i, j] : [j, i];
+      const ok = b < n ? p.swap(a, b) : a < n ? p.exchange(a, b - n) : false;
+      if (ok) { update(); ctx.changed(); }
+      return ok;
+    },
+  });
+  host.append(status, extra);
+  function update() {
+    const solved = p.isSolved(ctx.game.dictionary);
+    status.textContent = p.hasBlank ? 'One tile is missing.' : solved ? `✔ ${p.arrangement.toUpperCase()} forged!` : p.arrangement === p.word ? `${p.arrangement.toUpperCase()} is the original word. Make a different one.` : p.arrangement.toUpperCase();
+    status.classList.toggle('ok', solved);
+    extra.replaceChildren();
+    if (p.hasBlank) {
+      const tile = ctx.game.economy.held('wildcardTile') > 0;
+      extra.append(button(tile ? '🔤 Use Wildcard Tile' : '🔤 Buy missing tile (2🪙)', () => {
         const r = ctx.game.fillMissing();
         if (!r.ok) ctx.toast(r.error);
         tray.redraw(); update(); ctx.changed();

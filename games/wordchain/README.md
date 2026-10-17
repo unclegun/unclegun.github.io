@@ -96,3 +96,15 @@ Anarchy-only (Classic, Builder, Architect, Challenge and Wildcard are untouched)
 - **Local metrics** (`playtestMetrics.js`): counters stored locally (`wordchain.anarchy.metrics.v1`); the **Stats** button downloads them as JSON. Nothing is uploaded.
 
 Tests: `npm test` (includes `tests/browser.test.js`, which drives the HUD in headless Chromium when installed, otherwise skipped).
+
+## WordChain 2.1 (partial delivery)
+
+Done and tested (`tests/forge.test.js`, `tests/pwa.test.js`):
+
+- **Letter Forge** (`js/anarchy/puzzles/forge.js`) replaces Letter Collapse in the event pool. The solved word's tiles drop into a tray and the player must forge a *different* valid word: **anagram**, **letter swap** (exchange one tile with a spare), or **missing ingredient** (supply the tile with a Wildcard Tile or 2 coins). Targets come from bounded, deterministic dictionary searches; if no fair distinct variant exists the event is not offered. Different intended solutions pay different next-round benefits. Only temporary state changes; the crossword is never touched. Letter Collapse remains only so older saves load.
+- **Event Consequence Manager** (`js/anarchy/consequences.js`): carried-over effects (`startHint`, `freeGuess`, `shield`, `solveBonus`) with expiry (3 rounds), a cap of 3, one effect per type, no re-adding the same effect id, saved/restored with the run, shown as chips in the Anarchy HUD, applied at the start of the next round or consumed by the next solved word.
+- **First-time help** no longer opens over the mode menu; it appears once when the first game starts.
+- **PWA foundation**: `manifest.webmanifest`, icons, and `sw.js` (scope is this folder only, cache-first, versioned `wordchain-<VERSION>` caches, no automatic `skipWaiting`, so a game in progress is not swapped to new code). Bump `VERSION` in `sw.js` when assets change; `tests/pwa.test.js` checks the precache list matches the files. Offline use has **not** been verified in a real browser yet.
+- `docs/mobile-release-plan.md`: path to App Store / Google Play.
+
+Not done in this iteration (documented, not claimed): board-integrated tile-overlay animations for Wordquake/Gravity/Storm/Chain/Infection/Blackout, new action-changing modifiers (Letter Scramble, Dual Word, etc.), director pacing tiers and diversity metrics, theme cross-fade and jazz arrangement refinements, full mobile layout and accessibility audit, diagnostics separation, and real-browser tests for shop/audio/PWA/persistence.

@@ -1,6 +1,7 @@
 import { newDirectorState, isValidDirectorState, LIFECYCLE } from './anarchyDirector.js';
 import { newEconomyState, isValidEconomyState } from './arcadeEconomy.js';
 import { newChaosState, isValidChaosState } from './chaosMeter.js';
+import { isValidConsequenceState, newConsequenceState } from './consequences.js';
 import { EVENTS } from './eventRegistry.js';
 import { puzzleFromJSON, MINIGAMES } from './puzzles/index.js';
 
@@ -19,6 +20,7 @@ export const newAnarchyState = (seed) => ({
   director: newDirectorState(),
   economy: newEconomyState(),
   chaos: newChaosState(),
+  consequences: newConsequenceState(), // carried-over effects from earlier events
   themeSeed: (seed >>> 0) % 997, // palette = themeFor(themeSeed, solved words): deterministic across save/resume
   entries: [], // active/announced events: { id, kind, stage, roundsLeft, data }
   plan: null, // decided at solve time, applied by proceed(): { entries, forced, queued }
@@ -49,6 +51,7 @@ export function validateAnarchyState(a, engineSave) {
     if (!a || a.v !== STATE_VERSION || !PHASES.includes(a.phase)) return false;
     if (!Number.isFinite(a.rng) || !isValidDirectorState(a.director) || !isValidEconomyState(a.economy)) return false;
     if (a.chaos !== undefined && !isValidChaosState(a.chaos)) return false; // older saves have no meter; they are migrated on load
+    if (a.consequences !== undefined && !isValidConsequenceState(a.consequences)) return false; // older saves have none
     if (!Array.isArray(a.entries) || a.entries.length > 4 || !a.entries.every(validateEntry)) return false;
     if (a.attemptLimit !== null && !(Number.isInteger(a.attemptLimit) && a.attemptLimit >= 1 && a.attemptLimit <= 9)) return false;
     if (!Array.isArray(a.claimed) || !a.claimed.every((k) => typeof k === 'string')) return false;

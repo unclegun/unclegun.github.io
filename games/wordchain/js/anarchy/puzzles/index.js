@@ -1,4 +1,5 @@
 import { LetterCollapse } from './letterCollapse.js';
+import { LetterForge } from './forge.js';
 import { TileRepair } from './tileRepair.js';
 import { GravityShift } from './gravity.js';
 import { LetterStorm } from './letterStorm.js';
@@ -8,7 +9,7 @@ import { MemoryMatch } from './memory.js';
 import { ReverseWordle } from './reverseWordle.js';
 import { ChainEvent } from './chainReaction.js';
 
-const CLASSES = { collapse: LetterCollapse, repair: TileRepair, gravity: GravityShift, storm: LetterStorm, sudoku: MiniSudoku, sliding: SlidingLetters, memory: MemoryMatch, reverse: ReverseWordle, chain: ChainEvent };
+const CLASSES = { collapse: LetterCollapse, forge: LetterForge, repair: TileRepair, gravity: GravityShift, storm: LetterStorm, sudoku: MiniSudoku, sliding: SlidingLetters, memory: MemoryMatch, reverse: ReverseWordle, chain: ChainEvent };
 
 /** Rebuilds any temporary puzzle from its serialized form; null when the data is invalid. */
 export function puzzleFromJSON(json) {
