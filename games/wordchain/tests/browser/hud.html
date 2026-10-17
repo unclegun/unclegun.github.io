@@ -18,7 +18,6 @@ try {
   const calls = { persist: 0, toasts: [] };
   const ui = createAnarchyUI({ hud: document.getElementById('an-hud'), eventDialog: document.getElementById('an-modal'), sideDialog: document.getElementById('an-side'), renderer: { cellEls: new Map() }, getGame: () => game,
     hooks: { persist: () => calls.persist++, toast: (m) => calls.toasts.push(m), say() {}, refresh() {}, startRound() {}, endRun() {}, lockLetter() {} } });
-  // creating the UI again must not double-bind handlers (simulates restart/mode switch re-entry)
   ui.renderHud();
   const side = document.getElementById('an-side');
   document.getElementById('an-shop').click();

@@ -62,5 +62,5 @@ export function recordPick(state, tier) {
 
 export function catalyst(state, config = CHAOS) { state.catalyst = true; return add(state, config.catalystGain, config); }
 export function brake(state, config = CHAOS) { state.wordsSinceMajor = Math.max(0, state.wordsSinceMajor - 1); return add(state, -config.brakeDrop, config); }
-export const percent = (state, config = CHAOS) => Math.round((state.value / config.threshold) * 100);
+export const percent = (state, config = CHAOS) => Math.min(100, Math.round((state.value / config.threshold) * 100));
 export const nearlyFull = (state, config = CHAOS) => state.value >= config.threshold * 0.75;

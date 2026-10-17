@@ -60,7 +60,7 @@ export class AudioDirector {
     try {
       if (!this.ctx) {
         this.ctx = this.ctxFactory();
-        if (!this.ctx) { this.prefs.music = false; return false; }
+        if (!this.ctx) { this.prefs.music = false; this.#save(); return false; }
         this.master = this.ctx.createGain();
         this.master.gain.value = this.prefs.volume * 0.5;
         this.master.connect(this.ctx.destination);
@@ -68,7 +68,7 @@ export class AudioDirector {
       }
       await this.ctx.resume?.();
       this.#startScheduler();
-    } catch { this.prefs.music = false; this.stop(); return false; }
+    } catch { this.prefs.music = false; this.#save(); this.stop(); return false; }
     this.onChange();
     return this.playing;
   }
@@ -197,7 +197,7 @@ export class AudioDirector {
   /** Page hidden: suspend the context (no CPU); visible again: resume if music is wanted. */
   hidden(isHidden) {
     if (!this.ctx) return;
-    try { if (isHidden) this.ctx.suspend?.(); else if (this.prefs.music) this.ctx.resume?.(); } catch { /* optional */ }
+    try { const p = isHidden ? this.ctx.suspend?.() : this.prefs.music ? this.ctx.resume?.() : null; p?.catch?.(() => {}); } catch { /* optional */ }
   }
 
   /** Stops the scheduler and releases the context. Preferences are kept. */
