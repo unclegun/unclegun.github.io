@@ -52,6 +52,7 @@ export function createMenu({ root, modes, getInfo, onPlay, confirmDialog, curren
       const name = el('h2', 'mode-name', mode.name);
       name.id = `mode-${mode.id}-name`;
       head.append(icon, name, el('span', 'mode-badge', mode.id === 'classic' ? 'Original experience' : mode.badge));
+      const tag = mode.tagline ? el('p', 'mode-tagline', mode.tagline) : null;
       const desc = el('p', 'mode-desc', mode.description);
       const stats = el('p', 'mode-stats');
       stats.append(el('span', '', `Best: ${info.best.score}`), el('span', '', info.best.words ? ` · ${info.best.words} words` : ''));
@@ -69,7 +70,7 @@ export function createMenu({ root, modes, getInfo, onPlay, confirmDialog, curren
         stats.append(el('span', 'mode-saved', ` · Saved run: ${info.saved.words} words, ${info.saved.score} pts`));
       }
       actions.append(fresh);
-      card.append(head, desc, stats, actions);
+      if (tag) card.append(head, tag, desc, stats, actions); else card.append(head, desc, stats, actions);
       card.addEventListener('click', (e) => { if (!e.target.closest('button')) play(mode, !info.saved, info); });
       list.append(card);
     }

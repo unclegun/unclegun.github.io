@@ -7,6 +7,8 @@ import { validateSave } from './saveValidator.js';
 import { buildCrosswordSvg, buildShareText, buildShareGrid, shareResult, downloadSvg } from './share.js';
 import { listModes, getMode, isModeId } from './gameModes.js';
 import { createMenu, askConfirm } from './menu.js';
+import { AnarchyGame } from './anarchy/anarchyGame.js';
+import { createAnarchyUI } from './anarchy/ui/anarchyUI.js';
 
 const $ = (id) => document.getElementById(id);
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -27,11 +29,20 @@ let menuOpen = true;
 let selected = null; // previewed option id
 let runToken = 0; // bumped on restart/resume/menu so stale async transitions abort
 let lastResult = null;
+let anarchy = null; // AnarchyGame wrapper when the Anarchy mode is active (engine === anarchy.engine)
+const anUI = createAnarchyUI({
+  hud: $('an-hud'), eventDialog: $('an-modal'), sideDialog: $('an-side'), renderer, getGame: () => anarchy,
+  hooks: {
+    persist: () => persist(), toast: (m) => renderer.toast(m), say: (m) => announce(m), refresh: () => { if (engine) refresh(); },
+    startRound: () => startRound(), endRun: (complete) => endRun(complete),
+    lockLetter: (i, l) => { buffer.lock(i, l); refresh(); },
+  },
+});
 
 const announce = (msg) => { $('status').textContent = msg; };
 const best = () => getBestFor(modeId).score;
 
-const persist = () => { if (engine && modeId) saveRun(modeId, { ...engine.toJSON(), draft: buffer.letters }); };
+const persist = () => { if (engine && modeId) saveRun(modeId, { ...(anarchy ? anarchy.toJSON() : engine.toJSON()), draft: buffer.letters }); };
 
 function refresh({ animate = false, holdKeys = false } = {}) {
   renderer.renderGuesses(engine, buffer, { holdKeys });
@@ -42,6 +53,17 @@ function refresh({ animate = false, holdKeys = false } = {}) {
   $('choice').hidden = !choosing;
   $('play-area').hidden = choosing;
   $('panel').classList.toggle('choosing', choosing);
+  $('an-hud').hidden = !anarchy;
+  $('app').classList.toggle('anarchy', !!anarchy);
+  if (anarchy) { anUI.renderHud(); applyMask(); }
+}
+
+/** Display-only overlays from Anarchy modifiers (Blackout, Infection). The real crossword is never changed. */
+function applyMask() {
+  for (const el of renderer.cellEls.values()) { el.classList.remove('masked', 'infected'); el.removeAttribute('aria-hidden'); }
+  const m = anarchy.mask();
+  for (const k of m.hidden) { const el = renderer.cellEls.get(k); if (el) { el.classList.add('masked'); el.setAttribute('aria-hidden', 'true'); } }
+  for (const k of m.infected) renderer.cellEls.get(k)?.classList.add('infected');
 }
 
 function startRound() {
@@ -102,13 +124,23 @@ function reroll(id) {
 
 function newGame(id = modeId) {
   runToken++;
+  anUI.reset();
   modeId = id;
   clearRun(id);
-  engine = new GameEngine({ dictionary, seed: (Math.random() * 2 ** 32) >>> 0, mode: id });
+  const seed = (Math.random() * 2 ** 32) >>> 0;
+  if (getMode(id).features.anarchy) {
+    anarchy = new AnarchyGame({ dictionary, seed, reduceMotion: reduceMotion() });
+    anarchy.beginRound();
+    engine = anarchy.engine;
+  } else {
+    anarchy = null;
+    engine = new GameEngine({ dictionary, seed, mode: id });
+  }
   busy = false;
   selected = null;
   closeModals();
   renderer.renderBreakdown(null, engine.mode);
+  $('help-anarchy').hidden = !anarchy;
   startRound();
   renderer.focusActive(engine, { instant: true });
   persist();
@@ -119,9 +151,24 @@ function resume(id, state) {
   modeId = id;
   busy = false;
   selected = null;
-  engine = new GameEngine({ dictionary, state });
+  anUI.reset();
+  if (getMode(id).features.anarchy) {
+    anarchy = new AnarchyGame({ dictionary, saved: state, reduceMotion: reduceMotion() });
+    engine = anarchy.engine;
+  } else {
+    anarchy = null;
+    engine = new GameEngine({ dictionary, state });
+  }
+  $('help-anarchy').hidden = !anarchy;
   renderer.renderBreakdown(null, engine.mode);
   if (engine.status === 'complete') { endRun(true); return; }
+  if (anarchy && (anarchy.phase !== 'guessing' || anarchy.detour)) {
+    buffer.reset(engine.locked, engine.wordLength);
+    refresh();
+    renderer.focusActive(engine, { instant: true });
+    anUI.step(); // re-opens the pending event card, puzzle or detour
+    return;
+  }
   if (engine.phase === 'choosing') { showChoice({ instant: true }); persist(); return; }
   buffer.reset(engine.locked, engine.wordLength);
   buffer.restoreDraft(state.draft);
@@ -136,7 +183,7 @@ function closeModals() {
 
 function endRun(complete) {
   clearRun(modeId);
-  const sum = engine.summary();
+  const sum = anarchy ? anarchy.summary() : engine.summary();
   const isBest = recordRunFor(modeId, { score: engine.score, words: engine.solved });
   const bestNow = getBestFor(modeId);
   lastResult = { ...sum, best: bestNow.score, isBest, board: engine.board.words.map((w) => ({ ...w })) };
@@ -155,6 +202,12 @@ function endRun(complete) {
   $('end-junc').textContent = sum.junctions;
   $('end-obj-box').hidden = sum.objectives === null;
   $('end-obj').textContent = sum.objectives ?? 0;
+  $('end-coins-box').hidden = $('end-events-box').hidden = !anarchy;
+  if (anarchy) {
+    $('end-coins').textContent = sum.coinsEarned;
+    $('end-events').textContent = Object.values(sum.events).reduce((a, b) => a + b, 0) + sum.detours;
+    lastResult.extra = `${sum.coinsEarned} coins earned · ${Object.values(sum.events).reduce((a, b) => a + b, 0)} events survived`;
+  }
   $('end-board').innerHTML = lastResult.board.length ? buildCrosswordSvg(lastResult.board, { title: `WordChain ${engine.mode.name}` }) : '';
   renderer.clearGhosts();
   refresh();
@@ -163,15 +216,16 @@ function endRun(complete) {
 }
 
 async function submit() {
-  if (busy || menuOpen || engine.status !== 'playing' || engine.phase !== 'guessing') return;
+  if (busy || menuOpen || engine.status !== 'playing' || engine.phase !== 'guessing' || (anarchy && anarchy.phase !== 'guessing')) return;
   const row = engine.guesses.length;
   if (!buffer.complete) { renderer.shakeRow(row); renderer.toast('Not enough letters'); return; }
-  const res = engine.submitGuess(buffer.word);
+  const res = anarchy ? anarchy.submit(buffer.word) : engine.submitGuess(buffer.word);
   if (!res.ok) { renderer.shakeRow(row); renderer.toast(res.error); announce(res.error); return; }
   busy = true;
   const token = runToken;
   const alive = () => token === runToken;
   persist(); // never lose the guess, even if the page is closed mid-animation
+  if (anarchy) anUI.onGuess(res);
   renderer.renderGuesses(engine, buffer, { holdKeys: true });
   renderer.flipRow(row);
   renderer.renderStats(engine, best());
@@ -189,6 +243,14 @@ async function submit() {
     renderer.highlightWord(engine, solvedWord);
     await wait(650);
     if (!alive()) return;
+    if (anarchy) {
+      anUI.resultFx(res);
+      anarchy.proceed(); // applies the planned next word and announces any rule change
+      persist();
+      busy = false;
+      anUI.step();
+      return;
+    }
     engine.advance();
     if (engine.status === 'complete') { endRun(true); busy = false; return; }
     if (engine.phase === 'choosing') { selected = null; showChoice(); persist(); busy = false; return; }
@@ -227,7 +289,7 @@ function useExtraTry() {
 
 bindInput({
   keyboardEl: $('keyboard'),
-  isBlocked: () => busy || menuOpen || engine?.status !== 'playing' || engine?.phase !== 'guessing' || document.querySelector('dialog[open]') !== null,
+  isBlocked: () => busy || menuOpen || engine?.status !== 'playing' || engine?.phase !== 'guessing' || (anarchy && anarchy.phase !== 'guessing') || document.querySelector('dialog[open]') !== null,
   onLetter: (l) => { if (buffer.add(l)) { renderer.renderBreakdown(null, engine.mode); refresh(); persist(); } },
   onBackspace: () => { if (buffer.backspace()) { refresh(); persist(); } },
   onEnter: submit,
@@ -250,6 +312,7 @@ function savedSummaryUnvalidated(id) {
 function showMenu(note = '') {
   runToken++; // abort in-flight animations; state was persisted at every step
   busy = false;
+  anUI.reset();
   if (engine && modeId && engine.status === 'playing') persist();
   menuOpen = true;
   closeModals();

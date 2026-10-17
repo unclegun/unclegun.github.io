@@ -53,9 +53,18 @@ export const MODES = {
     features: { selection: false, tokens: true, challenges: false, variableLength: true, precompute: false },
     scoring: 'wildcard', progression: 'wildcard', tokens: TOKEN_ECONOMY,
   },
+  anarchy: {
+    id: 'anarchy', name: 'Anarchy', icon: '🌀', badge: 'Chaos',
+    tagline: 'Every word changes the game.',
+    description: 'Changing rules, shifting letters, surprise puzzles, arcade rewards, and unpredictable events. Survive the chaos.',
+    wordLengths: [4, 5, 6, 7], attempts: BASE_ATTEMPTS,
+    features: { selection: false, tokens: false, challenges: false, variableLength: true, precompute: false, anarchy: true },
+    scoring: 'anarchy', progression: 'anarchy',
+    anarchy: { maxExtra: 6, maxHints: 3, maxGuesses: 12 },
+  },
 };
 
-export const MODE_ORDER = ['classic', 'builder', 'architect', 'challenge', 'wildcard'];
+export const MODE_ORDER = ['classic', 'builder', 'architect', 'challenge', 'wildcard', 'anarchy'];
 export const DEFAULT_MODE = 'classic';
 
 export const getMode = (id) => MODES[id] || null;

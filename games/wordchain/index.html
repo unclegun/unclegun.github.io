@@ -33,6 +33,18 @@
       <div class="obj-track"><div class="obj-bar"></div></div>
     </div>
 
+    <div id="an-hud" class="an-hud" aria-label="Anarchy status" hidden>
+      <div class="an-row">
+        <span class="an-coins" title="Coins can be spent in the shop. Score is never spent.">🪙 <b id="an-coins">0</b></span>
+        <div id="an-chips" class="an-chips" aria-label="Active rules"></div>
+        <span id="an-goal" class="an-goal" hidden></span>
+        <button id="an-shield" type="button" class="an-btn" hidden>🛡️</button>
+        <button id="an-detour" type="button" class="an-btn" aria-label="Puzzle detours">🧩 Detours</button>
+        <button id="an-shop" type="button" class="an-btn" aria-label="Shop">Shop</button>
+      </div>
+      <div id="an-meter" class="an-meter" hidden></div>
+    </div>
+
     <main>
       <section id="board" tabindex="0" role="application" aria-label="Crossword board">
         <div id="world"></div>
@@ -80,6 +92,9 @@
     <div class="share-row"><button type="button" class="confirm-no">Cancel</button><button type="button" class="confirm-yes primary">OK</button></div>
   </dialog>
 
+  <dialog id="an-modal" class="an-dialog" aria-label="Anarchy event"></dialog>
+  <dialog id="an-side" class="an-dialog side" aria-label="Anarchy shop and detours"></dialog>
+
   <dialog id="help-modal" aria-labelledby="help-title">
     <h2 id="help-title">How to play</h2>
     <p>Guess the highlighted word in 6 tries. Each guess must be a valid word of the shown length.</p>
@@ -91,6 +106,16 @@
     <p>Solve a word and it joins the crossword. The next word crosses a solved one, and shared letters are
       <b>locked</b> and filled in for you. Drag to pan the board, scroll or pinch to zoom.</p>
     <p id="help-mode"></p>
+    <div id="help-anarchy" hidden>
+      <h3>Anarchy: every word changes the game</h3>
+      <ul class="help-list">
+        <li>After each word the rules may change. A card always announces the new rule before the round starts.</li>
+        <li><b>Score</b> measures your run and is never spent. <b>Coins</b> are earned and spent in the <b>Shop</b> (extra guesses, reveals, shields, rerolls, stabilizers, double coins).</li>
+        <li>Events replace the guess grid with something different: Letter Collapse, Wordquake, Gravity Shift, Letter Storm, Chain Reaction and Reverse Wordle. Your crossword is never damaged.</li>
+        <li>Encounters (Boss, Heist, Survival, Risk/Reward) add decisions. Open <b>Detours</b> for optional Sudoku, sliding and memory puzzles that pay out.</li>
+        <li>Calm rounds always follow chaotic ones. Seeded and fair: the rule is never hidden.</li>
+      </ul>
+    </div>
     <button id="help-close" type="button" class="primary">Play</button>
   </dialog>
 
@@ -106,6 +131,8 @@
       <div><dt>Intersections</dt><dd id="end-cross">0</dd></div>
       <div><dt>Junctions</dt><dd id="end-junc">0</dd></div>
       <div id="end-obj-box"><dt>Objectives</dt><dd id="end-obj">0</dd></div>
+      <div id="end-coins-box" hidden><dt>Coins earned</dt><dd id="end-coins">0</dd></div>
+      <div id="end-events-box" hidden><dt>Events</dt><dd id="end-events">0</dd></div>
     </dl>
     <div id="end-board" class="end-board" aria-label="Final crossword"></div>
     <div class="share-row">

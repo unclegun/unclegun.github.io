@@ -41,10 +41,14 @@ export class GameEngine {
     this.options = null; // candidate placements offered while phase === 'choosing' (contain hidden words)
     this.rejected = new Set();
     this.lastBreakdown = null;
+    // Hooks used by composed subsystems (Anarchy); inert (null) for every other mode.
+    this.attemptLimit = null; // overrides mode.attempts for the current word
+    this.queued = null; // placement to use for the next word (must still be valid)
+    this.forcedLengths = null; // restricts the next word's length (variable-length modes)
     if (state) {
       this.#restore(state);
       // A save taken mid-transition (solved, not yet advanced) resumes at the next word.
-      if (this.phase === 'solved' && this.status === 'playing') this.advance();
+      if (this.phase === 'solved' && this.status === 'playing' && !this.mode.features.anarchy) this.advance();
     } else this.#start(seed);
   }
 
@@ -64,10 +68,11 @@ export class GameEngine {
     this.guesses = [];
     this.hints = {};
     this.extra = 0;
+    this.attemptLimit = null;
     this.resources?.resetWord();
   }
 
-  get maxAttempts() { return this.mode.attempts + this.extra; }
+  get maxAttempts() { return (this.attemptLimit ?? this.mode.attempts) + this.extra; }
   get attemptsLeft() { return this.maxAttempts - this.guesses.length; }
   get wordLength() { return this.current ? this.current.word.length : WORD_LENGTH; }
   get wordNumber() { return this.solved + (this.phase !== 'guessing' || this.status !== 'playing' ? 0 : 1); }
@@ -296,6 +301,11 @@ export class GameEngine {
 
   #takeNext() {
     const wordNumber = this.solved + 1;
+    if (this.queued) {
+      const q = this.queued;
+      this.queued = null;
+      if (this.#stillValid(q)) return { word: q.word, x: q.x, y: q.y, dir: q.dir };
+    }
     if (this.mode.features.variableLength) return this.#takeNextVariable(wordNumber);
     const cached = this.next && this.next.forWord === this.current.word ? this.next.candidates : [];
     this.next = null;
@@ -306,7 +316,9 @@ export class GameEngine {
 
   /** Wildcard: try the preferred length first, then the other allowed lengths. */
   #takeNextVariable(n) {
-    const order = this.rules.lengthOrder(n, this.rng).filter((l) => this.dictionary.hasLength(l));
+    // forced lengths (Anarchy events) go first; the normal order remains as a fallback so a board never ends early
+    const order = [...(this.forcedLengths || []), ...this.rules.lengthOrder(n, this.rng)].filter((l, i, a) => a.indexOf(l) === i && this.dictionary.hasLength(l));
+    this.forcedLengths = null;
     for (const len of order) {
       const c = this.generator.pickNext(this.board, n, [len], this.rules.crossingPreference(n));
       if (c) return c;
