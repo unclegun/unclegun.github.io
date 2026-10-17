@@ -167,3 +167,141 @@ dialog h2 { margin-top: 0; }
 @media (min-width: 900px) and (min-height: 600px) { #panel.choosing { max-height: none; } }
 @media (max-width: 520px) { .title h1 { display: none; } header { gap: 8px; } .stats { gap: 8px; } .stats b { font-size: .95rem; } .mode-pill { font-size: .7rem; } }
 .share-row .primary, .confirm-yes { background: var(--correct); color: #fff; border: 0; }
+
+/* =====================================================================
+   Quiet interface. Chaotic gameplay.
+   Shared design tokens: neutral surfaces, one restrained accent, Wordle colors only for feedback.
+   Event accents (gold, red, violet…) are reserved for meaningful moments via #app[data-event].
+   ===================================================================== */
+:root {
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 20px;
+  --radius: 8px; --radius-lg: 12px;
+  --gold: #c9a227; --danger: #c0392b; --storm: #6d5bd0; --bonus: #2e9e50;
+  --event: var(--accent);
+}
+:root { --shadow: none; }
+.mode-card, dialog, .breakdown, .opt { box-shadow: none; }
+.mode-card:hover { border-color: var(--muted); }
+.mode-card.original { box-shadow: none; border-color: var(--line); }
+.mode-card.original .mode-badge { color: var(--muted); }
+.mode-tagline { margin: -4px 0 0; font-size: .85rem; color: var(--fg); font-weight: 600; }
+.cell.crossing { box-shadow: none; border-width: 3px; }
+.primary, .mode-actions .primary, .share-row .primary, .confirm-yes { background: var(--fg); color: var(--bg); }
+button { touch-action: manipulation; }
+button:not(.key):not(.tray-tile):not(.su-cell):not(.slide-tile):not(.drop) { min-height: 36px; }
+header { padding-top: calc(8px + env(safe-area-inset-top, 0px) * 0); }
+#app { padding-bottom: env(safe-area-inset-bottom); }
+
+/* ---- Anarchy HUD ---- */
+.an-hud { padding: 6px 12px; border-bottom: 1px solid var(--line); background: var(--panel); display: grid; gap: 6px; }
+.an-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.an-coins { font-weight: 700; font-variant-numeric: tabular-nums; padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; }
+.an-chips { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; min-width: 0; }
+.chip { font-size: .78rem; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.chip small { color: var(--muted); }
+.chip.pending { border-style: dashed; }
+.chip.tier-major { border-color: var(--storm); } .chip.tier-rare { border-color: var(--danger); }
+.an-goal { font-size: .78rem; color: var(--muted); }
+.an-btn { padding: 4px 10px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); font-size: .85rem; font-weight: 600; min-height: 36px; }
+.an-btn:disabled { opacity: .45; cursor: not-allowed; }
+.an-meter { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--muted); }
+.meter-track { flex: 1; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.meter-bar { height: 100%; background: var(--muted); transition: width .4s; }
+.meter-bar.tone-boss { background: var(--danger); } .meter-bar.tone-danger { background: var(--danger); } .meter-bar.tone-good { background: var(--bonus); }
+
+/* ---- Anarchy dialogs ---- */
+.an-dialog { width: min(94vw, 480px); max-height: 90dvh; overflow-y: auto; padding: 0; border-radius: var(--radius-lg); }
+.an-card-body { padding: 18px 18px calc(16px + env(safe-area-inset-bottom)); display: grid; gap: 12px; }
+.an-kicker { margin: 0; font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.an-dialog h2 { margin: 0; font-size: 1.25rem; }
+.event-card { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; display: grid; gap: 6px; }
+.event-card.tier-major { border-color: var(--storm); } .event-card.tier-rare { border-color: var(--danger); }
+.tier-badge { justify-self: start; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.event-text { margin: 0; line-height: 1.4; }
+.choices { display: grid; gap: 6px; margin-top: 4px; }
+.choice-opt { display: grid; grid-template-columns: auto 1fr; gap: 0 8px; align-items: center; border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; cursor: pointer; min-height: 44px; }
+.choice-opt small { grid-column: 2; color: var(--muted); }
+.choice-opt:has(input:checked) { border-color: var(--fg); }
+.an-foot { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.an-foot button, .secondary, .primary-btn { min-height: 44px; padding: 8px 14px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); font-weight: 600; }
+.an-foot .primary-btn, .primary-btn { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.primary-btn:disabled { opacity: .4; cursor: not-allowed; }
+.an-side-head { display: flex; justify-content: space-between; align-items: center; }
+.icon-btn { width: 40px; height: 40px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); }
+.shop-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.shop-item { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; flex-wrap: wrap; }
+.shop-info { flex: 1; min-width: 140px; display: grid; gap: 2px; }
+.shop-info small { color: var(--muted); } .muted { color: var(--muted); }
+.shop-balance, .shop-note { margin: 0; color: var(--muted); font-size: .85rem; }
+.buy { min-width: 64px; min-height: 44px; border-radius: var(--radius); border: 1px solid var(--fg); background: var(--panel); font-weight: 700; }
+.buy:disabled { opacity: .4; border-color: var(--line); cursor: not-allowed; }
+.hint { margin: 0; color: var(--muted); font-size: .9rem; }
+.puzzle-host { display: grid; gap: 10px; justify-items: center; outline: none; }
+.puzzle-host > * { max-width: 100%; }
+.puzzle-status { margin: 0; min-height: 1.3em; color: var(--muted); font-weight: 600; text-align: center; }
+.puzzle-status.ok { color: var(--bonus); }
+.help-list { padding-left: 18px; display: grid; gap: 6px; }
+
+/* ---- Puzzle components (tiles share the board's shape and size) ---- */
+.tray, .repair-row, .mem-seq { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.tray-tile, .slot-tile, .g-cell, .su-cell, .slide-tile, .mem-key, .drop { width: 48px; height: 48px; border-radius: 5px; border: 2px solid var(--line); background: var(--panel); font-weight: 700; font-size: 1.3rem; display: grid; place-items: center; text-transform: uppercase; color: var(--fg); }
+.tray-tile.selected, .su-cell.selected { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
+.tray-tile.blank { border-style: dashed; color: var(--muted); }
+.tray-tile.fall { animation: fall-in .55s cubic-bezier(.3,1.3,.5,1) both; animation-delay: calc(var(--i) * 70ms); }
+@keyframes fall-in { from { translate: 0 -60px; opacity: 0; } to { translate: 0 0; opacity: 1; } }
+.slot-tile.loose { border-style: dashed; border-color: var(--accent); }
+.slot-tile.hidden { color: var(--muted); }
+.gravity-grid { display: grid; grid-template-columns: repeat(var(--cols), 44px); gap: 4px; padding: 8px; border: 1px solid var(--line); border-radius: var(--radius); }
+.g-cell { width: 44px; height: 44px; transition: background .3s; } .g-cell.empty { border-style: dashed; opacity: .5; }
+.tilt-pad { display: grid; grid-template-columns: repeat(4, 48px) auto; gap: 6px; align-items: center; }
+.tilt { min-height: 48px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); }
+.sudoku-grid { display: grid; grid-template-columns: repeat(4, 52px); gap: 3px; }
+.su-cell { width: 52px; height: 52px; } .su-cell.given { background: var(--line); }
+.su-cell.bad { border-color: var(--danger); color: var(--danger); }
+.su-cell[data-box="1"], .su-cell[data-box="2"] { background: color-mix(in srgb, var(--muted) 8%, var(--panel)); }
+.su-cell.given[data-box="1"], .su-cell.given[data-box="2"] { background: color-mix(in srgb, var(--line) 80%, var(--muted)); }
+.num-pad { display: flex; gap: 6px; } .num { width: 48px; height: 48px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); font-weight: 700; }
+.slide-grid { display: grid; grid-template-columns: repeat(var(--cols), 52px); gap: 4px; }
+.slide-tile { width: 52px; height: 52px; transition: translate .15s; } .slide-tile.blank { border-style: dashed; opacity: .5; }
+.mem-bank { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.puzzle-host.wrong { animation: shake .25s; }
+.chain-list { margin: 0; padding-left: 20px; }
+.clue-grid { display: grid; gap: 4px; }
+.reverse-form { display: flex; gap: 8px; } .reverse-input { font: inherit; font-size: 1.1rem; text-transform: uppercase; padding: 8px 10px; border: 2px solid var(--line); border-radius: var(--radius); background: var(--panel); color: var(--fg); width: 9em; min-height: 44px; }
+.storm-field { position: relative; width: min(100%, 360px); height: 260px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: color-mix(in srgb, var(--storm) 6%, var(--panel)); }
+.storm-field.calm { height: auto; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; justify-content: center; }
+.drop { position: absolute; top: 0; left: calc(var(--col) * (100% / var(--cols))); width: 48px; height: 48px; margin-left: 4px; border-color: var(--storm); color: var(--storm); }
+.storm-field.calm .drop { position: static; margin: 0; }
+.drop.falling { animation: storm-fall var(--fall) linear both; translate: 0 -60px; }
+@keyframes storm-fall { from { translate: 0 -60px; } to { translate: 0 280px; } }
+.drop.caught.good { background: var(--bonus); color: #fff; border-color: var(--bonus); } .drop.caught.bad { background: var(--danger); color: #fff; border-color: var(--danger); }
+.drop:disabled:not(.caught) { opacity: .5; }
+.storm-field.over .drop { animation-play-state: paused; }
+
+/* ---- Board overlays for modifiers (display only) ---- */
+.cell.masked { color: transparent; background: color-mix(in srgb, var(--muted) 35%, var(--panel)); border-color: var(--muted); }
+.cell.infected { background: color-mix(in srgb, var(--storm) 35%, var(--panel)); border-color: var(--storm); }
+.cell.pulse { animation: flash-cross .7s ease-out; z-index: 2; }
+
+/* ---- Event accents: only while something unusual happens ---- */
+#app[data-event] { --event: var(--accent); }
+#app[data-event="jackpot"] { --event: var(--gold); } #app[data-event="boss"] { --event: var(--danger); } #app[data-event="storm"] { --event: var(--storm); }
+#app[data-event="quake"] { --event: var(--danger); } #app[data-event="bonus"] { --event: var(--bonus); } #app[data-event="chain"] { --event: var(--bonus); }
+#app[data-event="roulette"] { animation: roulette 1.2s steps(4) 1; }
+#app[data-event] header, #app[data-event] .an-hud { border-bottom-color: var(--event); transition: border-color .3s; }
+#app[data-event="boss"] #board { box-shadow: inset 0 0 40px color-mix(in srgb, var(--danger) 25%, transparent); }
+#app[data-event="jackpot"] .an-coins { border-color: var(--gold); color: var(--gold); }
+@keyframes roulette { 0% { --event: var(--gold); } 25% { --event: var(--storm); } 50% { --event: var(--danger); } 75% { --event: var(--bonus); } }
+.fx-shake #board, .fx-shake .an-hud { animation: shake .45s; }
+.fx.coin-fx { position: fixed; z-index: 50; pointer-events: none; font-size: 1.2rem; animation: coin-rise 1s ease-out both; animation-delay: var(--delay); }
+@keyframes coin-rise { from { transform: translate(0, 0) scale(.6); opacity: 1; } to { transform: translate(var(--dx), -90px) scale(1); opacity: 0; } }
+
+@media (max-width: 520px) {
+  .an-hud { padding: 4px 8px; } .an-chips { flex-basis: 100%; order: 5; }
+  .tray-tile, .slot-tile { width: 44px; height: 44px; }
+  .an-foot { justify-content: stretch; } .an-foot button { flex: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drop.falling { animation: none !important; translate: 0 0; }
+  .storm-field { height: auto; }
+}

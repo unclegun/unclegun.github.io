@@ -40,8 +40,9 @@ export function buildShareGrid(words, { maxSize = 24 } = {}) {
   return rows.join('\n');
 }
 
-export function buildShareText({ words, score, best, isBest, url = '', mode = '', grid = '' }) {
+export function buildShareText({ words, score, best, isBest, url = '', mode = '', grid = '', extra = '' }) {
   const lines = [`WordChain${mode ? ' ' + mode : ''}: ${words} word${words === 1 ? '' : 's'} solved, score ${score}`];
+  if (extra) lines.push(extra);
   if (best > 0) lines.push(isBest ? `New best score: ${best}!` : `Best score: ${best}`);
   if (grid) lines.push(grid);
   if (url) lines.push(url);

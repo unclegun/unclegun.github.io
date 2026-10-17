@@ -64,6 +64,19 @@ The menu opens on start (`menu.js`); each mode has its own saved run and best sc
 Tokens (Builder/Architect/Challenge/Wildcard only): Hint (reveal and lock one unknown letter), Reroll (swap an unstarted option; only charged on success),
 Extra Try (capped). Costs, caps and earning rules live in `TOKEN_ECONOMY` (`gameModes.js`); rewards are keyed so they cannot be re-claimed.
 
+## Anarchy (sixth mode)
+*Every word changes the game.* Separate saved run, best score and stats (`wordchain.v2.anarchy*`); the five modes above are untouched (Anarchy hooks into the shared engine only via small opt-in config).
+
+- **Loop:** solve → score + coins → a seeded **AnarchyDirector** picks the next event (weighted, with cooldowns, minimum rounds, pacing: normal / minor / major / rare, incompatibility checks, guaranteed fallback) → an event card announces it → optional shop/detours → play. Lifecycle: eligible → selected → announced → active → resolved → rewarded → cleaned up.
+- **Modifiers:** Pressure Cooker (attempts shrink with inherited letters, never below a fair viable-answer floor), Shared Guess Pool, Bet Your Guesses, Jackpot, Mutating Rules, Blackout (display only), Wildcard Round (4-7 letters), Reverse Wordle (deduce the answer from clues).
+- **Board events (on a temporary copy, canonical crossword never mutated):** Letter Collapse (anagram tray; drag, tap or keyboard), Wordquake, Gravity Shift, Letter Storm, Word Infection, Chain Reaction, Double Trouble, Rule Roulette.
+- **Encounters:** Boss Word (staged health bar), Risk/Reward choice, Heist (alarm meter, bank or push on), Survival (stability meter).
+- **Economy:** Score (never spent) and Coins (per run). Shop: Extra Guess, Reveal Letter, Mistake Shield, Rule Reroll, Wildcard Tile, Stabilizer, Double Coins; costs/caps in `arcadeEconomy.js`, charged only on success, rewards idempotent.
+- **Puzzle Detours (optional, reward-capped per round):** Mini Sudoku (4x4), Sliding Letter Puzzle (scrambled from solved state, always solvable), Memory Match. Registry in `js/anarchy/puzzles/index.js`.
+- **Layout:** `js/anarchy/` (DOM-free rules: director, state, modifiers, events, economy, scoring, encounters, `anarchyGame.js` orchestrator), `puzzles/` (pure models), `ui/` (dialogs, puzzle views, effects). Quiet monochrome UI; colour/motion only for events; honours `prefers-reduced-motion`.
+- **Tests:** `tests/anarchy.test.js` covers director determinism/cooldowns, modifiers, economy, puzzles, all events/encounters, save/resume, restart, corrupt saves and long simulated runs.
+- **Not verified:** touch drag-and-drop and Letter Storm timing on real devices; a scripted headless-Chromium run exercised the menu, HUD, announce cards, collapse/quake/gravity/roulette/reverse dialogs with no page errors, but not every event/mini-game visually. Letter Storm is wall-clock and resumes in a calm mode.
+
 ## Additional modules
 `gameModes.js` (mode config), `modeRules.js` (progression), `scoring.js` (weights + strategies), `challengeManager.js`, `resourceManager.js`, `menu.js`.
 `crosswordGenerator.js` gained `analyzePlacement`/`findOptions`; `gameEngine.js` is shared by all modes.

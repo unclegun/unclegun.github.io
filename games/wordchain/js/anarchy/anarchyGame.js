@@ -52,6 +52,7 @@ export class AnarchyGame {
   get score() { return this.engine.score; }
   get coins() { return this.economy.coins; }
   get entries() { return this.s.entries; }
+  get detour() { return this.s.detour; }
   get cfg() { return this.engine.mode.anarchy; }
 
   #recover() {
