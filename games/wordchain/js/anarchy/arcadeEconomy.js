@@ -17,6 +17,8 @@ export const ECONOMY = {
     reroll: { name: 'Rule Reroll', icon: '🎲', cost: 3, maxHeld: 1, kind: 'held', desc: 'Swaps the announced modifier for a different eligible one.' },
     wildcardTile: { name: 'Wildcard Tile', icon: '🔤', cost: 3, maxHeld: 2, kind: 'held', desc: 'Supplies a missing letter in a Letter Collapse puzzle.' },
     stabilizer: { name: 'Stabilizer', icon: '⚓', cost: 4, maxHeld: 1, kind: 'held', desc: 'Steadies a board mutation: resolves Wordquake, Gravity Shift or Word Infection at half reward.' },
+    chaosCatalyst: { name: 'Chaos Catalyst', icon: '🌪️', cost: 3, limitPerWord: 1, kind: 'instant', desc: 'Adds chaos now. The next major event pays +3 coins.' },
+    chaosBrake: { name: 'Chaos Brake', icon: '🧯', cost: 3, limitPerWord: 1, kind: 'instant', desc: 'Drains the Chaos Meter and delays the next major event.' },
     doubleCoins: { name: 'Double Coins', icon: '✨', cost: 5, kind: 'timed', rounds: 2, desc: 'Coin rewards are doubled for the next two solved words.' },
   },
 };
@@ -58,7 +60,7 @@ export class ArcadeEconomy {
     const def = this.config.items[item];
     if (!def) return { ok: false, cost: 0, error: 'Unknown item' };
     const cost = def.cost;
-    if (def.limitPerWord !== undefined && this.s.used[item] >= def.limitPerWord) return { ok: false, cost, error: 'Limit reached for this word' };
+    if (def.limitPerWord !== undefined && (this.s.used[item] || 0) >= def.limitPerWord) return { ok: false, cost, error: 'Limit reached for this word' };
     if (def.maxHeld !== undefined && this.held(item) >= def.maxHeld) return { ok: false, cost, error: 'You are carrying the maximum' };
     if (def.kind === 'timed' && this.s.doubleCoins > 0) return { ok: false, cost, error: 'Already active' };
     if (this.s.coins < cost) return { ok: false, cost, error: 'Not enough coins' };
@@ -74,7 +76,7 @@ export class ArcadeEconomy {
     this.s.spent += c.cost;
     if (def.kind === 'held') this.s.inv[item]++;
     else if (def.kind === 'timed') this.s.doubleCoins = def.rounds;
-    else this.s.used[item]++;
+    else this.s.used[item] = (this.s.used[item] || 0) + 1;
     return true;
   }
 
@@ -117,7 +119,7 @@ export class ArcadeEconomy {
 
   /** Called when a word is solved: counters for the next word reset, timed effects tick. */
   endWord() {
-    this.s.used = { extraGuess: 0, reveal: 0 };
+    this.s.used = { extraGuess: 0, reveal: 0, chaosCatalyst: 0, chaosBrake: 0 };
     if (this.s.doubleCoins > 0) this.s.doubleCoins--;
   }
 

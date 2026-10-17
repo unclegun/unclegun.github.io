@@ -7,6 +7,8 @@ import { AnarchyDirector, advanceStage } from './anarchyDirector.js';
 import { EVENTS } from './eventRegistry.js';
 import { viableCount, fairFloor, clampAttempts } from './eventRules.js';
 import { wordRewards } from './anarchyScoring.js';
+import * as Chaos from './chaosMeter.js';
+import { themeFor } from './themeDirector.js';
 import { newAnarchyState } from './anarchyState.js';
 import { puzzleFromJSON, MINIGAMES, DETOUR_LIMITS } from './puzzles/index.js';
 import { ReverseWordle } from './puzzles/reverseWordle.js';
@@ -37,6 +39,8 @@ export class AnarchyGame {
       this.engine = new GameEngine({ dictionary, seed, mode: 'anarchy' });
       this.s = newAnarchyState(seed);
     }
+    if (!this.s.chaos) this.s.chaos = Chaos.newChaosState(); // migrate saves from before the Chaos Meter
+    if (!Number.isInteger(this.s.themeSeed)) this.s.themeSeed = (this.s.rng >>> 0) % 997;
     this.rng = createRng(1);
     this.rng.setState(this.s.rng);
     this.economy = new ArcadeEconomy(this.s.economy);
@@ -53,6 +57,9 @@ export class AnarchyGame {
   get coins() { return this.economy.coins; }
   get entries() { return this.s.entries; }
   get detour() { return this.s.detour; }
+  get chaos() { return this.s.chaos; }
+  /** Palette for the current run position (changes after every solved word). */
+  get theme() { return themeFor(this.s.themeSeed, this.engine.solved); }
   get cfg() { return this.engine.mode.anarchy; }
 
   #recover() {
@@ -173,6 +180,7 @@ export class AnarchyGame {
     }
     res.rewards = { coins, score: delta, items: r.items, jackpot: hookResults.some((x) => x?.jackpot), boss: hookResults.some((x) => x?.boss) };
     this.economy.endWord();
+    Chaos.onWordSolved(this.s.chaos, { attempts: info.attempts, crossings, hard: info.attempts >= 5 || hookResults.some((x) => x?.boss) });
     const wasDouble = this.#finishEntries(entries, info);
     this.#planNext(wasDouble);
   }
@@ -225,8 +233,14 @@ export class AnarchyGame {
     else if (encounter) hook(encounter, 'prepare')?.(encounter, plan, rc);
     else {
       if (this.s.finishedEncounter) this.s.director.lastTier = 'major'; // recovery after an encounter
-      const picked = this.director.pick(this.#ctx({ round: round + 1 }), this.rng, this.s.director, { force: this.force });
+      const kind = Chaos.nextKind(this.s.chaos);
+      const picked = this.director.pick(this.#ctx({ round: round + 1 }), this.rng, this.s.director, { force: this.force, tier: kind });
       this.force = null;
+      const tiers = picked.map((p) => EVENTS[p.id].tier);
+      const top = tiers.some((t) => t === 'major' || t === 'rare') ? 'major' : picked.length ? 'minor' : 'none';
+      if (top === 'major' && this.s.chaos.catalyst) this.economy.award(`catalyst:${round}`, Chaos.CHAOS.catalystBonusCoins, { doubling: false });
+      Chaos.recordPick(this.s.chaos, top === 'none' ? null : top);
+      this.s.lastPick = top;
       for (const en of picked) {
         hook(en, 'prepare')?.(en, plan, rc);
         plan.entries.push(en);
@@ -439,6 +453,11 @@ export class AnarchyGame {
     if (usingCredit && d.limitPerWord !== undefined && this.economy.s.used[item] >= d.limitPerWord) result = { ok: false, cost: 0, error: 'Limit reached for this word' };
     if (!result.ok) return result;
     if (this.s.phase === 'over' || this.s.phase === 'transition') return { ok: false, cost: result.cost, error: 'Shop is closed right now' };
+    if (item === 'chaosCatalyst' || item === 'chaosBrake') {
+      if (this.s.phase !== 'guessing') return { ok: false, cost: result.cost, error: 'Only available while guessing' };
+      if (item === 'chaosCatalyst' && this.s.chaos.value >= Chaos.CHAOS.max) return { ok: false, cost: result.cost, error: 'Chaos Meter is already full' };
+      if (item === 'chaosBrake' && this.s.chaos.value <= 0) return { ok: false, cost: result.cost, error: 'Chaos Meter is already empty' };
+    }
     if (item === 'extraGuess' || item === 'reveal') {
       if (this.s.phase !== 'guessing') return { ok: false, cost: result.cost, error: 'Only available while guessing' };
       if (item === 'extraGuess' && this.engine.extra >= this.cfg.maxExtra) return { ok: false, cost: result.cost, error: 'No more extra guesses' };
@@ -452,7 +471,9 @@ export class AnarchyGame {
     if (!c.ok) return { ok: false, error: c.error };
     const e = this.engine;
     let out = {};
-    if (item === 'extraGuess') { e.extra++; out = { attemptsLeft: e.attemptsLeft }; }
+    if (item === 'chaosCatalyst') out = { chaos: Chaos.catalyst(this.s.chaos) };
+    else if (item === 'chaosBrake') out = { chaos: Chaos.brake(this.s.chaos) };
+    else if (item === 'extraGuess') { e.extra++; out = { attemptsLeft: e.attemptsLeft }; }
     else if (item === 'reveal') {
       const unknown = this.#unknownIndex();
       const index = unknown[this.rng.int(unknown.length)];

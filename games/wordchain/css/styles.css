@@ -305,3 +305,36 @@ header { padding-top: calc(8px + env(safe-area-inset-top, 0px) * 0); }
   .drop.falling { animation: none !important; translate: 0 0; }
   .storm-field { height: auto; }
 }
+
+/* ---- Anarchy 2.0: dynamic theme (decorative variables only; --correct/--present/--absent are never overridden) ---- */
+html[data-an-theme] { --bg: var(--an-bg); --panel: var(--an-panel); --fg: var(--an-fg); --muted: var(--an-muted); --line: var(--an-line); --accent: var(--an-accent); }
+html[data-an-theme] body { background: radial-gradient(circle at 50% -10%, color-mix(in srgb, var(--an-tint) 22%, var(--an-bg)), var(--an-bg) 70%); transition: background-color .9s ease, color .9s ease; }
+html[data-an-theme] #app, html[data-an-theme] .an-hud, html[data-an-theme] header, html[data-an-theme] #panel, html[data-an-theme] #board, html[data-an-theme] .an-dialog { transition: background-color .9s ease, color .9s ease, border-color .9s ease; }
+html[data-an-theme] .an-hud { background: var(--an-panel2, var(--panel)); }
+html[data-an-theme] :focus-visible { outline: 3px solid var(--an-accent); outline-offset: 2px; }
+html.an-theme-pop #board { animation: themePop .9s ease-out; }
+@keyframes themePop { 0% { box-shadow: inset 0 0 0 3px var(--an-accent); } 100% { box-shadow: inset 0 0 0 0 transparent; } }
+
+/* ---- Chaos Meter, inventory, audio ---- */
+.an-chaos { display: flex; align-items: center; gap: 8px; font-size: .72rem; color: var(--muted); }
+.an-chaos .track { flex: 1; height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.an-chaos .bar { height: 100%; background: var(--muted); transition: width .5s, background-color .5s; }
+.an-chaos.warm .bar { background: var(--gold); }
+.an-chaos.hot .bar { background: var(--danger); animation: chaosPulse 2.2s ease-in-out infinite; }
+@keyframes chaosPulse { 50% { opacity: .65; } }
+.an-inv { display: flex; gap: 6px; flex-wrap: wrap; font-size: .75rem; }
+.an-inv:empty { display: none; }
+.inv-item { padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); }
+.inv-item.armed { border-color: var(--bonus); font-weight: 700; }
+.inv-item.bump { animation: invBump .6s ease-out; }
+@keyframes invBump { 0% { transform: scale(1.25); } 100% { transform: scale(1); } }
+.an-audio { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: .75rem; color: var(--muted); }
+.an-audio input[type=range] { width: 90px; vertical-align: middle; }
+.an-small { min-height: 28px; font-size: .72rem; }
+.shop-group { margin: 6px 0 0; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); list-style: none; }
+.shop-why { color: var(--danger); font-size: .75rem; }
+.shop-item.bought { animation: invBump .6s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  html[data-an-theme] body, html[data-an-theme] #app, html[data-an-theme] .an-hud { transition: none; }
+  html.an-theme-pop #board, .an-chaos.hot .bar, .inv-item.bump, .shop-item.bought { animation: none; }
+}

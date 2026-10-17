@@ -1,0 +1,55 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../../css/styles.css"></head>
+<body><div id="app" class="anarchy"><div id="mount"></div></div><pre id="result">pending</pre>
+<script type="module">
+import { loadDictionary } from '../../js/dictionaryService.js';
+import { AnarchyGame } from '../../js/anarchy/anarchyGame.js';
+import { createAnarchyUI } from '../../js/anarchy/ui/anarchyUI.js';
+const out = { checks: {}, errors: [] };
+try {
+  const html = await (await fetch('../../index.html')).text();
+  const d = new DOMParser().parseFromString(html, 'text/html');
+  document.getElementById('mount').append(d.getElementById('an-hud'));
+  for (const id of ['an-modal', 'an-side']) document.body.append(d.getElementById(id));
+  const dictionary = await loadDictionary();
+  const game = new AnarchyGame({ dictionary, seed: 3 });
+  game.beginRound();
+  game.economy.s.coins = 20;
+  const calls = { persist: 0, toasts: [] };
+  const ui = createAnarchyUI({ hud: document.getElementById('an-hud'), eventDialog: document.getElementById('an-modal'), sideDialog: document.getElementById('an-side'), renderer: { cellEls: new Map() }, getGame: () => game,
+    hooks: { persist: () => calls.persist++, toast: (m) => calls.toasts.push(m), say() {}, refresh() {}, startRound() {}, endRun() {}, lockLetter() {} } });
+  // creating the UI again must not double-bind handlers (simulates restart/mode switch re-entry)
+  ui.renderHud();
+  const side = document.getElementById('an-side');
+  document.getElementById('an-shop').click();
+  out.checks.shopOpens = side.open && side.textContent.includes('Shop');
+  out.checks.shopHasGroups = side.textContent.includes('Use now') && side.textContent.includes('Buy for later');
+  out.checks.disabledReason = side.textContent.length > 0;
+  const buy = [...side.querySelectorAll('button.buy')].find((b) => b.getAttribute('aria-label').startsWith('Buy Mistake Shield'));
+  const before = game.coins;
+  buy.click();
+  out.checks.coinsDeducted = game.coins === before - 3;
+  out.checks.inventoryHeld = game.economy.held('shield') === 1;
+  out.checks.inventoryRendered = document.getElementById('an-inv').textContent.includes('Mistake Shield');
+  out.checks.coinsHud = document.getElementById('an-coins').textContent === String(game.coins);
+  out.checks.confirmToast = calls.toasts.some((t) => t.includes('Mistake Shield'));
+  const extra = [...side.querySelectorAll('button.buy')].find((b) => b.getAttribute('aria-label').startsWith('Buy Extra Guess'));
+  const att = game.engine.attemptsLeft;
+  extra.click();
+  out.checks.extraGuessApplied = game.engine.attemptsLeft === att + 1;
+  out.checks.persisted = calls.persist >= 2;
+  side.close();
+  const sh = document.getElementById('an-shield');
+  out.checks.shieldVisible = !sh.hidden && !sh.disabled;
+  sh.click();
+  out.checks.shieldArmed = game.economy.s.shieldArmed === true && sh.textContent.includes('Armed');
+  document.getElementById('an-detour').click();
+  out.checks.detoursOpen = side.open && side.textContent.includes('Detours');
+  side.close();
+  document.getElementById('an-shop').click();
+  document.getElementById('an-shop').click();
+  out.checks.noDuplicateDialogs = document.querySelectorAll('#an-side').length === 1;
+  out.checks.chaosMeter = document.getElementById('an-chaos').textContent.includes('Chaos');
+} catch (e) { out.errors.push(String(e && e.stack || e)); }
+document.getElementById('result').textContent = JSON.stringify(out);
+</script></body></html>

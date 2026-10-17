@@ -43,6 +43,14 @@
         <button id="an-shop" type="button" class="an-btn" aria-label="Shop">Shop</button>
       </div>
       <div id="an-meter" class="an-meter" hidden></div>
+      <div id="an-chaos" class="an-chaos" title="Chaos Meter: fills as you solve words. When full, a major event strikes."></div>
+      <div id="an-inv" class="an-inv" aria-label="Inventory" aria-live="polite"></div>
+      <div class="an-audio" aria-label="Music controls">
+        <button id="an-music" type="button" class="an-btn" aria-pressed="false">🎵 Enable music</button>
+        <label class="an-vol">Volume <input id="an-volume" type="range" min="0" max="100" step="5" value="50" aria-label="Music volume"></label>
+        <label class="an-sfx"><input id="an-sfx" type="checkbox" checked> Accents</label>
+        <button id="an-stats" type="button" class="an-btn an-small" title="Download local playtest stats as JSON (never uploaded)">Stats</button>
+      </div>
     </div>
 
     <main>
