@@ -107,4 +107,15 @@ Done and tested (`tests/forge.test.js`, `tests/pwa.test.js`):
 - **PWA foundation**: `manifest.webmanifest`, icons, and `sw.js` (scope is this folder only, cache-first, versioned `wordchain-<VERSION>` caches, no automatic `skipWaiting`, so a game in progress is not swapped to new code). Bump `VERSION` in `sw.js` when assets change; `tests/pwa.test.js` checks the precache list matches the files. Offline use has **not** been verified in a real browser yet.
 - `docs/mobile-release-plan.md`: path to App Store / Google Play.
 
-Not done in this iteration (documented, not claimed): board-integrated tile-overlay animations for Wordquake/Gravity/Storm/Chain/Infection/Blackout, new action-changing modifiers (Letter Scramble, Dual Word, etc.), director pacing tiers and diversity metrics, theme cross-fade and jazz arrangement refinements, full mobile layout and accessibility audit, diagnostics separation, and real-browser tests for shop/audio/PWA/persistence.
+Not done in this iteration (documented, not claimed): board-integrated tile-overlay animations for Wordquake/Gravity/Storm/Chain/Infection/Blackout, new action-changing modifiers (Letter Scramble, Dual Word, etc.), director pacing tiers and diversity metrics, theme cross-fade and jazz arrangement refinements, full mobile layout and accessibility audit, diagnostics separation, and real-browser tests for audio/PWA/persistence.
+
+## WordChain 2.2 reliability stage
+
+- Anarchy's normal Wordle and Reverse Wordle solves now share the same completion-effects path. UI-side completion effects are claimed once per solved word and the marker is saved with the run; older Anarchy saves migrate with an empty marker.
+- Reverse Wordle success uses the crossword-growth animation before the next event or round is opened.
+- The existing shop catalog has regression coverage for every configured price, successful deduction, failed-purchase accounting, and the existing activation, inventory, and HUD flows.
+- `.github/workflows/wordchain.yml` runs `npm test` with Node.js 22 and headless Chromium for pull requests that change WordChain or its workflow. The suite checks the JavaScript module import graph, PWA manifest and service-worker precache assets, and browser HUD/shop/Reverse Wordle integration. The test step adds a test summary, including explicit browser-skip reporting, to the Actions run summary.
+
+To make the workflow a required merge check, configure a branch protection rule or repository ruleset for `main` and require **WordChain CI / Test and browser smoke**. This repository does not configure or assert that merge protection is enabled.
+
+This is a reliability-focused partial 2.2 delivery, not the full arcade expansion. Timed encounters, Gems, achievements, cosmetic packs/Style Shop, crossword-overlay event animations, expanded event consequences, and real-device/offline PWA verification remain deferred and are not presented as available features. Run the suite with `cd games/wordchain && npm test`; without a local Chromium binary the browser test reports itself as skipped.

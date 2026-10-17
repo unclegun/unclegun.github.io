@@ -15,9 +15,9 @@ try {
   const game = new AnarchyGame({ dictionary, seed: 3 });
   game.beginRound();
   game.economy.s.coins = 20;
-  const calls = { persist: 0, toasts: [] };
+  const calls = { persist: 0, toasts: [], reverseSolved: [] };
   const ui = createAnarchyUI({ hud: document.getElementById('an-hud'), eventDialog: document.getElementById('an-modal'), sideDialog: document.getElementById('an-side'), renderer: { cellEls: new Map() }, getGame: () => game,
-    hooks: { persist: () => calls.persist++, toast: (m) => calls.toasts.push(m), say() {}, refresh() {}, startRound() {}, endRun() {}, lockLetter() {} } });
+    hooks: { persist: () => calls.persist++, toast: (m) => calls.toasts.push(m), say() {}, refresh() {}, startRound() {}, endRun() {}, lockLetter() {}, onReverseSolved: (res) => calls.reverseSolved.push(res) } });
   // creating the UI again must not double-bind handlers (simulates restart/mode switch re-entry)
   ui.renderHud();
   const side = document.getElementById('an-side');
@@ -50,6 +50,14 @@ try {
   document.getElementById('an-shop').click();
   out.checks.noDuplicateDialogs = document.querySelectorAll('#an-side').length === 1;
   out.checks.chaosMeter = document.getElementById('an-chaos').textContent.includes('Chaos');
+  side.close();
+  game.s.entries.push({ id: 'reverse_wordle', kind: 'modifier', stage: 'active', roundsLeft: 1, data: {} });
+  game.beginRound();
+  ui.step();
+  const reverseInput = document.querySelector('.reverse-input');
+  reverseInput.value = game.engine.current.word;
+  reverseInput.form.requestSubmit();
+  out.checks.reverseSolveUsesCompletionHook = calls.reverseSolved.length === 1 && calls.reverseSolved[0].solved && game.phase === 'transition';
 } catch (e) { out.errors.push(String(e && e.stack || e)); }
 document.getElementById('result').textContent = JSON.stringify(out);
 </script></body></html>

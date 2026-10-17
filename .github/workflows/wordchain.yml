@@ -22,14 +22,18 @@ jobs:
         with:
           node-version: 22
       - name: Install Chromium
-        uses: browser-actions/setup-chrome@v1
+        uses: browser-actions/setup-chrome@v2.2.0
+        id: chrome
       - name: Run WordChain tests
         working-directory: games/wordchain
         env:
-          CHROME_BIN: google-chrome
+          CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
         run: |
           set -o pipefail
+          set +e
           npm test 2>&1 | tee /tmp/wordchain-test-output.txt
+          status=$?
+          set -e
           {
             echo '## WordChain test summary'
             echo '```text'
@@ -41,3 +45,4 @@ jobs:
               echo 'Browser smoke tests: **executed** by the existing headless Chromium test.'
             fi
           } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"

@@ -57,7 +57,7 @@ export function validateAnarchyState(a, engineSave) {
     if (a.attemptLimit !== null && !(Number.isInteger(a.attemptLimit) && a.attemptLimit >= 1 && a.attemptLimit <= 9)) return false;
     if (!Array.isArray(a.claimed) || !a.claimed.every((k) => typeof k === 'string')) return false;
     if (!Array.isArray(a.paid) || !a.paid.every((k) => typeof k === 'string')) return false;
-    if (a.recordedThrough !== undefined && (!Number.isInteger(a.recordedThrough) || a.recordedThrough < 0)) return false;
+    if (a.recordedThrough !== undefined && (!Number.isInteger(a.recordedThrough) || a.recordedThrough < 0 || (engineSave && a.recordedThrough > engineSave.solved))) return false;
     if (a.puzzle !== null && !puzzleFromJSON(a.puzzle)) return false;
     if (a.phase === 'event' && !a.puzzle) return false;
     if (a.plan !== null) {
