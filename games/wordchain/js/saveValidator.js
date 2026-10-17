@@ -5,6 +5,7 @@ import { CORRECT } from './wordleEvaluator.js';
 import { getMode } from './gameModes.js';
 import { ResourceManager } from './resourceManager.js';
 import { ChallengeManager } from './challengeManager.js';
+import { validateAnarchyState } from './anarchy/anarchyState.js';
 
 export const SAVE_VERSION = 2;
 const isWord = (w, mode) => typeof w === 'string' && /^[a-z]+$/.test(w) && mode.wordLengths.includes(w.length);
@@ -30,9 +31,9 @@ export function validateSave(s, dictionary, expectedMode = null) {
     if (!Array.isArray(s.words) || s.words.length !== s.solved || !s.words.every((w) => isPlacement(w, mode))) return null;
     const extra = s.extra ?? 0;
     const hints = s.hints ?? {};
-    const cap = mode.tokens ? mode.tokens.limits.extraTryPerWord : 0;
+    const cap = mode.tokens ? mode.tokens.limits.extraTryPerWord : mode.anarchy ? mode.anarchy.maxExtra : 0;
     if (!Number.isInteger(extra) || extra < 0 || extra > cap) return null;
-    if (!Array.isArray(s.guesses) || s.guesses.length > MAX_ATTEMPTS + extra) return null;
+    if (!Array.isArray(s.guesses) || s.guesses.length > (mode.anarchy ? mode.anarchy.maxGuesses : MAX_ATTEMPTS + extra)) return null;
     const len = s.current?.word?.length;
     for (const g of s.guesses) {
       if (!g || !isWord(g.word, mode) || !Array.isArray(g.result) || g.result.length !== g.word.length || (len && g.word.length !== len)) return null;
@@ -52,7 +53,7 @@ export function validateSave(s, dictionary, expectedMode = null) {
         for (const [i, l] of Object.entries(hints)) {
           if (!(Number(i) < s.current.word.length) || s.current.word[i] !== l) return null;
         }
-        if (Object.keys(hints).length > (mode.tokens ? mode.tokens.limits.hintPerWord : 0)) return null;
+        if (Object.keys(hints).length > (mode.tokens ? mode.tokens.limits.hintPerWord : mode.anarchy ? mode.anarchy.maxHints : 0)) return null;
       } else {
         const last = s.words[s.words.length - 1];
         if (!last || last.word !== s.current.word) return null;
@@ -68,6 +69,7 @@ export function validateSave(s, dictionary, expectedMode = null) {
       if (new Set(s.options.map((o) => o.word)).size !== s.options.length) return null;
     }
     if (mode.features.tokens && !ResourceManager.isValidState(s.resources, mode.tokens)) return null;
+    if (mode.features.anarchy && !validateAnarchyState(s.anarchy, s)) return null;
     if (mode.features.challenges && !ChallengeManager.isValidState(s.challenges)) return null;
     return s;
   } catch { return null; }

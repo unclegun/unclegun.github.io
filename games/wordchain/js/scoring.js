@@ -13,6 +13,7 @@ export const SCORING = {
   architect: { word: 50, attempt: 5, intersection: 25, connect: 20, junction: 60, compact: 20, linear: -15, density: 30 },
   challenge: { word: 100, attempt: 10 },
   wildcard: { perLetter: 20, attempt: 10, unknown: 5 },
+  anarchy: { perLetter: 20, attempt: 10, unknown: 5, intersection: 10 },
 };
 
 const unusedAttempts = (c) => Math.max(0, c.baseAttempts - c.attempts);
@@ -57,6 +58,16 @@ const STRATEGIES = {
       item(`Unknown letters (${unknown})`, unknown * w.unknown),
     ];
   },
+};
+STRATEGIES.anarchy = (c, w) => {
+  const unknown = Math.max(0, c.length - c.known);
+  const items = [
+    item(`${c.length}-letter word`, c.length * w.perLetter),
+    item(`Efficiency (${unusedAttempts(c)} unused)`, unusedAttempts(c) * w.attempt),
+    item(`Unknown letters (${unknown})`, unknown * w.unknown),
+  ];
+  if (c.analysis && c.analysis.crossings > 1) items.push(item(`Extra intersections (${c.analysis.crossings - 1})`, (c.analysis.crossings - 1) * w.intersection));
+  return items;
 };
 STRATEGIES.challenge = STRATEGIES.classic;
 

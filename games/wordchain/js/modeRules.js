@@ -41,6 +41,11 @@ const RULES = {
       return out;
     },
   },
+  anarchy: {
+    crossingPreference: (n) => (n <= 1 ? null : n <= 3 ? { min: 1, max: 1 } : { min: 1, max: 2 }),
+    // Ordinary rounds use five letters; other lengths arrive through Wildcard Round and Boss events (forcedLengths).
+    lengthsFor: () => [5],
+  },
 };
 
 export const getRules = (mode) => {
