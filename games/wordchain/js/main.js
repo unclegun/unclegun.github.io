@@ -9,6 +9,8 @@ import { listModes, getMode, isModeId } from './gameModes.js';
 import { createMenu, askConfirm } from './menu.js';
 import { AnarchyGame } from './anarchy/anarchyGame.js';
 import { createAnarchyUI } from './anarchy/ui/anarchyUI.js';
+import { createAnarchyChrome } from './anarchy/ui/anarchyChrome.js';
+import { EVENTS } from './anarchy/eventRegistry.js';
 
 const $ = (id) => document.getElementById(id);
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -30,12 +32,14 @@ let selected = null; // previewed option id
 let runToken = 0; // bumped on restart/resume/menu so stale async transitions abort
 let lastResult = null;
 let anarchy = null; // AnarchyGame wrapper when the Anarchy mode is active (engine === anarchy.engine)
+const chrome = createAnarchyChrome();
 const anUI = createAnarchyUI({
   hud: $('an-hud'), eventDialog: $('an-modal'), sideDialog: $('an-side'), renderer, getGame: () => anarchy,
   hooks: {
     persist: () => persist(), toast: (m) => renderer.toast(m), say: (m) => announce(m), refresh: () => { if (engine) refresh(); },
     startRound: () => startRound(), endRun: (complete) => endRun(complete),
     lockLetter: (i, l) => { buffer.lock(i, l); refresh(); },
+    onPurchase: (id, cost) => chrome.metrics.purchase(id, cost), onShopOpen: () => chrome.metrics.shopOpened(),
   },
 });
 
@@ -55,7 +59,7 @@ function refresh({ animate = false, holdKeys = false } = {}) {
   $('panel').classList.toggle('choosing', choosing);
   $('an-hud').hidden = !anarchy;
   $('app').classList.toggle('anarchy', !!anarchy);
-  if (anarchy) { anUI.renderHud(); applyMask(); }
+  if (anarchy) { chrome.sync(anarchy); anUI.renderHud(); applyMask(); } else chrome.leave();
 }
 
 /** Display-only overlays from Anarchy modifiers (Blackout, Infection). The real crossword is never changed. */
@@ -132,6 +136,7 @@ function newGame(id = modeId) {
     anarchy = new AnarchyGame({ dictionary, seed, reduceMotion: reduceMotion() });
     anarchy.beginRound();
     engine = anarchy.engine;
+    chrome.metrics.startRun();
   } else {
     anarchy = null;
     engine = new GameEngine({ dictionary, seed, mode: id });
@@ -181,7 +186,19 @@ function closeModals() {
   for (const d of document.querySelectorAll('dialog[open]')) d.close();
 }
 
+function recordAnarchyWord(res) {
+  chrome.audio.bump(engine.solved);
+  chrome.metrics.word({ attempts: engine.history[engine.history.length - 1]?.attempts ?? engine.guesses.length, coins: res.rewards?.coins || 0 });
+  for (const en of anarchy.entries.filter((x) => x.stage === 'announced')) {
+    const def = EVENTS[en.id];
+    chrome.metrics.event(en.id, def.tier !== 'minor');
+    chrome.audio.accent({ jackpot: 'jackpot', wordquake: 'quake', gravity_shift: 'quake', letter_storm: 'storm', chain_reaction: 'chain', boss_word: 'boss' }[en.id]);
+  }
+  chrome.sync(anarchy);
+}
+
 function endRun(complete) {
+  if (anarchy) { if (!complete) chrome.metrics.failed(); chrome.metrics.endRun(); chrome.audio.accent(complete ? 'win' : 'fail'); }
   clearRun(modeId);
   const sum = anarchy ? anarchy.summary() : engine.summary();
   const isBest = recordRunFor(modeId, { score: engine.score, words: engine.solved });
@@ -246,6 +263,7 @@ async function submit() {
     if (anarchy) {
       anUI.resultFx(res);
       anarchy.proceed(); // applies the planned next word and announces any rule change
+      recordAnarchyWord(res);
       persist();
       busy = false;
       anUI.step();
@@ -314,6 +332,7 @@ function showMenu(note = '') {
   busy = false;
   anUI.reset();
   if (engine && modeId && engine.status === 'playing') persist();
+  chrome.leave(); // Anarchy theme and music never leak into the menu or other modes
   menuOpen = true;
   closeModals();
   $('menu-note').textContent = note;

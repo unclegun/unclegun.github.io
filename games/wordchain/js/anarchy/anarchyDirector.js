@@ -14,7 +14,7 @@ export function advanceStage(entry, to) {
 }
 
 export const DIRECTOR_CONFIG = {
-  quietRounds: 2, // rounds 1..quietRounds never get events
+  quietRounds: 1, // rounds 1..quietRounds never get events (first modifier can appear in round 2)
   normalChance: 0.28, // chance of a plain recovery round when events are possible
   tierWeights: { minor: 0.5, major: 0.4, rare: 0.1 },
   rareMinRound: 10,
@@ -97,18 +97,24 @@ export class AnarchyDirector {
     }
   }
 
-  pick(ctx, rng, state, { force = null } = {}) {
+  pick(ctx, rng, state, { force = null, tier: wantTier = null } = {}) {
     this.tick(state);
     state.picks++;
     const forced = force && this.events[force];
     if (!forced) {
       if (ctx.round <= this.config.quietRounds) return [];
-      if (state.lastTier === 'major' || state.lastTier === 'rare') { state.lastTier = null; return []; } // recovery
+      if (wantTier) { /* the Chaos Meter decided: skip recovery and plain-round rolls */ }
+      else if (state.lastTier === 'major' || state.lastTier === 'rare') { state.lastTier = null; return []; } // recovery
       if (ctx.active.some((a) => a.kind === 'encounter')) return [];
-      if (rng.next() < this.config.normalChance) { state.lastTier = null; return []; }
+      if (!wantTier && rng.next() < this.config.normalChance) { state.lastTier = null; return []; }
     }
     const pool = this.eligible(ctx, state);
     let def = forced ? forced : null;
+    if (!def && wantTier) {
+      const tiers = wantTier === 'major' ? ['major', 'rare'] : [wantTier];
+      def = this.#choose(pool.filter((d) => tiers.includes(d.tier)), state, rng);
+      if (!def) { state.lastTier = null; return []; } // nothing eligible: the meter stays ready
+    }
     if (!def) {
       const tier = this.#tierRoll(rng, [...new Set(pool.map((d) => d.tier))].length ? [...new Set(pool.map((d) => d.tier))] : ['minor']);
       def = this.#choose(pool.filter((d) => d.tier === tier), state, rng) || this.#choose(pool, state, rng);

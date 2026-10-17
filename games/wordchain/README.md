@@ -84,3 +84,15 @@ Persistence: `wordchain.v2.*` keys per mode; legacy Classic v1 saves/best score 
 
 ## Limitations
 Tests: `node --test` (unit/simulation). UI was only smoke-tested in headless Chromium, not exhaustively on real touch devices. 4/6/7-letter answer lists are auto-curated and may contain a few odd words.
+
+## Anarchy 2.0 additions
+
+Anarchy-only (Classic, Builder, Architect, Challenge and Wildcard are untouched):
+
+- **HUD**: Shop, Detours and Shield buttons are wired in `js/anarchy/ui/anarchyUI.js` (bound once). Inventory chips show held items; the shop separates *Use now* and *Buy for later* items and states why an item is unavailable.
+- **Chaos Meter** (`chaosMeter.js`): solving words fills it; a full meter (or 4 words without a major event) forces a major event, and long plain streaks force a minor modifier. All numbers live in `CHAOS`. *Chaos Catalyst* / *Chaos Brake* in the shop raise / drain it.
+- **Themes** (`themeDirector.js`): the palette is a pure function of `(themeSeed, solved words)`, so it changes after every solved word, never repeats back-to-back and restores on resume. Only decorative `--an-*` variables are set; Wordle feedback colours are never overridden.
+- **Music** (`audioDirector.js`): optional procedural jazz via Web Audio. Off by default, starts only from the *Enable music* click, one scheduler, bar-boundary variation per solved word, suspends when the tab is hidden, stops when leaving Anarchy. Preferences: `wordchain.anarchy.audio`.
+- **Local metrics** (`playtestMetrics.js`): counters stored locally (`wordchain.anarchy.metrics.v1`); the **Stats** button downloads them as JSON. Nothing is uploaded.
+
+Tests: `npm test` (includes `tests/browser.test.js`, which drives the HUD in headless Chromium when installed, otherwise skipped).

@@ -4,6 +4,7 @@ import { coinBurst, shake, accent, pulseCells, clearEffects } from './effects.js
 import { ECONOMY } from '../arcadeEconomy.js';
 import { listMinigames } from '../puzzles/index.js';
 import { EVENTS } from '../eventRegistry.js';
+import { CHAOS, percent, nearlyFull } from '../chaosMeter.js';
 
 const ACCENTS = { jackpot: 'jackpot', wordquake: 'quake', gravity_shift: 'quake', letter_storm: 'storm', chain_reaction: 'chain', boss_word: 'boss', mutating_rules: 'roulette', heist: 'boss', survival: 'boss' };
 const TIER_LABEL = { minor: 'Minor', major: 'Major', rare: 'Rare' };
@@ -23,7 +24,26 @@ export function createAnarchyUI({ hud, eventDialog, sideDialog, renderer, hooks,
   const $shop = q('#an-shop');
   const $detour = q('#an-detour');
   const $shield = q('#an-shield');
+  const $chaos = q('#an-chaos');
+  const $inv = q('#an-inv');
   let stepping = false;
+
+  // HUD buttons. createAnarchyUI runs once per page load, so these handlers are attached exactly once
+  // (restarting or switching modes only resets dialogs; it never re-binds listeners).
+  $shop.addEventListener('click', () => openShop());
+  $detour.addEventListener('click', () => openDetours());
+  $shield.addEventListener('click', () => armShield());
+
+  function armShield() {
+    const g = getGame();
+    if (!g) return;
+    const r = g.useShield();
+    if (!r.ok) { hooks.toast(r.error); return; }
+    hooks.persist();
+    hooks.toast('🛡️ Shield armed: your next miss is free');
+    accent('bonus', 900);
+    renderHud();
+  }
 
   eventDialog.addEventListener('cancel', (e) => e.preventDefault()); // event cards and puzzles must be resolved, never dismissed by accident
   sideDialog.addEventListener('close', () => {
@@ -60,6 +80,12 @@ export function createAnarchyUI({ hud, eventDialog, sideDialog, renderer, hooks,
     const goal = g.phase === 'guessing' ? g.goal : null;
     $goal.hidden = goal === null;
     $goal.textContent = goal === null ? '' : `Goal: solve in ${goal} or fewer`;
+    const ch = g.chaos;
+    $chaos.className = `an-chaos${ch.value >= CHAOS.threshold * 0.9 ? ' hot' : nearlyFull(ch) ? ' warm' : ''}`;
+    $chaos.replaceChildren(el('span', '', `🌪️ Chaos ${percent(ch)}%`), el('div', 'track', '', { role: 'progressbar', 'aria-label': 'Chaos Meter', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': String(percent(ch)) }));
+    $chaos.querySelector('.track').append(Object.assign(el('div', 'bar'), { style: `width:${percent(ch)}%` }));
+    $chaos.title = ch.catalyst ? 'Catalyst active: the next major event pays a coin bonus.' : 'Chaos Meter: fills as you solve words. When full, a major event strikes.';
+    renderInventory(g);
     const idle = g.phase === 'guessing' || g.phase === 'announce';
     $shop.disabled = g.phase === 'over' || g.phase === 'transition';
     $detour.disabled = !idle || !!g.detour;
@@ -68,6 +94,23 @@ export function createAnarchyUI({ hud, eventDialog, sideDialog, renderer, hooks,
     $shield.disabled = g.phase !== 'guessing' || g.economy.s.shieldArmed;
     $shield.textContent = g.economy.s.shieldArmed ? '🛡️ Armed' : `🛡️ ×${shields}`;
     $shield.setAttribute('aria-label', g.economy.s.shieldArmed ? 'Mistake shield armed' : `Arm Mistake Shield (${shields} held)`);
+  }
+
+  let lastInv = {};
+  function renderInventory(g) {
+    const now = {};
+    $inv.replaceChildren();
+    const add = (key, label, qty, cls = '') => {
+      now[key] = qty;
+      const item = el('span', `inv-item ${cls}${qty > (lastInv[key] || 0) ? ' bump' : ''}`, `${label} ×${qty}`);
+      $inv.append(item);
+    };
+    for (const [id, d] of Object.entries(ECONOMY.items)) if (d.kind === 'held' && g.economy.held(id) > 0) add(id, `${d.icon} ${d.name}`, g.economy.held(id), id === 'shield' && g.economy.s.shieldArmed ? 'armed' : '');
+    if (g.economy.s.shieldArmed) $inv.append(el('span', 'inv-item armed', '🛡️ Shield armed'));
+    if (g.economy.held('freeReveal')) add('freeReveal', '💡 Free Reveal', g.economy.held('freeReveal'));
+    if (g.economy.held('freeGuess')) add('freeGuess', '➕ Free Guess', g.economy.held('freeGuess'));
+    if (g.economy.s.doubleCoins) $inv.append(el('span', 'inv-item armed', `✨ Double Coins: ${g.economy.s.doubleCoins} words`));
+    lastInv = now;
   }
 
   // ---------- flow ----------
@@ -234,48 +277,61 @@ export function createAnarchyUI({ hud, eventDialog, sideDialog, renderer, hooks,
     if (!sideDialog.open) sideDialog.showModal();
   }
 
+  const GROUPS = [['Use now', (d) => d.kind !== 'held'], ['Buy for later (kept in your inventory)', (d) => d.kind === 'held']];
+  let justBought = null;
+
+  /** Purchase lifecycle: validate (canBuy) → commit atomically inside g.buy → apply effect → persist → refresh HUD → confirm. */
+  function purchase(id, d, opts = {}) {
+    const g = getGame();
+    const before = g.coins;
+    const r = g.buy(id, opts);
+    if (!r.ok) { hooks.toast(r.error); return r; }
+    if (r.item === 'reveal') hooks.lockLetter(r.index, r.letter);
+    hooks.persist();
+    hooks.refresh();
+    justBought = id;
+    const spent = before - g.coins;
+    const msgs = { reveal: `Letter ${r.index + 1} is ${String(r.letter).toUpperCase()}`, extraGuess: 'Extra guess added', chaosCatalyst: `Chaos rises to ${r.chaos}%`, chaosBrake: `Chaos falls to ${r.chaos}%`, doubleCoins: 'Double Coins active' };
+    hooks.toast(`${d.icon} ${d.name}${spent ? ` −${spent}🪙` : ' (free)'}: ${msgs[id] || (d.kind === 'held' ? 'added to inventory' : 'applied')}`);
+    if (id === 'reveal' || id === 'extraGuess') accent('bonus', 900);
+    hooks.onPurchase?.(id, spent);
+    return r;
+  }
+
   function openShop() {
     const g = getGame();
     if (!g || g.phase === 'over' || g.phase === 'transition') return;
+    hooks.onShopOpen?.();
     const list = el('ul', 'shop-list');
     const balance = el('p', 'shop-balance', '', { 'aria-live': 'polite' });
     const wrap = el('div');
     const draw = () => {
       list.replaceChildren();
       balance.textContent = `You have ${g.coins} coins. Score is never spent.`;
-      for (const [id, d] of Object.entries(ECONOMY.items)) {
-        const c = g.canBuy(id);
-        const held = d.kind === 'held' ? g.economy.held(id) : null;
-        const li = el('li', 'shop-item');
-        const info = el('div', 'shop-info');
-        info.append(el('strong', '', `${d.icon} ${d.name}`), el('small', '', d.desc), el('small', 'muted', held !== null ? `Held ${held}/${d.maxHeld}` : id === 'doubleCoins' && g.economy.s.doubleCoins ? `Active: ${g.economy.s.doubleCoins} words left` : ''));
-        const b = button(`${d.cost}🪙`, () => {
-          b.disabled = true; // prevent accidental double purchase
-          const r = g.buy(id);
-          if (!r.ok) hooks.toast(r.error);
-          else {
-            if (r.item === 'reveal') { hooks.lockLetter(r.index, r.letter); hooks.toast(`Letter ${r.index + 1} is ${r.letter.toUpperCase()}`); }
-            hooks.persist(); hooks.refresh();
+      for (const [title, pick] of GROUPS) {
+        list.append(el('li', 'shop-group', title));
+        for (const [id, d] of Object.entries(ECONOMY.items).filter(([, x]) => pick(x))) {
+          const c = g.canBuy(id);
+          const held = d.kind === 'held' ? g.economy.held(id) : null;
+          const li = el('li', `shop-item${justBought === id ? ' bought' : ''}`);
+          const info = el('div', 'shop-info');
+          info.append(el('strong', '', `${d.icon} ${d.name}`), el('small', '', d.desc),
+            el('small', 'muted', held !== null ? `Held ${held}/${d.maxHeld}` : id === 'doubleCoins' && g.economy.s.doubleCoins ? `Active: ${g.economy.s.doubleCoins} words left` : ''));
+          if (!c.ok) info.append(el('small', 'shop-why', `Unavailable: ${c.error}`));
+          const b = button(`${d.cost}🪙`, () => { b.disabled = true; purchase(id, d); renderHud(); draw(); }, 'buy', { 'aria-label': `Buy ${d.name} for ${d.cost} coins`, title: c.ok ? '' : c.error || '' });
+          b.disabled = !c.ok;
+          li.append(info, b);
+          const creditKind = id === 'reveal' ? 'freeReveal' : id === 'extraGuess' ? 'freeGuess' : null;
+          if (creditKind && g.economy.held(creditKind) > 0) {
+            const free = g.canBuy(id, { credit: true });
+            const fb = button(`Use free (${g.economy.held(creditKind)})`, () => { purchase(id, d, { credit: true }); renderHud(); draw(); }, 'secondary free');
+            fb.disabled = !free.ok;
+            li.append(fb);
           }
-          renderHud(); draw();
-        }, 'buy', { 'aria-label': `Buy ${d.name} for ${d.cost} coins`, title: c.ok ? '' : c.error || '' });
-        b.disabled = !c.ok;
-        li.append(info, b);
-        const creditKind = id === 'reveal' ? 'freeReveal' : id === 'extraGuess' ? 'freeGuess' : null;
-        if (creditKind && g.economy.held(creditKind) > 0) {
-          const free = g.canBuy(id, { credit: true });
-          const fb = button(`Use free (${g.economy.held(creditKind)})`, () => {
-            const r = g.buy(id, { credit: true });
-            if (!r.ok) hooks.toast(r.error);
-            else { if (r.item === 'reveal') hooks.lockLetter(r.index, r.letter); hooks.persist(); hooks.refresh(); }
-            renderHud(); draw();
-          }, 'secondary free');
-          fb.disabled = !free.ok;
-          li.append(fb);
+          list.append(li);
         }
-        list.append(li);
       }
-      if (g.phase !== 'guessing') list.append(el('li', 'shop-note', 'Extra Guess and Reveal Letter only work while you are guessing.'));
+      justBought = null;
     };
     wrap.append(balance, list);
     draw();
