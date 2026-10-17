@@ -341,6 +341,6 @@ html.an-theme-pop #board { animation: themePop .9s ease-out; }
 
 /* Letter Forge and carried-over effects */
 .tray-tile.spare { border-style: dashed; margin-left: 6px; }
-.tray-tile.spare:first-of-type, .tray-tile:not(.spare) + .tray-tile.spare { margin-left: 18px; }
+.tray-tile:not(.spare) + .tray-tile.spare { margin-left: 18px; }
 .chip.tier-effect { border-color: var(--accent); }
 .objective-line { font-weight: 600; margin: 0 0 6px; }

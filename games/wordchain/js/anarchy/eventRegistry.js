@@ -2,7 +2,6 @@ import { MODIFIERS } from './modifierRegistry.js';
 import { ENCOUNTERS } from './encounterManager.js';
 import { LetterCollapse } from './puzzles/letterCollapse.js';
 import { LetterForge } from './puzzles/forge.js';
-import { createRng } from '../random.js';
 import { TileRepair } from './puzzles/tileRepair.js';
 import { GravityShift } from './puzzles/gravity.js';
 import { LetterStorm } from './puzzles/letterStorm.js';
@@ -23,7 +22,7 @@ const reward = (puzzleDone, coins, score, label, round) => (puzzleDone ? { coins
 export const INTERLUDES = {
   letter_forge: {
     id: 'letter_forge', name: 'Letter Forge', icon: '🔨', tier: 'minor', kind: 'interlude', weight: 12, minRound: 2, cooldown: 3,
-    eligible: (ctx) => !!ctx.lastWord && !!LetterForge.create({ dictionary: ctx.dictionary, word: ctx.lastWord.word, rng: createRng(ctx.round * 7919 + ctx.lastWord.word.length), allowMissing: true, round: ctx.round }),
+    eligible: (ctx) => !!ctx.lastWord && LetterForge.supports(ctx.dictionary, ctx.lastWord.word),
     setup: () => ({}),
     describe: () => 'Your last word is melting in the forge. Build a DIFFERENT word from its letters (any valid word counts). Your crossword is safe: only a temporary copy is used. Forging earns coins and a benefit for your next word.',
     createPuzzle: (ctx, rng) => LetterForge.create({ dictionary: ctx.dictionary, word: ctx.lastWord.word, rng, round: ctx.round, allowMissing: ctx.round >= 6 && (ctx.coins >= 2 || ctx.inventory.wildcardTile > 0) }),

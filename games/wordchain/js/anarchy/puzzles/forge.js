@@ -9,15 +9,15 @@ const indexCache = new WeakMap();
 function anagramIndex(dictionary, len) {
   let byLen = indexCache.get(dictionary);
   if (!byLen) indexCache.set(dictionary, (byLen = new Map()));
-  let idx = byLen.get(len);
   const words = dictionary.answersOf(len);
-  if (!idx || idx.size_ !== words.length) {
-    idx = new Map();
-    for (const w of words) { const k = sortLetters(w); (idx.get(k) || idx.set(k, []).get(k)).push(w); }
-    idx.size_ = words.length;
-    byLen.set(len, idx);
+  let entry = byLen.get(len);
+  if (!entry || entry.words !== words || entry.size !== words.length) {
+    const map = new Map();
+    for (const w of words) { const k = sortLetters(w); (map.get(k) || map.set(k, []).get(k)).push(w); }
+    entry = { words, size: words.length, map };
+    byLen.set(len, entry);
   }
-  return idx;
+  return entry.map;
 }
 
 /** Distinct answers built from exactly the same letters. */
@@ -59,6 +59,11 @@ export class LetterForge {
     this.filled = filled;
     this.moves = moves;
     this.difficulty = difficulty;
+  }
+
+  /** Cheap check: does the dictionary offer any fair distinct target for this word? */
+  static supports(dictionary, word) {
+    return !!word && word.length >= 4 && word.length <= 7 && (findAnagrams(dictionary, word).length > 0 || findSubstitutions(dictionary, word).length > 0);
   }
 
   /** Builds a forge for `word`, or null when the dictionary supports no fair, distinct target. Deterministic for a given rng. */
@@ -148,6 +153,8 @@ export class LetterForge {
     if (!lets(j.slots) || !lets(j.spares) || j.slots.length !== j.word.length || j.spares.length > 2) return null;
     if (!Array.isArray(j.solutions) || !j.solutions.length || !j.solutions.every((w) => typeof w === 'string' && /^[a-z]+$/.test(w))) return null;
     if (j.variant === 'missing' && !(typeof j.missingLetter === 'string' && /^[a-z]$/.test(j.missingLetter))) return null;
+    const blanks = j.slots.filter((l) => l === '').length;
+    if (j.variant === 'swap' ? j.spares.length < 1 || blanks : j.spares.length || (j.variant === 'missing' ? blanks !== (j.filled ? 0 : 1) : blanks)) return null;
     return new LetterForge({ ...j, moves: Number.isInteger(j.moves) ? j.moves : 0, difficulty: [1, 2, 3].includes(j.difficulty) ? j.difficulty : 1 });
   }
 }

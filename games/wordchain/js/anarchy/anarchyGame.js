@@ -113,7 +113,7 @@ export class AnarchyGame {
     return this.s.phase;
   }
 
-  /** Applies carried-over 'roundStart' consequences exactly once (an effect that cannot apply yet stays queued until it expires). */
+  /** Applies carried-over 'roundStart' consequences exactly once (an effect that cannot apply yet stays queued until it expires; Reverse Wordle rounds skip them). */
   #applyRoundStartEffects() {
     const e = this.engine;
     const used = [];
