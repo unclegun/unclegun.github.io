@@ -42,6 +42,7 @@ export class AnarchyGame {
     }
     if (!this.s.chaos) this.s.chaos = Chaos.newChaosState(); // migrate saves from before the Chaos Meter
     if (!Number.isInteger(this.s.themeSeed)) this.s.themeSeed = (this.s.rng >>> 0) % 997;
+    if (!Number.isInteger(this.s.recordedThrough)) this.s.recordedThrough = 0;
     this.rng = createRng(1);
     this.rng.setState(this.s.rng);
     this.economy = new ArcadeEconomy(this.s.economy);
@@ -63,6 +64,14 @@ export class AnarchyGame {
   /** Palette for the current run position (changes after every solved word). */
   get theme() { return themeFor(this.s.themeSeed, this.engine.solved); }
   get cfg() { return this.engine.mode.anarchy; }
+
+  /** Claims the once-per-word UI completion effects (metrics/audio), independently of gameplay rewards. */
+  claimCompletion() {
+    const solved = this.engine.solved;
+    if (!Number.isInteger(solved) || solved <= this.s.recordedThrough) return false;
+    this.s.recordedThrough = solved;
+    return true;
+  }
 
   #recover() {
     this.engine.attemptLimit = this.s.attemptLimit;

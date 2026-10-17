@@ -235,8 +235,8 @@ export function createAnarchyUI({ hud, eventDialog, sideDialog, renderer, hooks,
       submitReverse: (word, status) => {
         const r = g.submitReverse(word);
         if (!r.ok) { status.textContent = r.error; return; }
+        if (r.solved) { eventDialog.close(); hooks.onReverseSolved?.(r.res); return; }
         hooks.persist();
-        if (r.solved) { eventDialog.close(); accent('bonus'); resultFx(r.res); step(); return; }
         if (r.failed) { hooks.toast('Out of tries. Playing it as a normal word.'); eventDialog.close(); step(); return; }
         status.textContent = `Not consistent with the clues. ${p.attemptsLeft} tries left.`;
       },

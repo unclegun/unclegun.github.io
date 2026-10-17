@@ -38,6 +38,7 @@ const anUI = createAnarchyUI({
   hooks: {
     persist: () => persist(), toast: (m) => renderer.toast(m), say: (m) => announce(m), refresh: () => { if (engine) refresh(); },
     startRound: () => startRound(), endRun: (complete) => endRun(complete),
+    onReverseSolved: (res) => completeReverseWord(res),
     lockLetter: (i, l) => { buffer.lock(i, l); refresh(); },
     onPurchase: (id, cost) => chrome.metrics.purchase(id, cost), onShopOpen: () => chrome.metrics.shopOpened(),
   },
@@ -187,6 +188,8 @@ function closeModals() {
 }
 
 function recordAnarchyWord(res) {
+  if (!anarchy.claimCompletion()) return false;
+  persist();
   chrome.audio.bump(engine.solved);
   chrome.metrics.word({ attempts: engine.history[engine.history.length - 1]?.attempts ?? engine.guesses.length, coins: res.rewards?.coins || 0 });
   for (const en of anarchy.entries.filter((x) => x.stage === 'announced')) {
@@ -195,6 +198,35 @@ function recordAnarchyWord(res) {
     chrome.audio.accent({ jackpot: 'jackpot', wordquake: 'quake', gravity_shift: 'quake', letter_storm: 'storm', chain_reaction: 'chain', boss_word: 'boss' }[en.id]);
   }
   chrome.sync(anarchy);
+  return true;
+}
+
+function finishAnarchyCompletion(res) {
+  if (!anarchy || anarchy.phase !== 'transition' || !res?.solved) return false;
+  anUI.resultFx(res);
+  anarchy.proceed();
+  recordAnarchyWord(res);
+  persist();
+  busy = false;
+  anUI.step();
+  return true;
+}
+
+async function completeReverseWord(res) {
+  if (busy || !anarchy || !res?.solved) return;
+  busy = true;
+  const token = runToken;
+  const alive = () => token === runToken;
+  renderer.renderBreakdown(res.breakdown, engine.mode);
+  refresh({ animate: true });
+  await wait(450);
+  if (!alive()) return;
+  const solvedWord = engine.board.words[engine.board.words.length - 1];
+  renderer.focusAll(engine);
+  renderer.highlightWord(engine, solvedWord);
+  await wait(650);
+  if (!alive()) return;
+  finishAnarchyCompletion(res);
 }
 
 function endRun(complete) {
@@ -261,12 +293,7 @@ async function submit() {
     await wait(650);
     if (!alive()) return;
     if (anarchy) {
-      anUI.resultFx(res);
-      anarchy.proceed(); // applies the planned next word and announces any rule change
-      recordAnarchyWord(res);
-      persist();
-      busy = false;
-      anUI.step();
+      finishAnarchyCompletion(res); // applies the planned next word and records every completion path once
       return;
     }
     engine.advance();

@@ -40,6 +40,24 @@ test('purchases deduct coins only on success and update inventory', () => {
   assert.match(g.canBuy('extraGuess').error, /Not enough coins/);
 });
 
+test('all arcade shop prices and purchase accounting remain consistent', () => {
+  for (const [id, item] of Object.entries(ECONOMY.items)) {
+    const e = new ArcadeEconomy();
+    e.s.coins = 20;
+    const before = e.coins;
+    assert.deepEqual(e.check(id), { ok: true, cost: item.cost }, `${id} is affordable at its configured price`);
+    assert.equal(e.commit(id), true, `${id} can be purchased`);
+    assert.equal(e.coins, before - item.cost, `${id} deducts exactly its configured cost`);
+    assert.equal(e.s.spent, item.cost, `${id} records its spend once`);
+    if (item.kind === 'held') assert.equal(e.held(id), 1, `${id} enters inventory`);
+    if (item.kind === 'timed') assert.equal(e.s.doubleCoins, item.rounds, `${id} activates its timed effect`);
+    const poor = new ArcadeEconomy();
+    poor.s.coins = item.cost - 1;
+    assert.equal(poor.commit(id), false, `${id} cannot be purchased without enough coins`);
+    assert.equal(poor.coins, item.cost - 1, `${id} does not charge for a failed purchase`);
+  }
+});
+
 test('shield purchase then arm consumes inventory and persists across save', () => {
   const g = fresh(4);
   g.economy.s.coins = 9;

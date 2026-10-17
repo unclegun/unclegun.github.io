@@ -95,6 +95,30 @@ test('Anarchy is the sixth mode and the five originals are unchanged', () => {
   assert.deepEqual(MODES.wildcard.wordLengths, [4, 5, 6, 7]);
 });
 
+test('ordinary and Reverse Wordle solves share score, economy, chaos and idempotent completion', () => {
+  const ordinary = fresh(73);
+  const reverse = fresh(73);
+  reverse.s.entries.push({ id: 'reverse_wordle', kind: 'modifier', stage: 'active', roundsLeft: 1, data: {} });
+  assert.equal(reverse.beginRound(), 'event');
+
+  const answer = ordinary.engine.current.word;
+  const normalResult = ordinary.submit(answer);
+  const reverseResult = reverse.submitReverse(answer);
+  assert.equal(reverseResult.solved, true);
+  assert.equal(reverseResult.res.solved, true);
+  assert.equal(normalResult.solved, true);
+  assert.equal(reverse.engine.solved, ordinary.engine.solved);
+  assert.equal(reverse.engine.score, ordinary.engine.score + reverseResult.res.rewards.score);
+  assert.equal(reverse.economy.s.earned, ordinary.economy.s.earned + reverseResult.res.rewards.coins);
+  assert.deepEqual(reverse.chaos, ordinary.chaos);
+  assert.notEqual(reverse.theme.id, themeFor(reverse.s.themeSeed, reverse.engine.solved - 1).id);
+  assert.equal(reverse.claimCompletion(), true);
+  assert.equal(reverse.claimCompletion(), false, 'a repeated completion callback is ignored');
+
+  const resumed = roundTrip(reverse);
+  assert.equal(resumed.claimCompletion(), false, 'the idempotency marker survives save/resume');
+});
+
 test('original modes still play and save through the shared engine', () => {
   for (const id of MODE_ORDER.filter((m) => m !== 'anarchy')) {
     const e = new GameEngine({ dictionary: D, seed: 5, mode: id });
