@@ -101,13 +101,13 @@ test('Classic saves keep the original v1 shape and legacy keys are migrated', ()
 });
 
 // ---- modes ----
-test('five modes are configured; only strategic modes have Tokens', () => {
-  assert.deepEqual(MODE_ORDER, ['classic', 'builder', 'architect', 'challenge', 'wildcard']);
+test('six modes are configured; only strategic modes have Tokens', () => {
+  assert.deepEqual(MODE_ORDER, ['classic', 'builder', 'architect', 'challenge', 'wildcard', 'anarchy']);
   assert.equal(MODE_ORDER[0], 'classic');
   for (const id of MODE_ORDER) {
     const m = MODES[id];
     assert.ok(m.name && m.icon && m.description);
-    assert.equal(!!m.features.tokens, id !== 'classic');
+    assert.equal(!!m.features.tokens, id !== 'classic' && id !== 'anarchy');
   }
   assert.equal(MODES.challenge.features.challenges, true);
   assert.deepEqual(MODES.wildcard.wordLengths, [4, 5, 6, 7]);
@@ -541,13 +541,14 @@ test('Challenge mode awards objective rewards and generates the next objective',
 test('each mode saves, restores and keeps independent progress', () => {
   const s = memStore();
   const engines = {};
-  for (const id of MODE_ORDER) {
+  const CORE = MODE_ORDER.filter((m) => m !== 'anarchy'); // Anarchy saves are covered in anarchy.test.js
+  for (const id of CORE) {
     const e = new GameEngine({ dictionary: D, seed: 50, mode: id });
     playMode(e, id === 'classic' ? 2 : 4);
     engines[id] = e;
     saveRun(id, { ...e.toJSON(), draft: [] }, s);
   }
-  for (const id of MODE_ORDER) {
+  for (const id of CORE) {
     const raw = loadRun(id, s);
     const valid = validateSave(raw, D, id);
     assert.ok(valid, id);

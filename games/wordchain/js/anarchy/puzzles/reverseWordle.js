@@ -25,15 +25,16 @@ export class ReverseWordle {
     const pool = shuffle(dictionary.answersOf(len).filter((w) => w !== answer), rng).slice(0, 260);
     const clues = [];
     let cands = dictionary.answersOf(len).slice();
-    while (cands.length > 1 && clues.length < maxClues) {
+    while ((cands.length > 3 || clues.length < 3) && clues.length < maxClues) {
       let best = null;
       for (const w of pool.slice(0, 80)) {
         const result = evaluateGuess(w, answer);
         if (result.every((r) => r === 'absent') && clues.length > 0) continue;
+        if (result.filter((r) => r === 'correct').length > len - 3) continue; // near-copies would give the answer away
         const left = cands.filter((a) => evaluateGuess(w, a).join() === result.join()).length;
         if (!best || left < best.left) best = { word: w, result, left };
       }
-      if (!best || best.left >= cands.length) break;
+      if (!best || (best.left >= cands.length && cands.length <= 3 && clues.length >= 3)) break;
       clues.push({ word: best.word, result: best.result });
       cands = cands.filter((a) => evaluateGuess(best.word, a).join() === best.result.join());
       pool.splice(pool.findIndex((p) => p === best.word), 1);
