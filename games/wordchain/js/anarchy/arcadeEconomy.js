@@ -15,7 +15,7 @@ export const ECONOMY = {
     reveal: { name: 'Reveal Letter', icon: '💡', cost: 3, limitPerWord: 2, kind: 'instant', desc: 'Reveals and locks one unknown letter.' },
     shield: { name: 'Mistake Shield', icon: '🛡️', cost: 3, maxHeld: 2, kind: 'held', desc: 'Your next unsuccessful guess will not use an attempt.' },
     reroll: { name: 'Rule Reroll', icon: '🎲', cost: 3, maxHeld: 1, kind: 'held', desc: 'Swaps the announced modifier for a different eligible one.' },
-    wildcardTile: { name: 'Wildcard Tile', icon: '🔤', cost: 3, maxHeld: 2, kind: 'held', desc: 'Supplies a missing letter in a Letter Collapse puzzle.' },
+    wildcardTile: { name: 'Wildcard Tile', icon: '🔤', cost: 3, maxHeld: 2, kind: 'held', desc: 'Supplies the missing tile in a Letter Forge puzzle.' },
     stabilizer: { name: 'Stabilizer', icon: '⚓', cost: 4, maxHeld: 1, kind: 'held', desc: 'Steadies a board mutation: resolves Wordquake, Gravity Shift or Word Infection at half reward.' },
     chaosCatalyst: { name: 'Chaos Catalyst', icon: '🌪️', cost: 3, limitPerWord: 1, kind: 'instant', desc: 'Adds chaos now. The next major event pays +3 coins.' },
     chaosBrake: { name: 'Chaos Brake', icon: '🧯', cost: 3, limitPerWord: 1, kind: 'instant', desc: 'Drains the Chaos Meter and delays the next major event.' },

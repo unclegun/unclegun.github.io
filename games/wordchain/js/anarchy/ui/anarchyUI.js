@@ -6,7 +6,7 @@ import { listMinigames } from '../puzzles/index.js';
 import { EVENTS } from '../eventRegistry.js';
 import { CHAOS, percent, nearlyFull } from '../chaosMeter.js';
 
-const ACCENTS = { jackpot: 'jackpot', wordquake: 'quake', gravity_shift: 'quake', letter_storm: 'storm', chain_reaction: 'chain', boss_word: 'boss', mutating_rules: 'roulette', heist: 'boss', survival: 'boss' };
+const ACCENTS = { letter_forge: 'bonus', jackpot: 'jackpot', wordquake: 'quake', gravity_shift: 'quake', letter_storm: 'storm', chain_reaction: 'chain', boss_word: 'boss', mutating_rules: 'roulette', heist: 'boss', survival: 'boss' };
 const TIER_LABEL = { minor: 'Minor', major: 'Major', rare: 'Rare' };
 
 /**
@@ -70,6 +70,7 @@ export function createAnarchyUI({ hud, eventDialog, sideDialog, renderer, hooks,
       $chips.append(chip);
       if (c.progress) meter = c.progress;
     }
+    for (const f of g.effects) $chips.append(el('span', 'chip tier-effect', `${f.icon} ${f.label}`, { title: `Carried from an earlier event. Expires after word ${f.expiresRound}.`, role: 'note' }));
     $meter.hidden = !meter;
     if (meter) {
       $meter.replaceChildren(el('span', 'meter-label', `${meter.label} ${meter.value}/${meter.max}`), el('div', 'meter-track', '', { role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(meter.max), 'aria-valuenow': String(meter.value), 'aria-label': meter.label }));
@@ -221,7 +222,7 @@ export function createAnarchyUI({ hud, eventDialog, sideDialog, renderer, hooks,
     const skip = button('Skip', () => finish({ giveUp: true }), 'secondary', { title: 'Leave without a reward' });
     const shopBtn = button('🪙 Shop', () => openShop(), 'secondary');
     const sync = () => {
-      const ready = p.type === 'collapse' ? p.isSolved(g.dictionary) : p.type === 'chain' ? true : p.isSolved();
+      const ready = p.type === 'collapse' || p.type === 'forge' ? p.isSolved(g.dictionary) : p.type === 'chain' ? true : p.isSolved();
       done.disabled = !ready;
       stab.hidden = !def.stabilizable || g.economy.held('stabilizer') < 1;
       renderHud();
@@ -259,7 +260,7 @@ export function createAnarchyUI({ hud, eventDialog, sideDialog, renderer, hooks,
     if (r.reward.coins || r.reward.score) {
       accent('bonus');
       coinBurst(q('.an-coins'), r.reward.coins);
-      hooks.toast(`${r.reward.label}: +${r.reward.coins}🪙 +${r.reward.score}`);
+      hooks.toast(`${r.reward.label}: +${r.reward.coins}🪙 +${r.reward.score}${r.reward.effect ? ` · Next: ${r.reward.effect}` : ''}`);
     } else hooks.toast(r.reward.label);
     eventDialog.close();
     hooks.refresh();
